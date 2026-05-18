@@ -12,7 +12,7 @@ logger = get_logger()
 class NewsletterGenerator:
     def __init__(self):
         self.template = """
-# 学术论文日报 ({{ date }})
+# 心理学相关论文日报 ({{ date }})
 
 ## 📊 今日论文统计
 - 总论文数：{{ total_papers }}
@@ -47,9 +47,6 @@ class NewsletterGenerator:
 
 ## 🎙️ 语音播报
 - [收听今日论文解读](../{{ audio_path }})
-
-## 📱 订阅渠道
-- GitHub: [hf-daily-paper-newsletter-chinese](https://github.com/2404589803/hf-daily-paper-newsletter-chinese)
 """
 
     def extract_paper_info(self, paper_data):

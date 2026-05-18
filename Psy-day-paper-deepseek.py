@@ -251,10 +251,10 @@ def create_poster(results, date_str, output_folder):
     title_bbox = draw.textbbox((0, 0), title, font=title_font)
     title_width = title_bbox[2] - title_bbox[0]
     
-    # 使用 HF logo
+    # 使用 Psy logo
     try:
         logo_size = (96, 96)  # 增加 logo 大小
-        logo_path = "hf_logo.png"
+        logo_path = "psy_logo.jpg"
         logo = Image.open(logo_path).convert('RGBA')
         logo = logo.resize(logo_size, Image.Resampling.LANCZOS)
         

@@ -1,18 +1,16 @@
-# Psy🤗每日简报机器人
-> [English Documentation](README.md)
+# Psy 每日简报机器人
 
 该机器人能自动从 [Pubmed](https://pubmed.ncbi.nlm.nih.gov/) 和[Crossref](https://www.crossref.org/)收集paper信息，然后使用 DeepSeek 进行解读。
 
 ## 🚀 主要功能
 
 - ✅ 自动从[Pubmed](https://pubmed.ncbi.nlm.nih.gov/) 和[Crossref](https://www.crossref.org/)获取paper信息
-- ✅ 使用 DeepSeek API 进行论文筛选，筛选标准如下：
+- ✅ 使用 DeepSeek 进行论文筛选，筛选标准如下：
       1. 情绪/情感的心理学或神经科学研究（Emotion, Affect, 情绪感知/表达/体验等）
-      2. 面部表情或语音表情（Facial/Vocal Expression）
+      2. 面部表情或语音情绪表达（Facial/Vocal Expression）
       3. 社会认知、人际关系、印象形成或人格
       4. 人工智能（AI、机器学习、深度学习）在上述心理/情绪/认知领域的交叉应用。
-      ⚠️ 排除标准：如果是纯粹的临床躯体疾病（如糖尿病、骨折、肿瘤）、纯细胞生物学机制、或者AI仅用于无关的普通医学图像识别，请严格判定为不相关。
-- ✅ 使用 DeepSeek API 进行智能论文解读
+- ✅ 使用 DeepSeek 进行智能论文解读
 - ✅ 生成论文的中文解读信息，包括标题、摘要、关键词
 - ✅ 自动生成每日论文海报
 - ✅ 生成关键词云图和趋势分析
@@ -54,7 +52,7 @@
 
 ## 🔄 运行方式
 
-- **自动运行**：每天北京时间 9:00 和 9:30 自动运行
+- **自动运行**：每天北京时间 23:00 自动运行
 - **手动运行**：在 Actions 页面选择工作流，点击 "Run workflow"
 
 ## 📁 项目结构
@@ -99,13 +97,5 @@
 - **智能翻译**：使用 DeepSeek API 进行专业的学术翻译
 - **自动重试**：遇到错误时自动重试，提高可靠性
 - **错误通知**：通过 GitHub Issues 自动通知运行错误
-- **多语言支持**：提供中英文文档
 - **数据可视化**：自动生成图表和统计信息
 
-## ⭐ Star 历史
-
-[![Star History Chart](https://api.star-history.com/svg?repos=2404589803/hf-daily-paper-newsletter-chinese&type=Date)](https://star-history.com/#2404589803/hf-daily-paper-newsletter-chinese&Date)
-
-## 📄 许可证
-
-本项目采用 MIT 许可证 
