@@ -2,13 +2,17 @@ name: Paper_metadata_download
 
 on:
   schedule:
-    - cron: '45 7 * * 1-5'  # 每周一到周五 UTC 7:45 (北京时间 15:45) 运行
+    # 每天 UTC 15:00 = 北京时间 23:00（GitHub cron 使用 UTC）
+    - cron: '0 15 * * *'
   workflow_dispatch:  # 允许手动触发
     inputs:
       date:
         description: '指定要下载的历史数据日期 (YYYY-MM-DD格式)'
         required: false
         type: string
+
+permissions:
+  contents: write
 
 jobs:
   download:
@@ -36,13 +40,14 @@ jobs:
     - name: Set date
       id: set-date
       run: |
+        export TZ='Asia/Shanghai'
         if [ "${{ github.event.inputs.date }}" != "" ]; then
-          echo "date=${{ github.event.inputs.date }}" >> $GITHUB_OUTPUT
+          PROCESS_DATE="${{ github.event.inputs.date }}"
         else
-          echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          PROCESS_DATE=$(date +'%Y-%m-%d')
         fi
-        # 立即保存日期，不需要等待检查结果
-        echo "${{ steps.set-date.outputs.date }}" > date.txt
+        echo "date=$PROCESS_DATE" >> $GITHUB_OUTPUT
+        echo "$PROCESS_DATE" > date.txt
     
     - name: Download paper metadata
       id: download
