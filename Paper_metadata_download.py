@@ -22,9 +22,9 @@ CROSSREF_USER_AGENT = "hf-daily-paper-bot/1.0 (mailto:zhugamen@gmail.com)"
 
 # 垂直领域：标题/摘要中需匹配的关键词（OR 组合，与当日 [dp] 联检）
 KEYWORDS = [
-    "Interpersonal Relationship",
+    "Cross-culture",
     "Impression",
-    "Personality",
+    "Emotion",
     "Face",
     "Voice",
     "Feeling",
@@ -35,8 +35,8 @@ KEYWORDS = [
     "Emotion Experience",
     "Facial Expression",
     "Vocal Expression",
-    "Cross-culture",
-    "Emotion",
+    "Interpersonal Relationship",
+    "Personality",
     "anger",
     "fear",
     "happiness",
@@ -48,9 +48,10 @@ KEYWORDS = [
 ]
 
 
-def _make_ncbi_session():
+def _make_api_session():
     """
-    使用连接池 + urllib3 自动重试，降低 TLS/连接被对端 RST（如 WinError 10054）时的失败率。
+    使用连接池 + urllib3 自动重试，供 NCBI E-utilities 与 Crossref REST API 共用，
+    降低 TLS/连接被对端 RST（如 WinError 10054）时的失败率。
     """
     retry = Retry(
         total=10,
@@ -66,20 +67,18 @@ def _make_ncbi_session():
     session = requests.Session()
     session.mount("https://", adapter)
     session.mount("http://", adapter)
-    tool = os.getenv("NCBI_TOOL", "hf-daily-paper-pubmed")
-    email = os.getenv("NCBI_EMAIL", "anonymous@example.local")
     session.headers.update(
         {
-            "User-Agent": f"{tool}/1.0 ({email})",
+            "User-Agent": os.getenv("API_USER_AGENT", CROSSREF_USER_AGENT),
             "Accept-Encoding": "identity",
         }
     )
     return session
 
 
-def _ncbi_get(session, url, params, timeout, label="NCBI"):
+def _api_get(session, url, params, timeout, label="API"):
     """
-    在 urllib3 重试之外再包一层：捕获连接被重置、超时等，做有限次退避重试。
+    在 urllib3 重试之外再包一层：捕获连接被重置、超时等，做有限次指数退避重试。
     """
     max_rounds = int(os.getenv("NCBI_MANUAL_RETRIES", "5"))
     base = float(os.getenv("NCBI_MANUAL_RETRY_BASE_SEC", "1.5"))
@@ -111,7 +110,7 @@ def _ncbi_get(session, url, params, timeout, label="NCBI"):
 
 
 def _ncbi_post(session, url, data, timeout, label="NCBI"):
-    """与 _ncbi_get 相同的手动退避重试，用于 POST（长 term 避免 GET URL 超限）。"""
+    """与 _api_get 相同的手动退避重试，用于 POST（长 term 避免 GET URL 超限）。"""
     max_rounds = int(os.getenv("NCBI_MANUAL_RETRIES", "5"))
     base = float(os.getenv("NCBI_MANUAL_RETRY_BASE_SEC", "1.5"))
     last_exc = None
@@ -382,64 +381,83 @@ def _strip_crossref_abstract(raw):
     return html.unescape(text).strip()
 
 
-def _fetch_crossref(date_str, retmax=80):
+def _crossref_query_params():
+    """
+    构建 Crossref 检索参数：截断关键词并用 query.abstract OR 组合，
+    避免将全部关键词 AND 进 query 导致空结果或无效查询。
+    """
+    max_kw = int(os.getenv("CROSSREF_QUERY_KEYWORDS_MAX", "10"))
+    max_kw = max(1, min(max_kw, len(KEYWORDS)))
+    kw_subset = KEYWORDS[:max_kw]
+    abstract_query = " OR ".join(kw_subset)
+    return {"query.abstract": abstract_query}
+
+
+def _fetch_crossref(session, date_str, retmax=80):
     """
     从 Crossref REST API 拉取指定 index-date 起入库、含摘要的文献，映射为与 PubMed 一致的结构，并标记 source=Crossref。
     retmax 在此作为 rows 上限，最大 100，避免单次请求过大。
+    失败时记录 warning 并返回空列表，不向上抛出以免中断主流程。
     """
-    crossref_query = " ".join([f'"{kw}"' for kw in KEYWORDS])
-    filter_str = f"from-index-date:{date_str},has-abstract:true"
-    params = {
-        "query": crossref_query,
-        "filter": filter_str,
-        "rows": min(int(retmax), 100),
-        "mailto": "zhugamen@gmail.com",
-    }
-    headers = {"User-Agent": CROSSREF_USER_AGENT}
-    r = requests.get(
-        CROSSREF_WORKS_URL,
-        params=params,
-        headers=headers,
-        timeout=90,
-    )
-    r.raise_for_status()
-    payload = r.json()
-    items = (payload.get("message") or {}).get("items") or []
-    out = []
-    for item in items:
-        doi = (item.get("DOI") or "").strip()
-        titles = item.get("title") or []
-        title = (titles[0] if titles else "").strip()
-        raw_abs = item.get("abstract")
-        if raw_abs is None:
-            continue
-        if isinstance(raw_abs, list):
-            raw_abs = " ".join(str(x) for x in raw_abs)
-        summary = _strip_crossref_abstract(raw_abs)
-        authors_out = []
-        for a in item.get("author") or []:
-            if not isinstance(a, dict):
-                continue
-            name = f"{a.get('given', '') or ''} {a.get('family', '') or ''}".strip()
-            if name:
-                authors_out.append({"name": name})
-        if not doi or not title or not summary:
-            continue
-        if not authors_out:
-            authors_out.append({"name": "Unknown"})
-        out.append(
-            {
-                "paper": {
-                    "id": doi,
-                    "title": title,
-                    "summary": summary,
-                    "authors": authors_out,
-                    "publishedAt": date_str,
-                    "source": "Crossref",
-                }
-            }
+    try:
+        filter_str = f"from-index-date:{date_str},has-abstract:true"
+        params = {
+            **_crossref_query_params(),
+            "filter": filter_str,
+            "rows": min(int(retmax), 100),
+            "mailto": os.getenv("CROSSREF_MAILTO", "zhugamen@gmail.com"),
+        }
+        r = _api_get(
+            session,
+            CROSSREF_WORKS_URL,
+            params=params,
+            timeout=90,
+            label="Crossref",
         )
-    return out
+        r.raise_for_status()
+        payload = r.json()
+        items = (payload.get("message") or {}).get("items") or []
+        out = []
+        for item in items:
+            doi = (item.get("DOI") or "").strip()
+            titles = item.get("title") or []
+            title = (titles[0] if titles else "").strip()
+            raw_abs = item.get("abstract")
+            if raw_abs is None:
+                continue
+            if isinstance(raw_abs, list):
+                raw_abs = " ".join(str(x) for x in raw_abs)
+            summary = _strip_crossref_abstract(raw_abs)
+            authors_out = []
+            for a in item.get("author") or []:
+                if not isinstance(a, dict):
+                    continue
+                name = f"{a.get('given', '') or ''} {a.get('family', '') or ''}".strip()
+                if name:
+                    authors_out.append({"name": name})
+            if not doi or not title or not summary:
+                continue
+            if not authors_out:
+                authors_out.append({"name": "Unknown"})
+            out.append(
+                {
+                    "paper": {
+                        "id": doi,
+                        "title": title,
+                        "summary": summary,
+                        "authors": authors_out,
+                        "publishedAt": date_str,
+                        "source": "Crossref",
+                    }
+                }
+            )
+        return out
+    except (
+        requests.exceptions.RequestException,
+        ValueError,
+    ) as e:
+        logger.warning("Crossref 数据拉取失败，将跳过: %s", e)
+        return []
 
 
 def download_papers(date_str=None, retmax=10000):
@@ -471,8 +489,10 @@ def download_papers(date_str=None, retmax=10000):
         )
 
         pubmed_papers = []
+        crossref_papers = []
         inter_delay = float(os.getenv("NCBI_INTER_REQUEST_DELAY_SEC", "0.35"))
-        session = _make_ncbi_session()
+        crossref_rows = int(os.getenv("CROSSREF_ROWS", "80"))
+        session = _make_api_session()
         try:
             try:
                 pmids = _esearch_pubmed(session, target_date, retmax=retmax)
@@ -502,16 +522,11 @@ def download_papers(date_str=None, retmax=10000):
                 logger.error(f"PubMed 请求失败（将仅使用 Crossref 若可用）: {e}")
             except ET.ParseError as e:
                 logger.error(f"解析 PubMed XML 失败: {e}")
+
+            crossref_papers = _fetch_crossref(session, target_date, retmax=crossref_rows)
+            logger.info(f"Crossref 返回条目数量: {len(crossref_papers)}")
         finally:
             session.close()
-
-        crossref_rows = int(os.getenv("CROSSREF_ROWS", "80"))
-        crossref_papers = []
-        try:
-            crossref_papers = _fetch_crossref(target_date, retmax=crossref_rows)
-            logger.info(f"Crossref 返回条目数量: {len(crossref_papers)}")
-        except Exception as e:
-            logger.warning(f"Crossref 抓取失败（忽略该源）: {e}")
 
         papers = pubmed_papers + crossref_papers
         if not papers:
