@@ -1,0 +1,532 @@
+[
+  {
+    "paper": {
+      "id": "42168709",
+      "title": "Housing Instability as a Barrier to HIV Viral Suppression: Evidence from a U.S. Systematic Review and Meta-analysis.",
+      "summary": "Housing instability and homelessness remain pervasive structural determinants of poor HIV outcomes in the United States. People living with HIV (PLWH) who experience homelessness face intersecting barriers, including stigma, behavioral comorbidities, and fragmented care systems, that undermine antiretroviral therapy adherence and viral suppression (VS). To quantify the impact of homelessness on viral suppression, we conducted a systematic review and meta-analysis of U.S.-based studies published from 2014 to 2024. Following PRISMA 2020 guidelines, PubMed, SCOPUS, and Web of Science were searched using controlled vocabulary and keywords related to HIV, viral suppression, and homelessness. Eligible studies included quantitative and/or qualitative analyses of PLWH reporting associations between housing instability or homelessness and VS outcomes. Study suitability was assessed using an adapted GRACE checklist, and random-effects meta-analysis was conducted in STATA v19 to pool adjusted odds ratios (aORs), with heterogeneity assessed via Q and I2 statistics. Of 603 identified studies, 43 met inclusion criteria and 21 contributed to the meta-analysis (total n = 46,291). Individuals experiencing homelessness had significantly lower odds of VS compared with housed counterparts (pooled OR = 0.38, 95% CI 0.33-0.45), with moderate to high heterogeneity (I2 = 74.2%) but consistent directionality across definitions of housing instability and analytic adjustments. No evidence of publication bias was detected (Egger's p = 0.125). Thematic synthesis identified five primary pathways linking homelessness to reduced VS: disrupted ART adherence and retention; psychosocial stressors such as stigma and depression; syndemic interactions with substance use and mental illness; stress-related immune dysregulation; and broader structural inequities including poverty, criminalization, and neighborhood disadvantage. Overall, findings demonstrate a robust and persistent association between homelessness and lower odds of HIV viral suppression, underscoring housing as a fundamental social determinant of health. Integrated, low-barrier housing interventions paired with behavioral health and case management services show the greatest promise for improving viral suppression and advancing equity. Addressing housing instability of any severity is essential to achieving the goals of the Ending the HIV Epidemic initiative and sustaining Undetectable = Untransmittable (U = U) outcomes.",
+      "authors": [
+        {
+          "name": "Thomas O'Grady"
+        },
+        {
+          "name": "Marlene Eisenberg"
+        },
+        {
+          "name": "Stephen Weinberg"
+        },
+        {
+          "name": "Ainur Kussainova"
+        },
+        {
+          "name": "James Tesoriero"
+        },
+        {
+          "name": "Shu-Yin John Leung"
+        }
+      ],
+      "publishedAt": "2026-05-22",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42168548",
+      "title": "Shorter to be effective: subanesthetic-dose ketamine infusion reduces the global and regional path length of brain functional connectivity in patients with treatment-resistant depression and suicidal ideation.",
+      "summary": "BACKGROUND: Studies have demonstrated that subanesthetic-dose ketamine may modulate the functioning of specific depression-related brain regions, particularly the anterior cingulate cortex and prefrontal cortex. However, how subanesthetic-dose ketamine alters the global and regional graph theory metrics of resting-state functional connectivity in patients with treatment-resistant depression (TRD) and strong suicidal symptoms remains unclear.\nMETHODS: We conducted a randomized, double-blinded, resting-state functional magnetic resonance imaging clinical trial in patients with TRD and strong suicidal symptoms. These patients received either subanesthetic-dose ketamine (0.5 mg/kg, n = 21) or midazolam (0.045 mg/kg, n = 22). Neuroimaging was performed before infusion and on day 3 after infusion. A graph theory analysis was conducted to calculate global and regional metrics after infusion.\nRESULTS: Compared with the midazolam group, the ketamine group exhibited a substantially lower mean global path length after infusion. Specifically, in patients who received subanesthetic-dose ketamine treatment, the regional path lengths were decreased in key depression-related brain regions such as the anterior cingulate cortex, posterior cingulate cortex, supplementary motor area, superior parietal lobule, and superior frontal gyrus.\nDISCUSSION: Decreased global and regional path lengths suggest improved network integration following subanesthetic-dose ketamine treatment in patients with TRD and strong suicidal symptoms. Further studies are required to validate our findings.",
+      "authors": [
+        {
+          "name": "Wei-Chen Lin"
+        },
+        {
+          "name": "Li-Kai Cheng"
+        },
+        {
+          "name": "Tung-Ping Su"
+        },
+        {
+          "name": "Li-Fen Chen"
+        },
+        {
+          "name": "Pei-Chi Tu"
+        },
+        {
+          "name": "Cheng-Ta Li"
+        },
+        {
+          "name": "Ya-Mei Bai"
+        },
+        {
+          "name": "Shih-Jen Tsai"
+        },
+        {
+          "name": "Mu-Hong Chen"
+        }
+      ],
+      "publishedAt": "2026-05-22",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42168511",
+      "title": "Bridging Pediatric to Adult Care: A Scoping Review on Transitional Care for Individuals with Congenital Heart Disease Using Data Mining Techniques to Identify Key Topics.",
+      "summary": "BACKGROUND: Adolescents and young adults with congenital heart disease (CHD) face significant challenges when transitioning from pediatric to adult care. Despite growing recognition of its importance, transitional care remains inconsistently implemented across healthcare systems, and a summary of published literature in this regard is still missing. This scoping review aims to systematically map the literature on CHD transitional care and identify key topics and trends.\nMETHODS: Following Joanna Briggs Institute guidelines, we conducted a comprehensive search across seven electronic databases using the Population, Concept, and Context framework. A total of 73 studies were included. Data were extracted and analyzed using Latent Dirichlet Allocation to identify core topics, and Multiple Correspondence Analysis was applied to explore thematic relationships and validate topic structure. Lexicometric analysis assessed the linguistic complexity and specificity of the literature.\nRESULTS: Three major themes emerged: (1) Education, Self-Management, and Structured Support, (2) Timing, Knowledge Transfer, and Developmental Needs, and (3) Transition Program Implementation and Coordination. These themes reflect an increasing focus on structured educational strategies, developmentally tailored care, and system-level program delivery. Education-focused interventions were more frequently found in recent, high-quality experimental studies. In contrast, studies addressing timing and developmental needs and those focused on implementation were more common in earlier-phase or heterogeneous research contexts.\nCONCLUSION: Transitional care for individuals with CHD requires more standardized, evidence-based approaches. Improved documentation when reporting transitional care is essential to enhance fidelity, scalability, and long-term impact. This review provides a foundation for developing outcome-focused research and supports designing individualized, high-quality transition programs.",
+      "authors": [
+        {
+          "name": "Salvatore Angileri"
+        },
+        {
+          "name": "Rocco Mazzotta"
+        },
+        {
+          "name": "Daniele Ciofi"
+        },
+        {
+          "name": "Rosario Caruso"
+        },
+        {
+          "name": "Silvia Favilli"
+        },
+        {
+          "name": "Gaia Spaziani"
+        },
+        {
+          "name": "Gianluca Conte"
+        },
+        {
+          "name": "Serena Francesca Flocco"
+        },
+        {
+          "name": "Jeroen M Hendriks"
+        },
+        {
+          "name": "Giulia Maga"
+        },
+        {
+          "name": "Pier Mario Perrone"
+        },
+        {
+          "name": "Silvana Castaldi"
+        },
+        {
+          "name": "Edward Callus"
+        },
+        {
+          "name": "Massimo Chessa"
+        },
+        {
+          "name": "Arianna Magon"
+        },
+        {
+          "name": "Maddalena De Maria"
+        }
+      ],
+      "publishedAt": "2026-05-22",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42168455",
+      "title": "Paroxysmal kinesigenic dyskinesia: clinical report of 10 cases from three pedigrees with literature review.",
+      "summary": "OBJECTIVE: To characterize the clinical and genetic features of 10 paroxysmal kinesigenic dyskinesia (PKD) patients from three Chinese pedigrees, with emphasis on intrafamilial phenotypic variability and the broader PRRT2-associated disease spectrum.\nMETHODS: Clinical data were collected from PKD patients attending the Department of Neurology, Second Hospital of Hebei Medical University (January 2023 - December 2024). Targeted next-generation sequencing of PKD-associated genes (PRRT2, TMEM151A, SCN8A, KCNA1, etc.) was performed for probands, followed by Sanger sequencing validation and family segregation analysis in available family members. Clinical features were analyzed in conjunction with literature review.\nRESULTS: Ten PKD cases from three families were identified. All patients exhibited exercise-induced dystonia, chorea, or athetosis without impaired consciousness; each episode lasted < 1 min. Interictal EEG and brain MRI were normal. Inheritance was autosomal dominant. Pathogenic variants were identified in PRRT2 (chromosome 16), including frameshift mutations c.649dup (p.Arg217ProfsTer8) and c.641delC (p.Arg217Glufs*12). Intrafamilial phenotypic variability was notable: the same c.649dup mutation produced clinically silent carriage in one father but severe daily attacks with secondary depression in another family member. In family 3, cold exposure was identified as a novel trigger.\nCONCLUSION: This study expands the mutational spectrum of PRRT2-associated PKD in the Chinese population by documenting a relatively rare c.641delC variant. The marked intrafamilial variability observed supports the role of additional modifiers influencing clinical expression beyond the primary PRRT2 mutation.",
+      "authors": [
+        {
+          "name": "Yuchen Sun"
+        },
+        {
+          "name": "Huifang Cao"
+        },
+        {
+          "name": "Xiaoqing Wang"
+        }
+      ],
+      "publishedAt": "2026-05-22",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42168448",
+      "title": "Efficacy and safety of recombinant human epidermal growth factor combined with fractional carbon dioxide laser for facial atrophic acne scars: a systematic review and meta-analysis of randomized trials.",
+      "summary": "BACKGROUND: The combination of recombinant human epidermal growth factor (rhEGF) and fractional carbon dioxide (CO2) laser therapy is increasingly used in the treatment of facial atrophic acne scars.\nOBJECTIVE: This study aimed to systematically assess the efficacy and safety of rhEGF combined with fractional CO2 laser therapy for managing facial atrophic acne scars.\nMETHODS: PubMed, Embase, the Cochrane Library, Web of Science, CNKI (China National Knowledge Infrastructure), Wanfang, SinoMed, and VIP were searched from inception to July 29, 2025. Parallel-group or split-face randomized controlled trials (RCTs) comparing fractional CO2 laser therapy + rhEGF with fractional CO2 laser therapy for treating atrophic acne scars were considered for inclusion. Risk of bias was assessed using the Cochrane Collaboration's risk-of-bias tool. The meta-analysis based on fixed or random effects models was carried out for Echelle d'Evaluation Clinique des Cicatrices d'acne (ECCA) scores, Vancouver Scar Scale (VSS) scores, transepidermal water loss (TEWL), etc. It was registered on PROSPERO (ID: CRD42024599311).\nRESULTS: Twelve RCTs involving 1,044 patients were included, and all trials were conducted in China. Follow-up durations across studies ranged from 1 week to 12 months. Compared with fractional CO₂ laser therapy alone, the combination therapy significantly reduced ECCA scores by a mean of 11.14 points (95% CI: -16.82 to -5.45, P = 0.0001) and VSS scores by a mean of 1.54 points (95% CI: -2.55 to -0.54, P = 0.003). The combination therapy demonstrated advantages in improving the durations of crust formation. The incidence of adverse events, particularly hyperpigmentation (RR = 0.41, 95% CI: 0.20 to 0.86; P = 0.02), was significantly lower in the combination therapy group. According to the GRADE assessment, the certainty of evidence ranged from very low to moderate for most outcomes.\nCONCLUSION: This study suggests that rhEGF combined with fractional CO₂ laser therapy may be beneficial for treating atrophic acne scars. However, because of the low to moderate certainty of evidence according to GRADE assessment, more robust, large-scale RCTs are needed to confirm these findings and define optimal treatment parameters.",
+      "authors": [
+        {
+          "name": "Shuyu Zhou"
+        },
+        {
+          "name": "Chenqi Guo"
+        },
+        {
+          "name": "Jingbo Zhai"
+        },
+        {
+          "name": "Yu Zhang"
+        }
+      ],
+      "publishedAt": "2026-05-22",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42168405",
+      "title": "Duloxetine as a gut-brain axis modulator in irritable bowel syndrome: neuroimmune, microbiota, and pharmacogenomic perspectives.",
+      "summary": "To provide an updated and integrative evaluation of duloxetine as a potential therapeutic agent for irritable bowel syndrome (IBS), with emphasis on its mechanisms of action across the gut-brain axis. The review addresses the key research question: Can duloxetine, beyond its antidepressant effects, modulate neuroimmune, microbial, and pharmacogenomic factors relevant to IBS, particularly pain-predominant subtypes? This narrative review provides a targeted synthesis of selected preclinical, clinical, and translational literature addressing duloxetine as a potential gut-brain axis modulator in irritable bowel syndrome. Evidence related to neuroimmune mechanisms, microbiota-related pathways, pharmacogenomic considerations, and clinical studies was narratively summarized. Evidence indicates that duloxetine modulates serotonergic and noradrenergic neurotransmission, decreases visceral hypersensitivity, and attenuates neuroinflammation via inhibition of microglial P2X4/NF-κB signaling. Duloxetine also shifts cytokine balance toward an anti-inflammatory profile (↑ IL-10, ↓ IL-6, ↓ TNF-α). Emerging data suggest additional benefits through modulation of gut microbiota composition, enhancement of short-chain fatty acid (SCFA) production, and improvement of intestinal barrier integrity. Pharmacogenomic factors, especially CYP2D6 and CYP1A2 polymorphisms, significantly influence duloxetine metabolism and therapeutic response. Compared with TCAs and SSRIs, duloxetine shows more favorable efficacy in relieving combined gastrointestinal and psychological symptoms with fewer sexual side effects. Duloxetine exhibits multifaceted actions that extend beyond mood regulation, positioning it as a promising but still investigational GBA-directed option dual-action therapy within the gut-brain axis framework. The collective findings support the need for biomarker-guided clinical trials incorporating microbiota profiling, cytokine signatures, and pharmacogenetic testing to validate duloxetine's role in precision-medicine-based IBS management.",
+      "authors": [
+        {
+          "name": "Mokhtar Rejili"
+        },
+        {
+          "name": "Aya M Mustafa"
+        },
+        {
+          "name": "Hayder M Al-Kuraishy"
+        },
+        {
+          "name": "Nawar R Hussein"
+        },
+        {
+          "name": "Thabat J Al-Maiahy"
+        },
+        {
+          "name": "Ali I Al-Gareeb"
+        },
+        {
+          "name": "Ali K Albuhadily"
+        },
+        {
+          "name": "Gaber El-Saber Batiha"
+        }
+      ],
+      "publishedAt": "2026-05-22",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42168147",
+      "title": "A curved-beam piezoelectric MEMS resonator featuring multiple temperature plateaus with enhanced stability.",
+      "summary": "Silicon-based Micro-electromechanical Systems (MEMS) resonators face stability challenges due to their temperature susceptibility, which impedes the advancement towards high-precision applications. This work reports a multi-modal curved-beam piezoelectric resonator that enhances frequency stability through engineered irregular geometry and mechanical nonlinearity. Utilizing a standard Silicon-On-Insulator (SOI) - Aluminum Nitride (AlN) process, the proposed device engenders 17 vibration modes within 5 MHz, addressing the detection constraints and information extraction of non-inplane modes for capacitive counterparts and circumventing the needs of vacuum encapsulation. In addition, owing to the inimitable temperature coefficient of frequency (TCf) insensitive plateaus discovered in high-frequency modes (Mode 16 and Mode 18), a novel stability enhancement strategy has emerged. Through open-loop sweeps and phase-locked loop (PLL) tracking, it is suggested that these plateaus likely stem from modal coupling triggered by mechanical nonlinearities. This behavior, reminiscent of frequency veering, potentially enables energy redistribution between modes, leading to the resonance frequency deviating from the intrinsic thermal drift trajectory of silicon. Experimental results show that Mode 16 achieves a stability of 17.4 ppb at 46.390 s at a 62 °C plateau under ±1 °C fluctuations and reaches 2.0 ppb under stringent temperature regulation. Mode 18 reaches a peak stability of 37.9 ppb at 43 °C. This innovative approach presents a promising avenue for developing high-precision frequency references without the need for intricate TCf compensation, providing considerable potential for the evolution of next-generation silicon micro-resonators and enhancing their capabilities as stable timing sources in various applications.",
+      "authors": [
+        {
+          "name": "Yancheng Lian"
+        },
+        {
+          "name": "Yueyang Li"
+        },
+        {
+          "name": "Fangzhou Chen"
+        },
+        {
+          "name": "Zhuoyue Zheng"
+        },
+        {
+          "name": "Jinuo Zhou"
+        },
+        {
+          "name": "Junchen Liu"
+        },
+        {
+          "name": "Fengzhe Xu"
+        },
+        {
+          "name": "Jinbo Yang"
+        },
+        {
+          "name": "Jianlin Chen"
+        },
+        {
+          "name": "Chen Wang"
+        },
+        {
+          "name": "Michael Kraft"
+        },
+        {
+          "name": "Ka-Meng Lei"
+        },
+        {
+          "name": "R P Martins"
+        },
+        {
+          "name": "Pui-In Mak"
+        },
+        {
+          "name": "Yuan Wang"
+        }
+      ],
+      "publishedAt": "2026-05-22",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42168029",
+      "title": "Development and Clinical Implementation of Voice-, Probe-, Neck Movement-Synchronized Functional Laryngeal Ultrasonography.",
+      "summary": "OBJECTIVE: To introduce a novel system called voice-, probe-, neck movement-synchronized functional laryngeal ultrasonography (VPN-FLUS) that integrates ultrasound images with patient and examiner voice recordings, real-time probe manipulation videos, and visual inspection of the neck, thus overcoming the limitations of conventional laryngeal ultrasonography that suffers from low reproducibility.\nMETHODS: Examinations were performed using the Canon Aplio i700 ultrasound system with linear probes (4.5-13 MHz or 2.8-9 MHz). Audio was recorded using a nondirectional electret condenser microphone (100-10,000 Hz). The microphone signal and ultrasound images were simultaneously captured on a laptop via Open Broadcaster Software Studio, with an additional recording that documented the session with the patient on a mobile phone. All video and audio data were synchronized post-examination using Shotcut. Between March 2025 and February 2026, 53VPN-FLUS examinations were performed, including 12 healthy volunteers and 38 outpatients with voice disorders.\nRESULTS: VPN-FLUS enabled continuous and dynamic visualization of the larynx, facilitating precise identification of the intrinsic laryngeal muscles and their spatial interrelationships. Visualization of each intrinsic laryngeal muscle's attachment sites to the arytenoid cartilage (AC) made it possible to depict the rotating, rocking, gliding/sliding, and reverse rocking movements of the ACs as well as assess various natural phonatory conditions, including pitch variations, and differentiation between respiratory and phonatory states. Aside from cervical dynamics, the system also enabled observation of overall laryngeal movement.\nCONCLUSION: VPN-FLUS technology overcomes several limitations of conventional laryngeal ultrasonography and provides comprehensive and reproducible imaging of the larynx. This technique enables more detailed anatomical understanding, allows multidimensional assessment of the larynx in its physiological state, and provides reproducible imaging of the larynx. Further clinical validation with more cases is required to establish its clinical utility.",
+      "authors": [
+        {
+          "name": "Chikako Kunieda"
+        },
+        {
+          "name": "Tomohiro Mori"
+        },
+        {
+          "name": "Hiroyuki Kato"
+        },
+        {
+          "name": "Takahisa Morimoto"
+        },
+        {
+          "name": "Yayoi Noro"
+        },
+        {
+          "name": "Fumiaki Nin"
+        }
+      ],
+      "publishedAt": "2026-05-22",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42163557",
+      "title": "Self-management of patients with chronic obstructive pulmonary disease: a best practice implementation project.",
+      "summary": "BACKGROUND: People with chronic obstructive pulmonary disease (COPD) experience high prevalence and mortality rates, along with episodes of exacerbation, poorer quality of life, and increased hospital readmission. These aspects place a considerable burden on the economy and society. Despite the availability of COPD self-management guidelines, a gap between recommendations and practice persists.\nOBJECTIVE: This project aimed to improve self-management among patients with COPD by implementing evidence-based practices in a tertiary hospital in China.\nMETHODS: The JBI Evidence Implementation Framework was used to structure this project into three phases of work. Phase 1 focused on contextual issues related to barriers and understanding roles and readiness for change. Phase 2 consisted of a baseline audit of six evidence-based criteria. Strategies were implemented to improve patient self-management plans, patient education, application of action planning tools, cognitive behavior related to dyspnea fear, and inter-disciplinary teamwork. Phase 3 comprised follow-up audits to determine any improvements.\nRESULTS: Five of the six criteria demonstrated significant improvement in the follow-up results, increasing from 86.25% to 100%. This included self-management plans (95%), symptom control and exacerbation management instructions (100%), comprehensive patient education (91.25%), action plans (86.25%), and incorporation of cognitive-behavioral strategies (90%). The last criterion on prescribing corticosteroids and antibiotics for patients at risk of exacerbation showed a smaller improvement (16.25%).\nCONCLUSION: This best practice implementation project significantly improved adherence to COPD self-management practices. The findings demonstrate that the JBI Evidence Implementation Framework is a feasible and effective approach for strengthening COPD self-management and has strong potential for wider implementation and sustainability in clinical practice.\nSPANISH ABSTRACT: http://links.lww.com/IJEBH/A572.",
+      "authors": [
+        {
+          "name": "Liping Liao"
+        },
+        {
+          "name": "Qiuhong Guo"
+        },
+        {
+          "name": "Yansi Luo"
+        },
+        {
+          "name": "Qing Yuan"
+        },
+        {
+          "name": "Tingting He"
+        },
+        {
+          "name": "Zhen Xiao"
+        },
+        {
+          "name": "Lifen Wang"
+        },
+        {
+          "name": "Ping Wang"
+        },
+        {
+          "name": "Ping Li"
+        },
+        {
+          "name": "Lijuan Qiu"
+        },
+        {
+          "name": "Yan Guo"
+        },
+        {
+          "name": "Xia Shu"
+        },
+        {
+          "name": "Jing Zhong"
+        },
+        {
+          "name": "Yun-Hua Li"
+        },
+        {
+          "name": "Ju Wu"
+        }
+      ],
+      "publishedAt": "2026-05-21",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42163032",
+      "title": "A Comparative Analysis of Cortical Thickness in Female Youth With Non-Suicidal Self-Injury.",
+      "summary": "OBJECTIVE: Non-suicidal self-injury (NSSI), prevalent among children and youth, is a risk factor for future suicidal behavior. Nonetheless, the neurobiological mechanisms of NSSI remain under-explored. This study compares the cortical thickness in female youth with NSSI and a healthy control (HC) group using brain magnetic resonance imaging (MRI) and ascertains its associations with relevant factors.\nMETHODS: The NSSI group comprised inpatients meeting NSSI diagnostic criteria according to Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition, while the HC group included youth without psychiatric symptoms. Both groups included female adolescents and young adults aged 9-24 years. Clinical data were collected for the NSSI group, and brain MRIs were obtained for both groups. Cortical thickness differences between groups were explored, adjusting for age, and correlations between cortical thickness and clinical variables in the NSSI group were analyzed.\nRESULTS: Both groups included 32 participants, with no statistically significant difference in average age (NSSI group: mean age 15.47± 3.20 years; HC group: mean age 15.56±4.83 years; p>0.05). Significant intergroup differences in mean cortical thickness were observed in both the left and right hemispheres (both p=0.001). Specifically, the NSSI group exhibited significantly thinner cortical thickness in the right cingulate cortex compared to the healthy HC group (corrected p<0.05). However, correlation analysis between the cortical thickness of the right cingulate cortex and anxiety (State Anxiety Inventory for Children: r=-0.547, p=0.053) (Trait Anxiety Inventory for Children: r=-0.257, p=0.396) and Children's Depression Inventory (r=-0.231, p=0.447) scales in the NSSI group did not reveal statistically significant correlations.\nCONCLUSION: The study identified a noteworthy reduction in cortical thickness in the right cingulate cortex in the NSSI group.",
+      "authors": [
+        {
+          "name": "Hyanghee Jeong"
+        },
+        {
+          "name": "Tae Young Choi"
+        },
+        {
+          "name": "Sujin Bae"
+        },
+        {
+          "name": "Jung Yeon Moon"
+        }
+      ],
+      "publishedAt": "2026-05-21",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42160438",
+      "title": "Systemic-to-local nanorobot thrombolysis.",
+      "summary": "Magnetic micro/nanorobots hold promise for targeted thrombolysis, yet face challenges of rapid immune clearance and poor degradability, often necessitating invasive localized deployment and retrieval. Here, we present safe and versatile systemic-to-local thrombolysis enabled by magnetic nanorobots constructed from polyvinyl pyrrolidone-shielded porous Fe3O4 colloidal nanocrystal clusters (p-Fe3O4@PVP CNCs). In this building block design, the PVP coating facilitates efficient tPA (tissue plasminogen activator) loading while ensuring prolonged circulation following systemic injection. The p-Fe3O4 core provides a strong collective magnetic moment necessary for sequential magnetic collection (via gradient field H) and actuation into navigating nanorobots [via precessing field Hp(t)] for targeted thrombolysis. Following thrombolysis, removal of Hp(t) disassemble the nanorobots into dispersed CNCs that, owing to their porous structure and ultrasmall primary nanocrystals (<5 nanometers), undergo rapid lysosomal degradation and are cleared primarily via the liver-bile-intestine axis, resulting in no long-term toxicity. This platform overcomes key translational challenges for nanorobotic thrombolytic therapy.",
+      "authors": [
+        {
+          "name": "Di Zhang"
+        },
+        {
+          "name": "Ouling Zhu"
+        },
+        {
+          "name": "Fangzhi Mou"
+        },
+        {
+          "name": "Xinyi Wang"
+        },
+        {
+          "name": "Chuan Cao"
+        },
+        {
+          "name": "Wei Yi"
+        },
+        {
+          "name": "Manyi Yang"
+        },
+        {
+          "name": "Yun Liu"
+        },
+        {
+          "name": "Xinkang Du"
+        },
+        {
+          "name": "Xiao Wang"
+        },
+        {
+          "name": "Jianfeng Liu"
+        },
+        {
+          "name": "Ding Wang"
+        },
+        {
+          "name": "Wei Luo"
+        },
+        {
+          "name": "Zhi Li"
+        },
+        {
+          "name": "Jianguo Guan"
+        }
+      ],
+      "publishedAt": "2026-05-20",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42044611",
+      "title": "Factors influencing vaccination staff willingness to vaccinate children with medical conditions: A cross-sectional study in China.",
+      "summary": "BACKGROUND: Children with medical conditions face elevated risks from vaccine-preventable diseases, yet their vaccination coverage remains suboptimal. This study examines vaccination staff's willingness to immunize this special population, guided by the Theory of Planned Behavior (TPB) conceptual framework.\nMETHODS: We conducted a cross-sectional questionnaire-based survey of vaccination staff working at any of 416 vaccination clinics that were selected at random from three exemplar cities of China. TPB-guided analyses included regression and structural equation modeling to examine predictors of vaccination willingness.\nRESULTS: A total of 428 vaccinating clinicians participated in the survey (response rate, 91.45%); 94.63% of respondents were female. The overall average score of willingness to vaccinate children with special health needs was 3.893 ± 0.795 points out of 5 points, indicating moderately-high willingness, with 50.9% of respondents having high willingness (≥4 points). Respondents' clinic type being a hospital clinic, position being the head of the clinic, and more frequent training were positively associated with willingness to vaccinate this special population. The structural equation model had good fit (CFI = 0.932, TLI = 0.920, χ2/df = 2.868). The structural equation model showed that perceived behavioral control had both a direct effect (β = 0.465, P < 0.001) and an indirect effect through subjective norms (β = 0.128, P = 0.001) on behavioral intention (willingness). Subjective norms (β = 0.323, P < 0.001) and behavioral attitudes (β = 0.095, P = 0.032) also exerted direct positive effects on behavioral intention. The total effects, ranked in descending order of influence, were perceived behavioral control, subjective norms, and behavioral attitudes.\nCONCLUSIONS: The willingness of vaccination staff to vaccinate children with medical conditions is generally acceptable but has room for improvement. Perceived behavioral control emerged as the most critical influencing factor. We recommend (1) case-oriented practical training to boost competence; (2) unified, operable technical guidelines; (3) leadership engagement and social-support networks.",
+      "authors": [
+        {
+          "name": "Zuyao Cheng"
+        },
+        {
+          "name": "Yudan Song"
+        },
+        {
+          "name": "Meng Liu"
+        },
+        {
+          "name": "Yuxiao Wu"
+        },
+        {
+          "name": "Yamin Wang"
+        },
+        {
+          "name": "Junhong Li"
+        },
+        {
+          "name": "Ying Xu"
+        },
+        {
+          "name": "Xindan Wang"
+        },
+        {
+          "name": "Xueqing Peng"
+        },
+        {
+          "name": "Zundong Yin"
+        },
+        {
+          "name": "Chao Ma"
+        }
+      ],
+      "publishedAt": "2026-05-08",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42013593",
+      "title": "The role of misinformation in COVID-19 vaccine hesitancy in low- & middle-income countries.",
+      "summary": "BACKGROUND: During the COVID-19 pandemic, timely vaccination was crucial in acquiring herd immunity. While high-income countries typically had better access to vaccines, interventions were implemented to improve accessibility for low and middle-income countries (LMICs). Vaccine uptake presented major barriers to achieving herd immunity globally and was more significant in LMICs. Vaccine hesitancy was amplified by misinformation, including but not limited to social media misinformation. This scoping review aims to: (1) explore the role of misinformation in COVID-19 vaccine hesitancy in LMICs and (2) identify primary sources, key themes, and dissemination channels of this misinformation, encompassing all relevant sources but with an emphasis on social media, given the infodemic context which proved to be particularly significant during the COVID-19 pandemic.\nMETHODS: This scoping review was conducted using the Arksey and O'Malley framework and PRISMA-ScR guidelines. Five databases (Scopus, Embase, PubMed, CINAHL, and PsycINFO) were searched using predefined search terms. All identified articles underwent a rigorous screening process, and if eligible, proceeded to data extraction.\nRESULTS: In total, 119 studies were included in this review. Primary dissemination platforms included Facebook, WhatsApp, X, YouTube, Instagram, TikTok, Telegram, Pinterest, LinkedIn, and Zalo. Key themes of misinformation identified included (1) malicious intent, (2) fear of side effects, (3) concerns about vaccine development and safety, (4) religious and cultural beliefs, and (5) natural immunity.\nCONCLUSION: Overall, this scoping review addresses the literature gap in the role of misinformation pertaining to COVID-19 vaccine hesitancy and suggests investing in misinformation-mitigation interventions to reduce public harms and disruptions.",
+      "authors": [
+        {
+          "name": "Aryan Yogesh Sarnaik"
+        },
+        {
+          "name": "Ziyad Uddin Khan"
+        },
+        {
+          "name": "Thenugaa Rajeswaran"
+        },
+        {
+          "name": "Aditi Majoe"
+        },
+        {
+          "name": "Joy Zeng"
+        },
+        {
+          "name": "Lakshna Ponrajah"
+        },
+        {
+          "name": "Zaara Kastura"
+        },
+        {
+          "name": "Labiqah Iftikhar"
+        },
+        {
+          "name": "Md Akhtarul Islam"
+        },
+        {
+          "name": "Naumana Basharat"
+        },
+        {
+          "name": "Mariam Hassan"
+        },
+        {
+          "name": "Jasleen Kaur"
+        },
+        {
+          "name": "Daliana Lobo Torres"
+        },
+        {
+          "name": "Dipika Shankar Bhattacharyya"
+        },
+        {
+          "name": "Bara' Abdallah AlShurman"
+        },
+        {
+          "name": "Nuzhat Namiha"
+        },
+        {
+          "name": "Zahid Ahmad Butt"
+        }
+      ],
+      "publishedAt": "2026-05-08",
+      "source": "PubMed"
+    }
+  }
+]
