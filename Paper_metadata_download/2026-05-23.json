@@ -1,0 +1,288 @@
+[
+  {
+    "paper": {
+      "id": "42167272",
+      "title": "Updated trends in the global prevalence and burden of mental disorders, 1990-2023: a systematic analysis for the Global Burden of Disease Study 2023.",
+      "summary": "BACKGROUND: The 2023 iteration of the Global Burden of Diseases, Injuries, and Risk Factors Study (GBD) estimated prevalence, incidence, and health burden for 375 diseases and injuries, including 12 mental disorders. We assess past, current, and emerging trends in the prevalence and burden of mental disorders across sexes and age groups, for 21 regions, 204 countries and territories, and by Socio-demographic Index (SDI) quintile, from 1990 to 2023.\nMETHODS: Mental disorders included in GBD 2023 were anxiety disorders, major depressive disorder, dysthymia, bipolar disorder, schizophrenia, autism spectrum disorders, conduct disorder, attention-deficit hyperactivity disorder, anorexia nervosa, bulimia nervosa, idiopathic developmental intellectual disability, and a residual category of other mental disorders. A literature review identified epidemiological data for each disorder. These were analysed via a Bayesian meta-regression to estimate prevalence by disorder, sex, age, location, and year. Disorder-specific prevalence was multiplied by disability weights representing the severity of health loss associated with each disorder to estimate years lived with disability (YLDs). Deaths due to anorexia nervosa were assessed with a Cause of Death Ensemble modelling strategy to estimate deaths by sex, age, location, and year, and then multiplied by the standard life expectancy at age of death to estimate years of life lost (YLLs). YLDs equalled disability-adjusted life-years (DALYs) for all mental disorders except anorexia nervosa (the only mental disorder considered as an underlying cause of death in GBD), for which DALYs represented the sum of YLDs and YLLs. We presented prevalence, deaths, YLDs, YLLs, and DALYs as counts, age-specific rates per 100 000 population, and age-standardised rates per 100 000 population.\nFINDINGS: We estimated 1·17 billion (95% uncertainty interval 1·06-1·31) prevalent cases of mental disorders globally in 2023, equivalent to an age-standardised prevalence rate of 14 210·7 cases (12 849·5-15 940·1) per 100 000 population. These estimates represented a 95·5% (75·0-121·2) increase in prevalent cases and 24·2% (11·4-41·4) increase in age-standardised prevalence rate between 1990 and 2023. All mental disorders showed increases in prevalent cases between 1990 and 2023, while notable increases were seen in age-standardised prevalence rates for anxiety disorders, major depressive disorder, dysthymia, anorexia nervosa, bulimia nervosa, schizophrenia, and conduct disorder. There were an estimated 171 million (127-228) DALYs due to mental disorders globally across sex and age in 2023, equivalent to an age-standardised DALY rate of 2070·5 DALYs (1519·1-2750·5) per 100 000 population. Mental disorders contributed to 6·1% (4·8-7·6) of all-cause DALYs in 2023, making them the fifth leading cause of global DALYs (up from 12th in 1990). DALYs were almost entirely composed of YLDs. Mental disorders were the leading cause of YLDs in 2023 (up from second in 1990), explaining 17·3% (14·8-20·6) of all-cause global YLDs. Leading causes of mental disorder DALYs were anxiety disorders (ranked 11th among the 304 diseases and injuries at Level 4 of the GBD cause hierarchy), major depressive disorder (15th), and schizophrenia (41st). Globally in 2023, mental disorder age-standardised DALY rates were higher among females (2239·6 [1643·7-3014·1] per 100 000) than among males (1900·2 [1399·8-2510·8] per 100 000), and peaked in the 15-19 years age group (2617·3 [1850·6-3696·8] per 100 000). All locations showed increased mental disorder DALY rates in 2023 compared with 1990, ranging across countries and territories from 1302·4 (952·7-1683·7) per 100 000 in Viet Nam to 3555·8 (2661·9-4715·0) per 100 000 in the Netherlands. Across SDI quintiles, DALY rates ranged from 1853·0 (1352·1-2469·3) per 100 000 for middle SDI to 2184·1 (1606·1-2890·3) per 100 000 for high SDI.\nINTERPRETATION: A significant health burden was imposed by mental disorders in all countries and territories in 2023, irrespective of the health resources available. In some instances, this burden has increased over time and is unevenly distributed across populations. Stronger surveillance systems, particularly in low-income and middle-income countries, are required. Additionally, we need more coordinated and inclusive policies to reduce the burden through early treatment and prevention, tailored to sex and age differences across locations. Responding to the mental health needs of our global population, especially those most vulnerable, is an obligation, not a choice.\nFUNDING: Gates Foundation, Queensland Health, and University of Queensland.",
+      "authors": [
+        {
+          "name": "GBD 2023 Mental Disorder Collaborators"
+        }
+      ],
+      "publishedAt": "2026-05-22",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41786062",
+      "title": "α-asaronol alleviates seizures, neuroinflammation and cognitive deficits in a mice model of lithium-pilocarpine-induced seizures.",
+      "summary": "ETHNOPHARMACOLOGICAL RELEVANCE: Temporal lobe epilepsy (TLE) is often drug-resistant and accompanied by cognitive deficits and anxiety, which are inadequately addressed by current anti-seizure medications. Acorus tatarinowii Schott, a traditional remedy for convulsions and neurological disorders, contains bioactive components - α-asarone, α-asaronol and β-asarone -capable of crossing the blood-brain barrier, yet their comparative efficacy and mechanisms in epilepsy remain unclear.\nAIM OF THE STUDY: This study systematically compared the anti-epileptic effects of α-asarone, α-asaronol, and β-asarone from A. tatarinowii Schott, and investigated the mechanism of the most active compound.\nMATERIALS AND METHODS: Anticonvulsant activity was evaluated using maximal electroshock seizure (MES) test and pentylenetetrazol (PTZ)-induced acute seizure models. The most promising component was further studied in a chronic lithium-pilocarpine (LIP)-induced TLE model. Mechanisms were explored via integrated multi-omics analysis, including network pharmacology, proteomics, metabolomics, and molecular dynamics simulations.\nRESULTS: α-Asaronol demonstrated superior and earlier-onset seizure protection compared to α-asarone, and β-asarone. In chronic TLE, it dose-dependently reduced seizure frequency and duration, while alleviating cognitive impairment and anxiety. α-Asaronol also attenuated hippocampal neuronal loss, glial activation, and shifted microglia from pro-inflammatory M1 to anti-inflammatory M2 phenotype, suppressing TNF-α, IL-1β, and IL-6 release. Mechanistically, it targeted PPARγ, modulated PPAR-related signaling, and restored epilepsy-associated disruptions in taurine/hypotaurine and pyrimidine metabolism.\nCONCLUSION: α-Asaronol from A. tatarinowii Schott exerts multi-faceted anti-epileptic effects, not only suppressing seizures but also improving comorbidities, likely through PPARγ-mediated anti-inflammatory and metabolic modulation. It represents a promising candidate for the treatment of drug-resistant TLE and its co-occurring neuropsychiatric symptoms.",
+      "authors": [
+        {
+          "name": "Ruoshi Tian"
+        },
+        {
+          "name": "Xufei Chen"
+        },
+        {
+          "name": "Jiaqing Hu"
+        },
+        {
+          "name": "Yan Yang"
+        },
+        {
+          "name": "Qiulian Zeng"
+        },
+        {
+          "name": "Ying Sun"
+        },
+        {
+          "name": "Yajun Bai"
+        },
+        {
+          "name": "Xiaohui Zheng"
+        },
+        {
+          "name": "Xirui He"
+        }
+      ],
+      "publishedAt": "2026-03-14",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41780614",
+      "title": "Mechanistic insights into the antidepressant effects of the Angelica sinensis and Ligusticum chuanxiong Herb Pair: Involvement of the PI3K/AKT signaling pathway.",
+      "summary": "ETHNOPHARMACOLOGICAL RELEVANCE: The Angelica sinensis and Ligusticum chuanxiong Herb Pair (DC) serves as a core pairing in Traditional Chinese Medicine for treating blood stasis and blood deficiency syndromes, which are frequently associated with depressive-like symptoms in clinical practice. The antidepressant potential of this combination aligns with its traditional functions of promoting qi circulation, activating blood flow, and alleviating depression.\nAIM OF THE STUDY: This study aims to investigate the antidepressant effects of DC and its potential mechanisms through a combination of network pharmacology prediction and in vitro and in vivo experimental validation.\nMATERIALS AND METHODS: Network pharmacology screening identified active components and target molecules in DC, constructing a component-target network and validating binding activity through molecular docking. A CUMS-induced rat model of depression was established, with drug efficacy evaluated via behavioral tests (forced swim, sucrose preference, and open field tests) and blood rheology parameters measured. ELISA assay of neurotransmitter and inflammatory factor levels in serum and hippocampal tissue, Observation of histopathological changes in hippocampal tissue using HE and Nissl staining, Western blot and immunofluorescence assays were performed to detect the expression of proteins in the PI3K/AKT pathway. An in vitro inflammatory model was established by inducing BV-2 cells with LPS. The MTT assay was used to screen for the safe concentration of drug-containing serum and observe cell morphology, the Gries method for detecting NO release, ELISA for detecting inflammatory cytokines, Western blot analysis of PI3K/AKT pathway proteins was performed, and pathway inhibition was validated using LY294002.\nRESULTS: Through network pharmacology analysis, seven major active components of DC and 197 related functional targets for depression treatment were identified, with the majority enriched in the PI3K/AKT signaling pathway. Behavioral studies and in vivo experiments indicate that DC significantly ameliorates depressive-like behaviors in CUMS rats, reduces blood viscosity, increases hippocampal tissue levels of 5-HT, NE, and DA, decreases IL-1β, IL-6, and TNF-α content, and mitigates hippocampal neuronal damage. Western blot and immunofluorescence results indicate that DC can activate the PI3K/AKT pathway, upregulating p-AKT and BDNF expression. In vitro experiments further confirmed that the drug-containing serum could suppress LPS-induced inflammatory responses in BV-2 cells, reducing the release of factors such as NO and IL-1β. This effect was reversible upon treatment with the PI3K inhibitor LY294002.\nCONCLUSION: DC exhibits potent antidepressant effects by modulating the PI3K/AKT pathway to enhance neurotransmitter release and reduce inflammatory factor levels. This mechanism protects neurons and alleviates neuroinflammation, thereby exerting antidepressant effects.",
+      "authors": [
+        {
+          "name": "Tong Yi Yang"
+        },
+        {
+          "name": "Xiang Ming Sun"
+        },
+        {
+          "name": "Zhi Wei Xiong"
+        },
+        {
+          "name": "Wen Jun Zhang"
+        },
+        {
+          "name": "Xu Liu"
+        },
+        {
+          "name": "Tong Xuan Zhang"
+        },
+        {
+          "name": "Yi Lin Mao"
+        },
+        {
+          "name": "Wei Liang"
+        },
+        {
+          "name": "Wen Lan Li"
+        }
+      ],
+      "publishedAt": "2026-03-14",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41763619",
+      "title": "Exploring the intervention mechanism of Acori Tatarinowii Rhizoma-Polygalae Radix herb pair on post-stroke depression based on multi-omics analysis.",
+      "summary": "ETHNOPHARMACOLOGICAL RELEVANCE: The herb pair of Acori Tatarinowii Rhizoma (Shi Chang Pu) and Polygalae Radix (Yuan Zhi) is a classic combination in Traditional Chinese Medicine for \"opening the orifices to revive the mind, and relieving depression to calm the spirit\". Acori Tatarinowii Rhizoma-Polygalae Radix Herb Pair (APHP) has been widely used in treating post-stroke depression (PSD) and has shown promising results. However, its underlying combined mechanism of action remains unclear.\nAIM OF THE STUDY: This study is aimed to evaluate the therapeutic effect of APHP on PSD and elucidate its mechanism through transcriptome and metabolomic approaches.\nMATERIALS AND METHODS: A PSD rat model was developed using middle cerebral artery occlusion (MCAO) coupled with chronic unpredictable mild stress (CUMS). Subsequently, the therapeutic efficacy of APHP on PSD were assessed through behavioral experiments, hematoxylin-eosin (HE) staining, Nissl staining, enzyme-linked immunosorbent assay (ELISA), and immunofluorescence. Then a systematic study was conducted on its mechanism using network pharmacology, transcriptomics and metabolomics.\nRESULTS: APHP effectively alleviated depressive-like behaviors and restrained neuroinflammation in PSD rats. Specifically, APHP reversed anhedonia and despair-like states, ameliorated pathological brain damage and neuronal loss, inhibited inflammation, and regulated neurotransmitter levels. Ultra-performance liquid chromatography-tandem mass spectrometry (UPLC-MS/MS) analysis and network pharmacology indicated that kaempferol and α-Asarone might be the effective candidate ingredients ameliorating PSD via the modulation of inflammatory signaling pathways. Transcriptomic analysis revealed that compared to the model group, there were 80 genes upregulated and 167 genes downregulated in the APHP group. Metabolomic analysis identified upregulation of theobromine and 3-methylxanthine in the model group, which were downregulated following APHP treatment. Further analyses suggested that APHP may regulate the inflammatory response via the PI3K/AKT/NF-κB signaling pathway, inhibit the gene expression of CCL4 and IL-1 β in brain tissue, ameliorate metabolic disorders, and modulate the caffeine metabolism pathway, thereby exerting a protective effect.\nCONCLUSIONS: APHP exhibited significant anti-PSD effects, potentially improving depressive symptoms and alleviating neuroinflammation by regulating the PI3K/AKT/NF-κB signaling cascade and modulating the caffeine metabolism pathway. This research establishes a solid basis for the clinical use of APHP in PSD management and paves the way for developing safer and more effective drugs derived from this herb pair.",
+      "authors": [
+        {
+          "name": "Yansai Zhao"
+        },
+        {
+          "name": "Wei Hong"
+        },
+        {
+          "name": "Ying Chen"
+        },
+        {
+          "name": "Shuyi Chen"
+        },
+        {
+          "name": "Qiying Liu"
+        },
+        {
+          "name": "Ziqian Liao"
+        },
+        {
+          "name": "Yingqi Mao"
+        },
+        {
+          "name": "Tao Qiu"
+        }
+      ],
+      "publishedAt": "2026-03-14",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41763617",
+      "title": "Efficacy and safety of medicine-food homology Shenqi paste in older adults with diabetic sarcopenia: A randomized, double-blind, placebo-controlled trial.",
+      "summary": "ETHNOPHARMACOLOGICAL RELEVANCE: Diabetic sarcopenia (DS), an emerging diabetes complication, poses an increasing challenge to the elderly population. Shenqi paste (SQP) consists of 8 medicine-food homology substances: Astragalus membranaceus (Fisch.) Bge., Codonopsis pilosula (Franch.) Nannf., Polygonatum sibiricum Red., Dioscorea opposita Thunb., Poria cocos (Schw.) Wolf, Eucommia ulmoides Oliv., Hordeum vulgare L., and Ophiopogon japonicus (L.f.) Ker Gawl. SQP has shown potential benefits for sarcopenia in clinical practice. Its efficacy and safety in DS have not been validated in a randomized controlled trial.\nAIM OF THE STUDY: This study aimed to evaluate the efficacy, safety, and limitations, and provide insights into methods and strategies for utilizing SQP in DS management.\nMATERIALS AND METHODS: In this randomized, double-blind, placebo-controlled trial, community-dwelling older adults (≥60 years) with DS and spleen-kidney deficiency syndrome were allocated 1:1 to receive either SQP or placebo paste for 12 weeks. Primary outcomes were skeletal muscle mass index (SMI), handgrip strength, and five-time chair stand test (FCST) duration. Secondary outcomes included health-related scales and biochemical indicators. Assessments were conducted at the baseline (T0), week 6 (T1), and week 12 (T2). Safety evaluation included blood routine, liver and kidney function tests. Intention-to-treat analysis was applied to the primary outcomes data from all participants, with per-protocol analysis for sensitivity. Generalized estimating equations with covariate adjustment and t-tests or Wilcoxon rank-sum tests were used for statistical analysis.\nRESULTS: Of 90 randomized participants, the SQP group showed greater improvements in handgrip strength (T2: interact p < 0.001), SMI (T2: interact p < 0.001), and FCST (T2: interact p < 0.001) versus control. Secondary outcome measures of 74 participants, including frailty, nutrition, physical activity, sleep quality, depression, and TCM syndrome scores, significantly improved (p < 0.05), with significant fasting blood glucose reduction (T2: interact p = 0.018) and C-reactive protein decrease (T2: interact p < 0.001). There was no statistically significant difference in the change in the difference between the two groups in fasting insulin, glycated hemoglobin and insulin resistance index before and after intervention (p > 0.05). Within-group analysis demonstrated significant reductions of SQP group in inflammatory cytokines, and sarcopenia-related biomarkers (p < 0.001) post-intervention. No serious adverse events occurred.\nCONCLUSION: A 12-week SQP intervention enhanced muscle mass, strength, function, and metabolic and inflammatory profiles in older adults with DS, with good tolerability, supporting its potential as a safe, complementary therapy.",
+      "authors": [
+        {
+          "name": "Lijiangshan Hua"
+        },
+        {
+          "name": "Yunchao Wang"
+        },
+        {
+          "name": "Xiao Yuan"
+        },
+        {
+          "name": "Rongyun Wang"
+        },
+        {
+          "name": "Xiaoyan Li"
+        },
+        {
+          "name": "Ying Fan"
+        },
+        {
+          "name": "Zhuoer Hou"
+        },
+        {
+          "name": "Lili Yang"
+        },
+        {
+          "name": "Ting Liu"
+        },
+        {
+          "name": "Qiuhua Sun"
+        }
+      ],
+      "publishedAt": "2026-03-14",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41740819",
+      "title": "Chaihu-Baishao confers antidepressant effects in CSDS mice by ameliorating hippocampal synaptic plasticity impairment via blocking α2δ-1-NR2B interaction.",
+      "summary": "ETHNOPHARMACOLOGICAL RELEVANCE: The herbal combination of Bupleurum chinense DC (Chaihu) and Paeonia lactiflora Pall (Baishao), collectively referred to as Chaihu-Baishao (CB), has been historically utilized in traditional Chinese medicine for the treatment of depression. However, the mechanisms underlying its therapeutic benefits have not been clearly defined.\nAIM OF THE STUDY: This study investigated whether CB alleviates depressive symptoms by modulating the interaction between the voltage-gated calcium channel subunit α2δ-1 and the N-methyl-D-aspartate receptor (NMDAR) subunit NMDAR2B (NR2B), thereby restoring hippocampal synaptic plasticity.\nMATERIALS AND METHODS: In vivo, the chronic social defeat stress (CSDS) mouse model was employed to assess the impact of CB on depression-like behaviors, hyperactivity of the hypothalamic-pituitary-adrenal (HPA) axis, impairments in hippocampal neuronal and synaptic plasticity, as well as the expression and interaction of α2δ-1 and NR2B. In vitro, corticosterone (CORT) was utilized to induce cellular injury. In PC12 cells, the therapeutic effects of CB-containing serum and the α2δ-1 inhibitor gabapentin (GBP) were assessed, focusing on the interaction between α2δ-1 and NR2B, as well as the expression levels of synaptic proteins postsynaptic density protein 95 (PSD95) and synaptophysin (SYN). The role of CB was further corroborated using Cacna2d1 gene knockout cells. Molecular docking techniques were employed to predict the key active components within CB that target α2δ-1 and NR2B, hereby exerting antidepressant effects.\nRESULTS: In vivo studies demonstrated that CB significantly alleviated depression-like behaviors in mice, decreased levels of adrenocorticotropic hormone (ACTH) and CORT. Furthermore, CB relieved structural damage to hippocampal neurons and synapses, downregulated the expression of α2δ-1 and NR2B, inhibited their interaction and restored synaptic protein expression. In vitro experiments revealed that CB mitigated CORT-induced cellular damage, suppressed the α2δ-1-NR2B interaction, and enhanced synaptic proteins expression. Additionally, studies involving GBP treatment and Cacna2d1-knockout confirmed that α2δ-1 plays a regulatory role in NR2B expression and synaptic plasticity. Molecular docking analyses identified Saikosaponin C, Saikosaponin B4, and Bupleuroside I as potential key components.\nCONCLUSION: The findings of this study elucidate a novel mechanism through which CB exerts its antidepressant effects, specifically by modulating the α2δ-1-NR2B interaction and restoring of synaptic plasticity within the hippocampus.",
+      "authors": [
+        {
+          "name": "Shuxian Zang"
+        },
+        {
+          "name": "Ziyun Ban"
+        },
+        {
+          "name": "Lingchen Hou"
+        },
+        {
+          "name": "Yuxuan Zhang"
+        },
+        {
+          "name": "Yuanyuan Wang"
+        },
+        {
+          "name": "Yuanyuan Zhang"
+        },
+        {
+          "name": "Chaonan Wang"
+        },
+        {
+          "name": "Depei Li"
+        },
+        {
+          "name": "Feiyu An"
+        },
+        {
+          "name": "Yuqi Liu"
+        },
+        {
+          "name": "Yunyun Geng"
+        },
+        {
+          "name": "Yonggang Gao"
+        }
+      ],
+      "publishedAt": "2026-03-14",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41724290",
+      "title": "Chaihu-Shugan San ameliorates perimenopausal obesity with depression by coordinately targeting hepatic PGC-1α/CYP8B1/PPARγ signaling and gut barrier integrity.",
+      "summary": "ETHNOPHARMACOLOGICAL RELEVANCE: Perimenopausal obesity and depression are highly prevalent and debilitating comorbidities in aging women, yet effective integrative treatment options remain limited. Chaihu Shugan San (CHSGS), a classic traditional herbal formula, has long been utilized in clinical practice for treating perimenopausal symptoms and mood disorders. However, whether CHSGS exerts therapeutic efficacy in perimenopausal obesity with depression (POD), and the mechanisms underlying its actions remain unclear.\nAIM OF THE STUDY: To evaluate the therapeutic effects of CHSGS on POD and to elucidate its underlying molecular mechanisms.\nMETHODS: A POD mouse model was established by combining ovariectomy (OVX), chronic unpredictable mild stress (CUMS), and a high-fat diet (HFD). CHSGS efficacy was assessed through biochemical analysis, organ indices, and a battery of behavioral assays. Serum and hepatic triglycerides (TG), total cholesterol (TC), and low-density lipoprotein cholesterol (LDL-C) were quantified, and hepatic steatosis was evaluated using hematoxylin-eosin and Oil Red O staining. RNA sequencing was performed to identify differentially regulated pathways, followed by qRT-PCR and Western blot validation. UPLC-HRMS and network pharmacology were used to identify core bioactive constituents and putative targets. Molecular docking further characterized interactions between major compounds and key proteins.\nRESULTS: POD mice developed obesity, loose stools, and pronounced anxiety- and depression-like behaviors. CHSGS treatment markedly alleviated these pathological manifestations, reduced hyperlipidemia, and improved hepatic steatosis and glucose intolerance. CHSGS decreased systemic and hepatic TG, TC, and LDL-C levels, and improved histopathological scores. Transcriptomic profiling indicated that the metabolic benefits of CHSGS are associated with modulation of the PGC-1α/CYP8B1/PPARγ axis. Subsequent qRT-PCR and Western blot analyses confirmed that CHSGS reversed POD-induced dysregulation of the PGC-1α/CYP8B1/PPARγ pathway. Integrated analyses further revealed that CHSGS upregulated the tight-junction protein Occludin, thereby enhancing intestinal barrier integrity, reducing systemic inflammation, and mitigating depression-like behaviors. Molecular docking identified glycyrrhizic acid, naringin, and naringenin as principal bioactive constituents with strong affinities for the core targets.\nCONCLUSION: CHSGS ameliorates POD through a coordinated, multi-target mechanism involving restoration of hepatic lipid metabolism via regulation of the PGC-1α/CYP8B1/PPARγ pathway, and reinforcement of intestinal barrier function through Occludin-mediated suppression of systemic inflammation. These findings highlight CHSGS as a promising holistic therapeutic approach for POD, reflecting the multi-component and multi-pathway pharmacological characteristics of traditional formulas.",
+      "authors": [
+        {
+          "name": "Qiliang Chen"
+        },
+        {
+          "name": "Jian Liu"
+        },
+        {
+          "name": "Junqiao Wang"
+        },
+        {
+          "name": "Ting Yin"
+        },
+        {
+          "name": "Yedi Wu"
+        },
+        {
+          "name": "Tianpeng Zhang"
+        },
+        {
+          "name": "Fangjun Yu"
+        }
+      ],
+      "publishedAt": "2026-03-14",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41724286",
+      "title": "Yinhuo Decoction attenuates depression-like behaviors and promotes M2 microglia polarization by regulating PI3K/Akt/NF-κB signaling pathway in a murine model of menopausal depression.",
+      "summary": "ETHNOPHARMACOLOGICAL RELEVANCE: Yinhuo Decoction (YHD), a classical Chinese herbal formula for yin-nourishing and kidney-tonifying, has been traditionally prescribed for depression and female climacteric syndrome, and shows therapeutic potential for menopausal depression (MD). While modern pharmacological studies confirm its potent anti-inflammatory properties, the role of YHD in regulating microglial polarization and its key active components remains unclear.\nAIM OF THE STUDY: This study aimed to identify the key active components and molecular targets of YHD responsible for anti-neuroinflammation and to elucidate its underlying mechanisms.\nMATERIALS AND METHODS: The ovariectomy (OVX) + chronic unpredictable mild stress (CUMS)-induced murine model of menopausal depression was established. Mice were randomly assigned to six groups (n = 15 per group): Sham, OVX + CUMS, E2 (0.13 mg/kg), and YHD (11.7、23.4、46.8 g/kg). The YHD components in cerebrospinal fluid were qualitatively analyzed using UHPLC-LTQ-Orbitrap MS. Combined with network pharmacology, the core components, targets of its anti-neuroinflammatory effect were screened. Molecular docking, cellular thermal shift assays (CETSA) under intervention with specific concentration (100 μM) of active monomers, and affinity ultrafiltration techniques were used to analyze the interaction between YHD components and key targets. The therapeutic effects of YHD active ingredients were explored in lipopolysaccharides/adenosine triphosphate (LPS + ATP)-induced cell models.\nRESULTS: Treatment with YHD significantly alleviated depressive-like behaviors in OVX + CUMS mice, regulate M1/M2 phenotypic balance of microglia and reduced neuroinflammation. Chemical profiling of cerebrospinal fluid identified seven YHD derived components, and network pharmacology analysis suggested the PI3K/Akt/NF-κB signaling pathway as a key mechanistic target. This prediction was confirmed in vivo. In LPS + ATP stimulated BV2 microglia, the core monomeric constituents, including echinacoside, schisandrin B, and verbascoside, recapitulated the pathway modulating effects observed in vivo. Molecular docking, cellular thermal shift assay (CETSA), and affinity ultrafiltration studies further demonstrated direct binding of all three compounds to PI3K, with verbascoside exhibiting the highest affinity. In addition, the PI3K inhibitor LY294002 can reverse the activation of the PI3K/Akt pathway and the inhibition of the NF-κB signal by verbascoside.\nCONCLUSIONS: The findings of this study suggest that YHD promotes microglial polarization from M1 to M2 in OVX + CUMS mice and that the underlying mechanism involves of the PI3K/AKT/NF-κB pathway.",
+      "authors": [
+        {
+          "name": "Yue Zhang"
+        },
+        {
+          "name": "Xia Lei"
+        },
+        {
+          "name": "Ao Xue"
+        },
+        {
+          "name": "Deping Zhao"
+        },
+        {
+          "name": "Hao Ai"
+        },
+        {
+          "name": "Yu Zhou"
+        },
+        {
+          "name": "Wenwen Wang"
+        },
+        {
+          "name": "Ning Zhang"
+        },
+        {
+          "name": "Fang Geng"
+        },
+        {
+          "name": "Hongdan Xu"
+        }
+      ],
+      "publishedAt": "2026-03-14",
+      "source": "PubMed"
+    }
+  }
+]
