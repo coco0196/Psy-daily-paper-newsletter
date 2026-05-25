@@ -1,0 +1,542 @@
+[
+  {
+    "paper": {
+      "id": "42178577",
+      "title": "Uncovering lipid biomarkers linked to methylphenidate efficacy in treating apathy in Alzheimer's disease: insights from the ADMET 2 trial.",
+      "summary": "BACKGROUND: Apathy is a prevalent neuropsychiatric symptom (NPS) in Alzheimer's disease (AD), linked to functional impairment and reduced quality of life. The Apathy in Dementia Methylphenidate Trial 2 (ADMET-2) found methylphenidate (MPH) had modest efficacy for treating apathy, but treatment responses varied. MPH blocks dopamine and noradrenaline transporters, inhibiting dopamine and noradrenaline reuptake. Lipids are closely tied to monamine transporter function through their structural and signaling roles in neurotransmission, neuroinflammation, and synaptic plasticity. This study aimed to identify lipid species associated with MPH response and explore lipid pathway disruptions in responders versus non-responders.\nMETHODS: Participants from ADMET-2 with baseline lipidomic data were included. Responders were defined by a ≥4-point improvement on the Neuropsychiatric Inventory Apathy subscale (NPI-A), or moderate-to-marked improvement on the ADCS-Clinicians Global Impression-Change (ADCS-CGIC). Baseline plasma samples underwent lipidomic profiling. Sparse Partial Least Squares Discriminant Analysis (sPLS-DA) in the MPH group was used to identify lipid species distinguishing responders from non-responders. Model performance was evaluated by area under the curve (AUC). Identified lipid species were analyzed in MetaboAnalyst for pathway enrichment. A secondary analysis in the placebo group assessed specificity of findings to MPH.\nRESULTS: Of the 43 MPH-treated participants, 28 were NPI-apathy responders, and 10 were ADCS-CGIC responders. The PLS-DA model achieved robust discrimination between responders and non-responders (NPI-apathy: AUC = 0.82 +/- 0.05; ADCS-CGIC: AUC=0.84 +/- 0.07). Pathway analysis revealed disruptions in ceramide, phosphosphingolipid, and glycosphingolipid metabolism for NPI-apathy responders, and ceramide and glycosphingolipid metabolism for ADCS-CGIC responders. In 55 placebo-treated participants (30 NPI-apathy responders), an AUC of 0.79 +/- 0.05 was achieved, with pathway analysis indicating disruption in glycosphingolipid metabolism only.\nCONCLUSIONS: This study demonstrates the utility of lipidomic profiling in identifying biomarkers of response to MPH in AD patients with apathy. The identified lipidomic species are broadly related to monoamine transporter function, reflecting their role in neurotransmission and synaptic plasticity. While glycosphingolipid metabolism appears broadly linked to changes in apathy, disruptions in ceramide and phospholipid metabolism may be specific to MPH treatment. Further study of these pathways may offer insights into the molecular mechanisms underlying apathy and treatment response, and could inform future biomarker-guided interventions.",
+      "authors": [
+        {
+          "name": "Myuri Ruthirakuhan"
+        },
+        {
+          "name": "Maya Mills"
+        },
+        {
+          "name": "Paul Rosenberg"
+        },
+        {
+          "name": "Norman Haughey"
+        },
+        {
+          "name": "Jacobo Mintzer"
+        },
+        {
+          "name": "Suzanne Craft"
+        },
+        {
+          "name": "Nathan Herrmann"
+        },
+        {
+          "name": "Alan J Lerner"
+        },
+        {
+          "name": "Allan I Levey"
+        },
+        {
+          "name": "Prasad R Padala"
+        },
+        {
+          "name": "Anton Porsteinsson"
+        },
+        {
+          "name": "Christopher H van Dyck"
+        },
+        {
+          "name": "David Shade"
+        },
+        {
+          "name": "Krista L Lanctôt"
+        }
+      ],
+      "publishedAt": "2026-05-25",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42178545",
+      "title": "Potential profile analysis of reproductive concerns and influencing factors among testicular cancer patients of reproductive age.",
+      "summary": "AIM: To analyze the status and potential profiles of reproductive concerns in testicular cancer patients in reproductive age and explore the related factors of reproductive concerns levels in different categories of patients.\nMETHODS: A cross-sectional study was used in this study. A total of 214 patients with testicular cancer of reproductive age from the department of urology, Sun Yat-sen University Cancer Center in Guangdong Province were selected by convenience sampling from January 2024 to January 2025. Data on demographic characteristics, the reproductive concerns after cancer scale-male (RCAC-M), and the fear of progression questionnaire-short form (FoP-Q-SF) were collected. Potential profile analysis of reproductive concerns levels in testicular cancer patients of reproductive age was performed, and binary logistic regression was used to analyze the related factors of reproductive concerns levels in different categories.\nRESULTS: The reproductive concerns score of testicular cancer patients of reproductive age was (58.16 ± 10.99), and their reproductive concerns was divided into two potential profiles: a low level of reproductive concerns group (46.3%) and a high level of reproductive concerns group (53.7%). Those with fertility intention (OR = 4.208, 95% CI: 2.204-8.034) and more severe fear of disease progression (OR = 1.111, 95% CI: 1.069-1.156) were more likely to develop into the high-level reproductive concerns group (all P < 0.05).\nCONCLUSION: Reproductive concerns in male cancer patients of reproductive age was at a moderate level and showed a substantial heterogeneity. Healthcare professionals should recognize the different reproductive concerns conditions of patients and implement targeted interventions to reduce the reproductive concerns of patients with testicular cancer.\nCLINICAL TRIAL NUMBER: Not applicable.",
+      "authors": [
+        {
+          "name": "Ya Hu"
+        },
+        {
+          "name": "Guolong Chen"
+        },
+        {
+          "name": "Yong Dong"
+        },
+        {
+          "name": "Xiangdong Li"
+        },
+        {
+          "name": "CangMei Fu"
+        },
+        {
+          "name": "Wanqin Hu"
+        },
+        {
+          "name": "Xue Fu"
+        }
+      ],
+      "publishedAt": "2026-05-25",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42178543",
+      "title": "Identifying Vulnerability in Adults With Congenital Heart Disease: A Mixed-Methods Examination of Psychosocial Experiences.",
+      "summary": "BACKGROUND: With increased survival into adulthood, psychosocial research in adults with congenital heart disease (ACHD) has become increasingly important. However, existing studies often rely on isolated quantitative metrics or small qualitative samples, limiting insight into patients' lived experiences and potential variation across demographic subgroups. To address this gap, this mixed-methods study integrated quantitative survey data with qualitative thematic analysis to characterize psychosocial experiences among ACHD and examine differences by disease complexity, sex, and age.\nMETHODS: A national online survey was conducted among Dutch ACHD (≥ 16 years) recruited via the national patient association (Oct-Dec 2024). The survey formed part of a broader psychosocial and sexual health questionnaire. For the present analysis, items on demographic characteristics and psychosocial experiences were used. Closed-ended responses were analyzed descriptively, and open-ended responses were analyzed using inductive thematic analysis.\nRESULTS: A total of 259 participants responded (68.8% female; 47.1% aged 26-40). Disease complexity was severe in 38.6%, moderate in 47.6%, and mild in 13.8%. Nearly all participants (94.1%) reported at least one psychosocial concern, most related to physical endurance (64.7%), reproduction (64.0%), and visible scarring (47.8%), alongside frequent social concerns such as difficulty keeping up with peers (53.7%), relationship challenges (47.8%), fear of rejection (39.0%), and worries about others' judgement (38.2%). Difficulties were more common among females and those with more complex CHD. A developmental pattern emerged, with physical and social insecurities arising in childhood and adolescence, and reproductive and employment-related concerns emerging in young adulthood. Although many insecurities stemmed from earlier experiences, participants described effective coping strategies and positive meaning-making.\nCONCLUSIONS: Despite considerable resilience, psychosocial difficulties in ACHD are heterogenous and present across all patient groups, with certain subgroups showing heightened vulnerability. Identifying these patients and understanding the origins of their concerns is essential for timely support. Moreover, early onset and age-specific patterns emphasize the need for joint involvement of pediatric and adult cardiologists in recognizing psychosocial concerns and ensuring continuity during transition, as these experiences may shape long-term psychosocial trajectories.",
+      "authors": [
+        {
+          "name": "Floor C van der Meijs"
+        },
+        {
+          "name": "Henk W Elzevier"
+        },
+        {
+          "name": "Arno A W Roest"
+        },
+        {
+          "name": "Loes A M van Winden"
+        },
+        {
+          "name": "Marloes Duijkers"
+        },
+        {
+          "name": "Veronica R Janssen"
+        },
+        {
+          "name": "Philippine Kiès"
+        }
+      ],
+      "publishedAt": "2026-05-25",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42178537",
+      "title": "Lower limb compensation mechanisms influencing sagittal balance after lumbar fusion.",
+      "summary": "BACKGROUND: The adoption of whole-body imaging in routine practice has allowed radiographic analysis of the lower limbs, even in degenerative pathologies. This work aims to characterize the occurrence of knee flexion in relation to global and regional sagittal parameters of the spine in lumbar degenerative pathologies.\nMETHODS: This work is a single-center retrospective analysis including patients who underwent lumbar spine fusion for degenerative pathology. All included patients had biplanar whole-body imaging before and after surgery with a minimum of 6 months of follow-up. Exclusion criteria were patients with prior spine surgery and total knee replacement before lumbar spine fusion. Patients were grouped based on preoperative knee flexion threshold (10°) and postoperative changes in knee flexion (ΔKF).\nRESULTS: Postural parameters of 108 patients (65 M; 43 F) with an average age of 63.02 years were studied. Patients with greater preoperative knee flexion (n = 68) had significantly greater PI-LL mismatch (9.88 +/- 10.48° vs. 0.57 +/- 12.19°) and SVA (5.7 +/- 4.2 cm vs. 2.1 +/- 3.9 cm) than the group with less knee flexion (n = 44). Patients with exacerbated knee flexion postoperatively (n = 57) had significantly greater PI-LL mismatch (p = 0.01) as well as loss of lordosis (p = 0.04) after surgery compared to the group with less flexion (n = 51) without any impact on SVA.\nCONCLUSION: Knee flexion angle can help quantify lower limb compensation in relation to spinopelvic misalignment in patients operated on for degenerative pathologies. Nevertheless, further work is needed to fully understand the complex interplay of compensation mechanisms in the face of sagittal imbalance and spinopelvic malalignment.",
+      "authors": [
+        {
+          "name": "Victor Baisamy"
+        },
+        {
+          "name": "Mohammad Daher"
+        },
+        {
+          "name": "Amer Sebaaly"
+        },
+        {
+          "name": "Thierry Cresson"
+        },
+        {
+          "name": "Jacques de Guise"
+        },
+        {
+          "name": "Carlos Vazquez"
+        },
+        {
+          "name": "Jesse Shen"
+        },
+        {
+          "name": "Zhi Wang"
+        }
+      ],
+      "publishedAt": "2026-05-25",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42178523",
+      "title": "Attempted suicide: lived experiences of refugees in Rhino Camp, West Nile, Uganda.",
+      "summary": "BACKGROUND: Suicide is among the leading causes of death worldwide, and every year, more people die as a result of suicide than HIV, malaria, breast cancer, war, and homicide. Suicide rates are high among vulnerable groups that experience discrimination, such as refugees and migrants.\nPURPOSE: This study explored the lived experiences of refugee suicide survivors in Rhino Camp, West Nile, Uganda, using Thomas Joiner's interpersonal theory of suicide attempts.\nMETHODS: This study employed an interpretative phenomenological research design and purposive sampling techniques to select 15 participants (seven key informants and eight refugee suicide survivors). Face-to-face interviews using in-depth interview guides and observations were used to gather data. Data were collected between June and July 2023.\nRESULTS: Among refugee suicide survivors, saturation was reached after the seventh interview, and key informants reached saturation after the sixth interview, at which point no new themes emerged. Participants described socioeconomic deprivation, intimate partner conflict and gender-based violence, trauma loss and war experiences, health burdens and physical vulnerability, psychological distress and cognitive overload, suicide attempt as crisis responses, stigma, social judgment, and isolation as a broad set of interconnected subjective experiences and triggers shaping suicide attempts among refugees. Community rescue, institutional intervention, and psychosocial support were identified as supportive systems, while refugee suicide attempt survivors described meaning-making, coping, and recovery.\nCONCLUSIONS: Socioeconomic deprivation, psychological distress, gender-based violence, stigma, and isolation heighten vulnerability among refugees, leading to suicide attempts. Strengthening available supportive systems enhances support for refugee suicide survivors.",
+      "authors": [
+        {
+          "name": "Robinson Ojwok"
+        },
+        {
+          "name": "Judith Abal Akello"
+        },
+        {
+          "name": "Jenifer Acio"
+        }
+      ],
+      "publishedAt": "2026-05-25",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42178518",
+      "title": "CSI-SSU: phylogenetic contamination screening of genomic datasets, demonstrated on The Protist 10,000 Genomes (P10K) Project.",
+      "summary": "BACKGROUND: Genomic data are essential for uncovering the evolutionary history, ecological roles, and diversity of life. Yet, diverse microbial eukaryotes, predominantly unicellular and traditionally referred to as protists, remain critically underrepresented in genomic repositories, limiting our ability to address fundamental questions in eukaryotic evolution. The Protist 10,000 Genomes (P10K) initiative seeks to fill this gap by generating and compiling genomic and transcriptomic data for a wide range of microbial eukaryotes. However, large-scale sequencing efforts face persistent challenges, including contamination and imprecise taxonomic identification, particularly for poorly studied taxa that require specialized taxonomic expertise. To ensure the reliability of these resources, robust and scalable approaches for taxonomic identification and contamination screening are essential.\nRESULTS: We developed CSI-SSU (https://github.com/AlexTiceLab/CSI-SSU), a command-line tool for Contaminant Sequence Investigation (CSI) that uses small subunit ribosomal RNA (SSU) sequences, chimeric sequence detection, and phylogenetic placement to rapidly identify, retrieve, and classify SSU sequences from eukaryotic genomic-level assemblies. CSI-SSU incorporates a curated SSU reference dataset representing the major known eukaryotic supergroups, with sequences and taxonomic nomenclature derived from the Protist Ribosomal Reference (PR2) database. In addition to detecting contaminant sequences, CSI-SSU enables approximate taxonomic assignment of the target lineage in each assembly, with resolution constrained by the current diversity represented in PR2. To further assess potential bacterial contamination, CSI-SSU employs bacterial BUSCO searches as a proxy. We demonstrate CSI-SSU utility and performance by screening 2,960 genomic-level assemblies spanning a broad diversity of eukaryotes from P10K. CSI-SSU efficiently detected non-target eukaryotic SSU sequences, revealing cross-group contamination. Classifications also corroborated or refined the original taxonomic assignments, with resolution depending on PR2 representation. Bacterial BUSCO searches indicated bacterial contamination. Independent SSU and COI phylogenies of Amoebozoa supported CSI-SSU classifications, highlighting its accuracy and sensitivity.\nCONCLUSION: CSI-SSU provides a scalable and reproducible framework for phylogenetically informed contamination screening and taxonomic validation of genomic and transcriptomic data. Coupling phylogenetic placement with contamination detection enabled us to distinguish high-quality P10K datasets from those requiring decontamination or additional sequencing before downstream use. These findings serve as a reference for future analyses and guide further sequencing efforts to expand the taxonomic diversity of microbial eukaryotes at the genomic level. Addressing imprecise taxonomic assignments, contamination, and reproducibility in genomic-level datasets will enhance the value of these resources and facilitate studies illuminating the evolution and diversification of eukaryotic life.",
+      "authors": [
+        {
+          "name": "Alfredo L Porfirio-Sousa"
+        },
+        {
+          "name": "Robert E Jones"
+        },
+        {
+          "name": "Matthew W Brown"
+        },
+        {
+          "name": "Daniel J G Lahr"
+        },
+        {
+          "name": "Alexander K Tice"
+        }
+      ],
+      "publishedAt": "2026-05-25",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42178482",
+      "title": "Adherence to dietary patterns and their association with perinatal depression: a Scoping review.",
+      "summary": "Perinatal depression is a common disorder that can manifest during pregnancy and the postpartum period, severely affecting both the mother and the baby. Dietary factors have been associated with an increased risk of perinatal depression. We analyzed the association between adherence to certain dietary patterns before and during pregnancy and postpartum and perinatal depression. A scoping review of the available literature was conducted reporting the main findings following the PRISMA 2020 statement. The search strategy was last reproduced in December 2024 in MEDLINE, Web of Science and Scopus databases. The methodological quality of the studies was evaluated using the Newcastle-Ottawa Scale and the Revised Cochrane risk-of-bias tool for randomized trials. The protocol has been published on OSF (https://doi.org/10.17605/OSF.IO/AV8TP). 11 studies (6 cohort studies, 4 cross-sectional studies, and 1 randomized clinical trial) conducted in various countries were included in the mapping review. These studies evaluated the dietary intake of the participants at different times during the perinatal period and identified several dietary patterns. 9/11 studies showed a significant inverse association between adherence to the Mediterranean Diet or healthy patterns, characterized by high intake of vegetables, fruits, fish and seafood and perinatal depression. In contrast, 4/11 studies showed that adherence to Western dietary patterns and the consumption of ultra-processed foods was associated with higher risk of perinatal depression. Adherence to healthy dietary patterns may be negatively associated with perinatal depression. Conversely, Western diet and the intake of ultra-processed and pro-inflammatory foods are directly associated with a higher risk of perinatal depression.",
+      "authors": [
+        {
+          "name": "Laura Rodríguez-Ávila"
+        },
+        {
+          "name": "Ángela Hernández-Ruiz"
+        },
+        {
+          "name": "Laura García-Molina"
+        },
+        {
+          "name": "Rafael A Caparros-Gonzalez"
+        },
+        {
+          "name": "Carmen Amezcua-Prieto"
+        },
+        {
+          "name": "Miriam Gutiérrez-Jimeno"
+        },
+        {
+          "name": "Blanca Riquelme-Gallego"
+        }
+      ],
+      "publishedAt": "2026-05-25",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42178442",
+      "title": "Health-Related Quality of Life Deterioration Among Tuberculosis Patients During the COVID-19 Pandemic: a Convergent Mixed-Methods Study of Syndemic Vulnerability in Urban Bangladesh.",
+      "summary": "BACKGROUND: United Nations Sustainable Development Goal 3 (Target 3.3) calls for ending the tuberculosis (TB) epidemic by 2030; yet TB programmes in low-income settings remain acutely vulnerable to pandemic disruption. During the COVID-19 first wave, TB patients in urban Bangladesh faced a convergence of disease burden, pandemic-related stressors, and poverty-driven resource constraints. Systematic evidence quantifying health-related quality of life (HRQoL) deterioration in this population and identifying its modifiable structural determinants is limited.\nMETHODS: A convergent parallel mixed-methods study was conducted among 439 TB patients attending 12 Directly Observed Treatment, Short-course (DOTS) clinics across six municipal districts in Dhaka, Bangladesh, between August and September 2020. HRQoL was measured with the EQ-5D-3L and post-traumatic stress with the Impact of Event Scale-Revised (IES-R). Multinomial logistic regression identified factors independently associated with HRQoL deterioration. Concurrently, 36 semi-structured in-depth interviews were analysed using Braun and Clarke's thematic analysis framework.\nRESULTS: Pain or discomfort was reported by 46.5% of participants (95% CI: 41.9-51.1%) and anxiety or depression by 36.9% (95% CI: 32.5-41.5%). On multivariable analysis, anxiety/depression was independently associated with larger household size (adjusted OR = 1.08 per person; 95% CI: 1.03-1.14; p = 0.002), greater distance to the DOTS clinic (adjusted OR = 1.03 per km; 95% CI: 1.01-1.05; p < 0.001), and appointment intervals of ≤ 14 days versus 15-30 days (adjusted OR = 2.86; 95% CI: 1.33-7.14; p = 0.011). Drug-resistant TB was strongly associated with activity limitation (adjusted OR = 27.7; 95% CI: 8.3-92.4). Qualitative analysis identified three themes: stigma intensification through symptom conflation with COVID-19; economic hardship obstructing treatment adherence and nutrition; and perceived inadequacy of government relief for chronically ill populations.\nCONCLUSIONS: In this cross-sectional study, HRQoL deterioration among urban TB patients in Bangladesh during the COVID-19 pandemic was significantly associated with modifiable structural factors. These preliminary findings suggest that appointment scheduling optimisation, service decentralisation, nutritional support, and psychosocial services may reduce pandemic-era HRQoL burden. Prospective longitudinal studies are needed to establish causality and inform programme design.",
+      "authors": [
+        {
+          "name": "Santu Das"
+        },
+        {
+          "name": "Rantu Das"
+        }
+      ],
+      "publishedAt": "2026-05-25",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42178427",
+      "title": "Clinical, cognitive and neuropsychiatric correlates of personality in Wilson's disease.",
+      "summary": "INTRODUCTION: Wilson's disease (WD) is an autosomal recessive disorder characterized by hepatic, neurologic, or psychiatric symptoms. Compared to other recognized clinical symptoms, the personality profile of WD patients remains under-investigated. This study compared personality traits in a sample of adults with WD and healthy controls (HC). Moreover, we assessed the cognitive and affective correlates of personality within the WD group.\nMETHODS: We enrolled 20 patients affected with genetically confirmed WD, with prevalent extrapyramidal symptoms, and 20 age and education-matched HC. Participants completed the revised Eysenck Personality Questionnaire, neuropsychological tests, and psychological questionnaires.\nRESULTS: WD patients scored significantly higher on neuroticism (Cohen's d = 1.28; Confidence Interval: 0.61-1.95) and psychoticism (Cohen's d = 0.72; Confidence Interval: 0.08-1.36) compared to HC, but no differences were observed for extraversion. Among WD patients, neuroticism correlated with global disability, trail making test, depression, and mental health status; psychoticism correlated with memory and executive functions (all r > ± 0.5).\nCONCLUSION: We observed that WD patients are characterized by high neuroticism and psychoticism, and this personality profile is related to other clinical, cognitive, and neuropsychiatric manifestations. Identification of personality traits can enhance early detection, improve monitoring, and guide targeted management strategies for individuals with WD.",
+      "authors": [
+        {
+          "name": "Natascia De Lucia"
+        },
+        {
+          "name": "Raffaele Lisbino"
+        },
+        {
+          "name": "Margherita Matarazzo"
+        },
+        {
+          "name": "Augusta Giglio"
+        },
+        {
+          "name": "Rosa Coppola"
+        },
+        {
+          "name": "Fabiola Di Dato"
+        },
+        {
+          "name": "Raffaele Iorio"
+        },
+        {
+          "name": "Gabriele Riccio"
+        },
+        {
+          "name": "Nelson Mauro Maldonato"
+        },
+        {
+          "name": "Antonio Terracciano"
+        },
+        {
+          "name": "Anna De Rosa"
+        }
+      ],
+      "publishedAt": "2026-05-25",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42178421",
+      "title": "A preliminary study of facial soft tissue thickness for forensic facial reconstruction in a Nigerian adult female community.",
+      "summary": "Forensic facial reconstruction is the reproduction of a deceased person's antemortem face, most commonly achieved using population-based data of facial soft tissue thickness. Facial soft tissue thickness (FSTT) data have been documented for many populations. However, there are no published data for Nigerian female adults. This study measured the facial soft tissue thickness of 32 subjects based on computed tomography scans. Measurements were taken from 50 facial soft tissue thickness points, including 12 mid-sagittal and 19 bilateral (right and left) points, across a diverse age range of 18 to 95 years. The Nigerian female adult consistently shows marginal increase in soft tissue thickness on the left side of the face when compared with the right, with the greatest relative difference at the zygomatic arch and mid-lateral orbit. When compared with the published data of populations in South Africa, Turkey, Korea, and Belgium, there were similarities at the midline but appreciable differences at the lip and chin regions. The right side of the face of the Nigerian female adults was also compared with other populations; the differences at the lateral side of the face were greater than the midline differences. These differences reflects the greater thickness of bilateral soft tissue. This study demonstrates that although the data between different populations are similar, there are still measurable differences at several points. This new dataset will be most applicable for forensic facial reconstruction in Nigerian female adults.",
+      "authors": [
+        {
+          "name": "Nurudeen Adegbite"
+        },
+        {
+          "name": "Manuela Mura"
+        },
+        {
+          "name": "Haliru Shafiu"
+        },
+        {
+          "name": "Christopher Avery"
+        },
+        {
+          "name": "Mohammed Al-Khafajiy"
+        },
+        {
+          "name": "Waqar Ahmed"
+        }
+      ],
+      "publishedAt": "2026-05-25",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42176700",
+      "title": "Migration status and urologic health inequities: a scoping review.",
+      "summary": "PURPOSE OF REVIEW: Migration is an increasingly important determinant of health and healthcare access. Migrants often face language barriers, socioeconomic vulnerability, administrative obstacles, and reduced access to preventive and specialist services. This review summarizes current evidence on migration-related inequities in urologic care.\nRECENT FINDINGS: Available evidence suggests that migrant populations experience disparities across the continuum of urologic care, including screening, diagnostic work-up, access to specialist evaluation, treatment receipt, and follow-up. In urologic oncology, migrants are less likely to participate in screening programs and may present with more advanced disease. Structural barriers, language discordance, low health literacy, cultural beliefs, medical mistrust, and insurance or legal insecurity all contribute to delayed care. Similar inequities are seen in nonmalignant urologic conditions, including lower urinary tract symptoms, overactive bladder, urinary incontinence, and nephrolithiasis, where symptoms are often underreported and undertreated.\nSUMMARY: Migration is an important but under-studied determinant of inequity in urologic care. The current literature remains heterogeneous and often fails to distinguish between migration status and race or ethnicity. Future research should use standardized migration-related variables and focus on actionable strategies to improve equitable access, communication, early diagnosis, and high-quality treatment for migrant populations.",
+      "authors": [
+        {
+          "name": "Kimia Goodarzi"
+        },
+        {
+          "name": "Marcin Miszczyk"
+        },
+        {
+          "name": "Pierre I Karakiewicz"
+        },
+        {
+          "name": "Leonardo O Reis"
+        },
+        {
+          "name": "Shahrokh F Shariat"
+        }
+      ],
+      "publishedAt": "2026-05-24",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42036314",
+      "title": "Distinct Metabolomic and Clinical Phenotypes of Depression in Heart Failure　- Pilot Exploratory Analysis.",
+      "summary": "BACKGROUND: Depression is common among patients with heart failure (HF) and worsens prognosis, but its metabolic heterogeneity remains unclear.\nMETHODS AND RESULTS: Fifty HF patients completed the Patient Health Questionnaire-9 (PHQ-9) and underwent metabolomic profiling of 163 metabolites. Depressed patients (PHQ-9 score ≥5; n=26) were stratified using k-means clustering. Spearman's correlation with false discovery rate (FDR) correction (FDR <0.05) and bootstrap-validated least absolute shrinkage and selection operator (LASSO) regression (1,000 iterations) were applied to identify robust predictors of PHQ-9 scores. Two subtypes emerged. Cluster 1 (n=19) was characterized by elevated HbA1c; in this cluster, glycerol was the only metabolite significantly correlated with PHQ-9 scores. Cluster 2 (n=7) exhibited a cardiorenal phenotype, with elevated B-type natriuretic peptide (BNP) levels and a reduced estimated glomerular filtration rate. In Cluster 2, PHQ-9 scores were significantly positively correlated with BNP and metabolites related to methyl-group metabolism, specifically N,N-dimethylglycine (DMG), betaine, and 1-methylhistidine/3-methylhistidine. Bootstrap-validated LASSO identified BNP and DMG as the most robust predictors of depression severity in this specific cluster.\nCONCLUSIONS: Depression in HF is metabolically heterogeneous. Cluster 1 is characterized by glycerol-linked lipid dysregulation. In contrast, Cluster 2 is associated with cardiac stress and alterations in methylation pathways, potentially linking metabolic dysfunction to neurotransmitter imbalances. These preliminary findings highlight the potential need for phenotype-specific therapeutic strategies to effectively manage depression in HF patients.",
+      "authors": [
+        {
+          "name": "Yoshiharu Kinugasa"
+        },
+        {
+          "name": "Hiroko Kamitani-Noguchi"
+        },
+        {
+          "name": "Kensuke Nakamura"
+        },
+        {
+          "name": "Masayuki Hirai"
+        },
+        {
+          "name": "Midori Manba"
+        },
+        {
+          "name": "Natsuko Ishiga"
+        },
+        {
+          "name": "Takeshi Sota"
+        },
+        {
+          "name": "Natsuko Nakayama"
+        },
+        {
+          "name": "Tomoki Ota"
+        },
+        {
+          "name": "Masahiko Kato"
+        },
+        {
+          "name": "Kazuhiro Yamamoto"
+        }
+      ],
+      "publishedAt": "2026-04-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41905712",
+      "title": "Resting-state quantitative electroencephalography in men and women college athletes before and after sport-related concussion.",
+      "summary": "This study aimed to determine whether sex-related differences exist in resting-state quantitative electroencephalography (rs-QEEG), along with post-concussion symptoms and psychological health indicators, at baseline and within 72 h following a sport-related concussion. Baseline visit included 115 (31 women) student-athletes aged 16-22 years old where self-reported measures of psychological health and post-concussion symptoms, as well as 10 min of rs-QEEG (five minutes eyes-closed, five minutes eyes-open) were recorded. 30 athletes (8 women) subsequently sustained a sport-related concussion during training or competition of the 2019-2020 season and were reassessed with the same post-concussion symptoms scale and 10 min of rs-QEEG. Primary rs-QEEG outcomes included absolute and relative power across standard frequency bands. At baseline, women exhibited higher beta1 power (absolute and relative) and higher beta2 power (absolute), primarily in the eyes-open condition, after Benjamini-Hochberg corrections were applied. They also reported greater scores for anxiety, sleep-arousal, affective and total symptoms. No significant associations between rs-QEEG power and symptoms were observed after adjustment for multiple comparisons. Following a concussion, no statistically significant main effect of time on rs-QEEG measures was observed after correction for multiple comparisons. However, theta absolute power showed a decrease across regions in the eyes-open condition at the unadjusted level. Additionally, women continued to show higher beta2 power (absolute and relative) than men. An association between alpha absolute power and affective symptoms was observed in women at the post-concussion assessment but did not remain significant in sensitivity analyses. Overall, these findings indicate sex-related differences across rs-QEEG parameters and symptom profiles, both before and after a concussion. Although the clinical utility of rs-QEEG has not yet been established, our findings underscore the importance of considering biological sex when interpreting rs-QEEG metrics and evaluating post-concussion symptomatology.",
+      "authors": [
+        {
+          "name": "Mariane Doucet"
+        },
+        {
+          "name": "Hélène Brisebois"
+        },
+        {
+          "name": "Anne-Catherine Gauthier-Lamer"
+        },
+        {
+          "name": "Michelle McKerral"
+        }
+      ],
+      "publishedAt": "2026-04-21",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41887595",
+      "title": "Convolutional neural networks detected changes in facial expressions of mice that had conditioned fear stress.",
+      "summary": "Animal models are essential for studying aversive states such as fear and pain. Facial expressions may provide non-invasive readouts of aversive states in animals. This study investigated whether changes in facial expressions, which are potentially consistent between humans and mice, can serve as objective indicators of fear responses and distinguish fear from pain. We analyzed changes in the facial expressions of mice associated with conditioned fear stress (CFS) using convolutional neural networks (CNNs). Photographs of CFS and control mice were analyzed using four advanced CNN models: VGG16, ResNet50, DenseNet121, and InceptionV3. The CNNs identified CFS mice from facial images under contrasts: control/non-freezing vs CFS/freezing and control/non-freezing vs CFS/non-freezing, with consistently high performance (Control/non-freezing vs CFS/freezing: sensitivity 0.942, specificity 0.929, accuracy 0.935, precision 0.929, AUC 0.966; Control/non-freezing vs CFS/non-freezing: sensitivity 0.912, specificity 0.900, accuracy 0.906, precision 0.902, AUC 0.950). The ability to detect CFS without freezing decreased as stress intensity weakened, from an AUC of 0.950 to 0.701, suggesting that CNNs can detect facial changes depending on the degree of stress exposure. Facial changes were particularly pronounced in freezing mice, further supporting their association with CFS-related emotional responses. During testing, mice were returned to the conditioning chamber without shock; therefore, this facial expression could reflect fear response rather than pain response. These findings demonstrate the potential of CNNs to serve as non-invasive tools for detecting stress-induced affective changes in mice.",
+      "authors": [
+        {
+          "name": "Takatoshi Sakata"
+        },
+        {
+          "name": "Atsushi Teramoto"
+        },
+        {
+          "name": "Ryoya Tada"
+        },
+        {
+          "name": "Masaya Hasegawa"
+        },
+        {
+          "name": "Hitomi Kurahashi"
+        },
+        {
+          "name": "Kazuo Kunisawa"
+        },
+        {
+          "name": "Toshitaka Nabeshima"
+        },
+        {
+          "name": "Akihiro Mouri"
+        }
+      ],
+      "publishedAt": "2026-04-21",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41876056",
+      "title": "Modelling social fear in mice: advancements in social fear conditioning and social defeat paradigms.",
+      "summary": "Social anxiety disorder (SAD) is a common and chronic mental illness whose pathogenesis is not yet fully understood, and treatment responses are often suboptimal. Animal models play a crucial role in elucidating its neurobiological mechanisms and developing novel therapeutic approaches. This article systematically reviews two primary mouse modelling paradigms: social fear conditioning (SFC) and social defeat. The SFC model induces specific social fear behaviors by pairing a social stimulus with an aversive event, whereas the social defeat model, by simulating social conflict and psychological stress, more closely mirrors the ecological validity of human SAD. This review also examines recent advancements in these models, including automation, standardization, behavioral specificity, and the enhancement of psychological components. Furthermore, it outlines future directions for model development, including modelling genetic susceptibility, investigating the role of gut microbiota in conjunction with genetic factors, and examining sex differences. The continuous refinement of these models provides powerful tools for deepening our understanding of the neural mechanisms underlying SAD and for screening effective interventions.",
+      "authors": [
+        {
+          "name": "Haifeng Xu"
+        }
+      ],
+      "publishedAt": "2026-04-21",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41865828",
+      "title": "The effects of acute psychosocial stress on binge urges, inhibitory control, negative urgency and eating pathology in Binge Eating Disorder.",
+      "summary": "Stress is frequently reported as a trigger for binge episodes, yet it remains unclear how subjective and physiological stress responses interact with cognitive and affective mechanisms to increase binge eating risk. The present study investigated the effects of acute psychosocial stress on binge urges, focusing on the role of state- and trait-level vulnerabilities. Twenty-eight individuals with BED were randomized to either a Stress condition (n = 14) or No-Stress condition (n = 14). Following an acute psychosocial stressor, participants completed the Stop-Signal Task to behaviourally assess inhibitory control. Self-reported mood, binge urge ratings and saliva samples for stress biomarker detection were collected at three timepoints throughout the experimental session. Results demonstrated that acute psychosocial stress elicited marked increases in total mood disturbance, without corresponding physiological stress responses and significantly impaired inhibitory control. Notably, only subjective stress responses were associated with greater binge urges, whereas physiological stress responses were not. This dissociation highlights subjective stress reactivity as a clinically meaningful mechanism of risk in BED, underscoring the potential value of interventions that target stress perception and regulation to reduce binge eating vulnerability.",
+      "authors": [
+        {
+          "name": "S L Brassard"
+        },
+        {
+          "name": "K Punia"
+        },
+        {
+          "name": "M Laliberte"
+        },
+        {
+          "name": "H Liu"
+        },
+        {
+          "name": "K M Lucibello"
+        },
+        {
+          "name": "S Potter"
+        },
+        {
+          "name": "I M Balodis"
+        }
+      ],
+      "publishedAt": "2026-04-21",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41786020",
+      "title": "Autonomic and resting-state effective connectivity signatures of binge eating behavior.",
+      "summary": "Autonomic dysfunction, measured by heart rate variability (HRV) is implicated in the manifestation of binge eating (BE) behaviors. Aberrant resting-state functional connectivity among brain regions involved in reward processing, affect regulation, and cognitive control have been implicated in BE. However, the co-influence of brain regions involved in central autonomic control and BE behavior remains unclear. The current study examines whether effective connectivity (EC) patterns in neural networks supporting the afore-mentioned motivational, emotional, and cognitive processes moderates the relationship between HRV and BE behaviors. Resting-state fMRI data from an a priori-defined eating regulation network was analyzed in 158 healthy adults (BE = 30; Control = 128) using spectral dynamic causal modeling. Leave-one-out cross-validation (LOOCV) evaluated the predictive utility of EC patterns on BE group status. Although 20 EC connections were associated with BE (posterior probability > 0.99), EC from the left posterior cingulate cortex to the hypothalamus predicted group membership above chance (AUC = 0.622, 95% CI [0.508, 0.731]). Approximate entropy was a significant predictor of binge eating behavior (ß = -6.625; p < 0.05) in a subset of 114 participants with usable photoplethysmography data (BE = 24; Control = 90). This relationship was significantly moderated by ventral tegmental area to hypothalamus EC (ß = -6.529; p < 0.05). These findings uncover novel directional information flow from brain regions involved in reward processing and emotion regulation to those involved in food-seeking behavior is mitigated by autonomic tone, offering promising targets for future intervention strategies for BE.",
+      "authors": [
+        {
+          "name": "Etienne Atangana"
+        },
+        {
+          "name": "Maria Di Bello"
+        },
+        {
+          "name": "Roger McIntosh"
+        }
+      ],
+      "publishedAt": "2026-04-21",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41627899",
+      "title": "Neurocognitive performance and depressive mood in people with HIV: The role of prescription opioids use.",
+      "summary": "BACKGROUND: The issue of potential adverse reactions or toxicities of pharmacotherapies used for chronic diseases in people with HIV (PWH) is still to be clarified.\nMETHODS: This study targeted potential effects on neurocognition and mood from prescription opioids, alone or in combination with other classes of drugs, using cross-sectional data from 400 participants in the multicenter CHARTER study.\nRESULTS: We found that prescription opioid use alone was not associated with neurocognitive performance (β=-1.05, SE=0.80, p =0.18) or depressive mood (β=-0.08, SE=0.19, p =0.65). However, if used in combination with antidepressants, prescription opioid use significantly correlated with reduced neurocognitive performance (β=-2.58, SE=1.17, p =0.03). Also, combinations of prescription opioids and antidepressants with statins (β=-2.87, SE=1.49, p =0.05) or lipid-lowering agents other than statins (β=-2.88, SE=1.39, p =0.04) were associated with lower neurocognitive performance. The interaction of prescription opioid use with the presence of distal sensory polyneuropathy (DSP) was significant ( p =0.03). In those without DSP, prescription opioid use was associated with better neurocognitive performance (β=4.25, SE=2.13, p =0.04); by contrast, in those with DSP, the direction of the effect was reversed. No modifying effect on neurocognition was obtained considering distal neuropathic pain, lifetime substance disorder, lifetime major depression diagnosis, or detectable viral load.\nCONCLUSION: These findings underscore the importance of neurocognition impact from drug combinations and careful consideration of opioid prescriptions in combination with other medications in the management of PWH.",
+      "authors": [
+        {
+          "name": "Enrico Ripamonti"
+        },
+        {
+          "name": "Qing Ma"
+        },
+        {
+          "name": "Anya Umlauf"
+        },
+        {
+          "name": "Scott Letendre"
+        },
+        {
+          "name": "Ronald J Ellis"
+        }
+      ],
+      "publishedAt": "2026-02-02",
+      "source": "PubMed"
+    }
+  }
+]
