@@ -1,0 +1,56 @@
+2026-05-27 08:09:44,851 - INFO - 正在处理 2026-05-27 的论文数据
+2026-05-27 08:09:44,852 - INFO - 读取到 7 篇论文数据
+2026-05-27 08:09:44,852 - INFO - 正在处理第 1/7 篇论文
+2026-05-27 08:09:44,852 - INFO - 正在评审/翻译第 1 篇论文 (尝试 1/3)
+2026-05-27 08:09:44,852 - INFO - 使用模型: DeepSeek Chat
+2026-05-27 08:09:45,703 - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-27 08:09:46,463 - INFO - 第 1 篇论文被 DeepSeek 判定为不相关，已自动过滤。
+2026-05-27 08:09:46,464 - INFO - 第 1 篇论文已过滤，未写入结果集
+2026-05-27 08:09:49,464 - INFO - 正在处理第 2/7 篇论文
+2026-05-27 08:09:49,464 - INFO - 正在评审/翻译第 2 篇论文 (尝试 1/3)
+2026-05-27 08:09:49,464 - INFO - 使用模型: DeepSeek Chat
+2026-05-27 08:09:49,782 - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-27 08:09:54,087 - INFO - 第 2 篇论文处理成功
+2026-05-27 08:09:57,088 - INFO - 正在处理第 3/7 篇论文
+2026-05-27 08:09:57,088 - INFO - 正在评审/翻译第 3 篇论文 (尝试 1/3)
+2026-05-27 08:09:57,088 - INFO - 使用模型: DeepSeek Chat
+2026-05-27 08:09:57,483 - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-27 08:09:58,727 - INFO - 第 3 篇论文被 DeepSeek 判定为不相关，已自动过滤。
+2026-05-27 08:09:58,727 - INFO - 第 3 篇论文已过滤，未写入结果集
+2026-05-27 08:10:01,728 - INFO - 正在处理第 4/7 篇论文
+2026-05-27 08:10:01,728 - INFO - 正在评审/翻译第 4 篇论文 (尝试 1/3)
+2026-05-27 08:10:01,728 - INFO - 使用模型: DeepSeek Chat
+2026-05-27 08:10:02,134 - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-27 08:10:03,595 - INFO - 第 4 篇论文被 DeepSeek 判定为不相关，已自动过滤。
+2026-05-27 08:10:03,595 - INFO - 第 4 篇论文已过滤，未写入结果集
+2026-05-27 08:10:06,596 - INFO - 正在处理第 5/7 篇论文
+2026-05-27 08:10:06,596 - INFO - 正在评审/翻译第 5 篇论文 (尝试 1/3)
+2026-05-27 08:10:06,596 - INFO - 使用模型: DeepSeek Chat
+2026-05-27 08:10:06,930 - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-27 08:10:07,902 - INFO - 第 5 篇论文被 DeepSeek 判定为不相关，已自动过滤。
+2026-05-27 08:10:07,902 - INFO - 第 5 篇论文已过滤，未写入结果集
+2026-05-27 08:10:10,902 - INFO - 正在处理第 6/7 篇论文
+2026-05-27 08:10:10,902 - INFO - 正在评审/翻译第 6 篇论文 (尝试 1/3)
+2026-05-27 08:10:10,903 - INFO - 使用模型: DeepSeek Chat
+2026-05-27 08:10:11,232 - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-27 08:10:12,399 - INFO - 第 6 篇论文被 DeepSeek 判定为不相关，已自动过滤。
+2026-05-27 08:10:12,402 - INFO - 第 6 篇论文已过滤，未写入结果集
+2026-05-27 08:10:15,402 - INFO - 正在处理第 7/7 篇论文
+2026-05-27 08:10:15,403 - INFO - 正在评审/翻译第 7 篇论文 (尝试 1/3)
+2026-05-27 08:10:15,403 - INFO - 使用模型: DeepSeek Chat
+2026-05-27 08:10:15,743 - INFO - HTTP Request: POST https://api.deepseek.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-27 08:10:16,605 - INFO - 第 7 篇论文被 DeepSeek 判定为不相关，已自动过滤。
+2026-05-27 08:10:16,605 - INFO - 第 7 篇论文已过滤，未写入结果集
+2026-05-27 08:10:19,605 - INFO - 论文处理统计：总数 7，成功 1，失败 0
+2026-05-27 08:10:19,975 - INFO - 开始分析论文数据，时间范围：2026-05-20 至 2026-05-27
+2026-05-27 08:10:19,981 - INFO - 处理 2026-05-27 的数据：找到 1 篇论文
+2026-05-27 08:10:19,981 - DEBUG - Building prefix dict from the default dictionary ...
+2026-05-27 08:10:20,479 - DEBUG - Dumping model to file cache /tmp/jieba.cache
+2026-05-27 08:10:20,515 - DEBUG - Loading model cost 0.534 seconds.
+2026-05-27 08:10:20,515 - DEBUG - Prefix dict has been built successfully.
+2026-05-27 08:10:20,534 - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2026-05-27 08:10:20,535 - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2026-05-27 08:10:20,538 - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2026-05-27 08:10:20,539 - INFO - Using categorical units to plot a list of strings that are all parsable as floats or dates. If these strings should be plotted as numbers, cast to the appropriate data type before plotting.
+2026-05-27 08:10:23,686 - INFO - 统计图表生成完成
+2026-05-27 08:10:23,693 - INFO - 日报已生成：newsletters/2026-05-27_daily_paper.md
