@@ -1,0 +1,205 @@
+[
+  {
+    "paper": {
+      "id": "42192026",
+      "title": "Psychological distress in cancer survivors: a population-based analysis and machine learning-based risk stratification.",
+      "summary": "PURPOSE: As the number of cancer survivors increases, psychological distress has become an important issue. Using nationally representative data, we evaluated mental health outcomes among Korean cancer survivors compared with cancer-free controls and developed models to identify individuals at risk of psychological distress.\nMETHODS: We analyzed data from the Korea National Health and Nutrition Examination Survey (KNHANES) from 2007 to 2021. Psychological outcomes were assessed using standardized questionnaires, and a composite distress outcome was constructed. Risk stratification models were developed among cancer survivors using logistic regression and machine learning algorithms, including random forest, XGBoost, LightGBM, support vector machines, k-nearest neighbors, and naïve Bayes.\nRESULTS: A total of 88,061 participants were included, comprising 3733 cancer survivors and 84,328 cancer-free controls. Compared with cancer-free controls, cancer survivors had higher odds of depressed mood (OR 1.33; 95% CI 1.18-1.51), suicidal ideation (OR 1.14; 95% CI 1.00-1.31), suicide planning (OR 1.91; 95% CI 1.37-2.65), and mental health counseling (OR 1.36; 95% CI 1.08-1.71). Among cancer survivors, multiple models were evaluated, with logistic regression showing the highest performance (AUROC 0.689), followed by XGBoost (0.686). In logistic regression, longer working hours, depression history, activity limitation, female sex, smoking, employment, low income, and distorted body image were independently associated with distress. SHAP analysis identified activity limitation, sex, and depression history as key factors.\nCONCLUSIONS: Cancer survivors experience increased psychological distress across multiple outcomes. Machine learning-based models may help identify individuals at higher risk of psychological distress, supporting risk-based assessment in survivorship care.",
+      "authors": [
+        {
+          "name": "Jeong Yun Jang"
+        },
+        {
+          "name": "Dawoon Jeong"
+        },
+        {
+          "name": "Hyeon Kang Koh"
+        },
+        {
+          "name": "Kyunghye Bang"
+        },
+        {
+          "name": "Gyurim Kim"
+        },
+        {
+          "name": "Semie Hong"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42191977",
+      "title": "Neurovascular coupling in the basolateral amygdala modulates negative emotions.",
+      "summary": "Emotion induces changes in regional cerebral blood flow, a manifestation of neurovascular coupling (NVC). However, whether NVC provides feedback to actively modulate emotion remains unexplored. Here, we demonstrate that NVC actively and bidirectionally modulates stress-induced negative emotions. We established bidirectional manipulations of NVC in freely moving mice by employing integrated pharmacological, genetic, and arteriolar optogenetic approaches. Our results showed that both systemic and region-specific NVC deficiencies in the basolateral amygdala (BLA) heightened emotional responses when mice transitioned from a safe, familiar environment to anxiogenic environments and that local restoration of NVC in the BLA normalized these responses. Mechanistically, NVC dysfunction impaired the capacity of BLA neuronal scaling during state transitions, manifesting as a characteristic biphasic pattern of c-Fos topology. NVC-deficient animals aberrantly adopted high-stress configurations under mild stress but regressed to low-stress templates during high-demand survival threats, thereby compromising defensive sustainability. Notably, the genetic NVC-enhancement model counteracted NVC impairments caused by chronic stress, thereby alleviating stress-driven emotional distress. These findings establish NVC in the BLA as an allostatic program that fine-tunes neural circuit activity during emotional responses, with implications for understanding and treating emotional disorders.",
+      "authors": [
+        {
+          "name": "Jiayu Ruan"
+        },
+        {
+          "name": "Xinghua Quan"
+        },
+        {
+          "name": "Huiqi Xie"
+        },
+        {
+          "name": "Yiyi Zhang"
+        },
+        {
+          "name": "Dongdong Zhang"
+        },
+        {
+          "name": "Wentao Wang"
+        },
+        {
+          "name": "Bingrui Zhao"
+        },
+        {
+          "name": "Danping Lu"
+        },
+        {
+          "name": "Yuxiao Niu"
+        },
+        {
+          "name": "Jie-Min Jia"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42191936",
+      "title": "Third molars surgical extraction awareness: a cross-sectional questionnaire-based survey.",
+      "summary": "PURPOSE: This study aimed to assess public awareness of the surgical third molar extraction, preventive recommendations, and fear levels among individuals who underwent third molar surgical extraction (E) and those without prior experience (WE).\nMETHODS: A questionnaire survey of 584 respondents assessed demographics, knowledge of preventive recommendations, areas in which they felt a lack of information, and fear levels (1-10 point scale). Statistical analyses were performed at a significance level of p = 0.05.\nRESULTS: The E group (313 respondents) proved to be better informed than WE (271). The lowest knowledge scores in both groups were related to pain medication and postoperative diet; the most unclear areas included complications (33.6%) and pain medication (22.1%). The highest level of effectiveness was observed for the combination of written leaflets and verbal instructions among the educational approaches evaluated. In E group, the mean fear score was 5.7 (SD = 2.7) before the first and 4.9 (SD = 2.8) before the second extraction (p < 0.001), while in WE the score was higher 6.3 (SD = 2.7) (p = 0.012). Fear levels were lower among regular dentist attendees (p = 0.004), and in men (p < 0.0001).\nCONCLUSION: Insufficient knowledge of postoperative care, especially in pain medication use, was observed, even among respondents with a prior history of the surgical extraction. Combined verbal and written instructions appeared to be associated with knowledge of preventive recommendations. Lower levels of fear were reported by men and by individuals with prior experience of the procedure.",
+      "authors": [
+        {
+          "name": "Jiří Borovec"
+        },
+        {
+          "name": "Wanda Urbanová"
+        },
+        {
+          "name": "Petra Křížová"
+        },
+        {
+          "name": "Jana Vašáková"
+        },
+        {
+          "name": "David Vařejčko"
+        },
+        {
+          "name": "Petra Poláčková"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42191343",
+      "title": "Dietary polyphenols as modulators of the microbiota-gut-brain axis in depression and anxiety: a preclinical perspective.",
+      "summary": "Mood and anxiety disorders are increasingly prevalent conditions, and growing evidence indicates that the gut microbiota plays a central role in their pathophysiology through the microbiota-gut-brain axis. This review summarizes the current preclinical evidence of the effects of dietary polyphenols on this axis and their implications for mood regulation, while also discussing their translational relevance based on human-equivalent dose estimations and available clinical findings. Overall, the literature supports that polyphenols modulate the gut microbial composition and diversity, promote beneficial bacterial groups, and alter microbiota-derived metabolites, particularly short-chain fatty acids, while improving the gut barrier integrity and reducing systemic and neuroinflammatory processes. These microbiota-related changes were often associated with alterations in neurotransmitter systems, neurotrophic factors, and markers of synaptic plasticity, resulting in improvements in depressive- and anxiety-like behaviors and, in some cases, cognitive performance in animal models. Correlation analyses further strengthen the links between specific microbial taxa, metabolites, and neurobehavioral outcomes, reinforcing the relevance of gut microbiota modulation as a determinant pathway. In addition, dose translation analyses reveal substantial variability in dietary feasibility, and clinical studies, although limited, generally support beneficial effects on mood-related outcomes. Collectively, these findings highlight dietary polyphenols as promising modulators of the microbiota-gut-brain axis and emphasize their relevance for future nutritional strategies targeting mood-related disorders.",
+      "authors": [
+        {
+          "name": "Levi Nascimento Bellinazzi"
+        },
+        {
+          "name": "Iara Lopes Lemos"
+        },
+        {
+          "name": "Agatta Caroline de Souza"
+        },
+        {
+          "name": "Giulianna Genizelli"
+        },
+        {
+          "name": "Angela Giovana Batista"
+        },
+        {
+          "name": "Mario Roberto Marostica Junior"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42191211",
+      "title": "Hot days increase the risk of heat-stress-related deaths in endangered koala populations.",
+      "summary": "Heat exposure has been recognized as an increasingly important driver of wildlife vulnerability worldwide, making it essential to understand how rising temperatures affect species with limited physiological flexibility. We used a case-crossover analytical framework from environmental epidemiology to evaluate the association between ambient temperature and koala admission into care and mortality across New South Wales, Australia. We examined 11 862 koala rescue admissions recorded between 2000 and 2022. Risk of admission and mortality for adult koalas increased once the 7-day average maximum daily temperature exceeded 27°C, with risk continuing to rise at higher temperatures. Exposure above 30°C increased the odds of admission or death 1.5-3.5 times compared with individuals exposed to 25°C. Mapping heat-related risk indicated that inland north-west populations face the greatest exposure to high temperatures. We list intervention guidelines to support prevention, preparedness and response in high-risk regions. Our results highlight how even moderate temperature increases can elevate mortality risk in a thermally sensitive mammal, underscoring the need to identify and mitigate heat-related threats for wildlife as climates continue to warm. We adapted a technique used in human health to wildlife veterinary admission data and provided a novel framework for quantifying the impacts of extreme heat on vulnerable free-ranging populations.",
+      "authors": [
+        {
+          "name": "Valentina S A Mella"
+        },
+        {
+          "name": "Mark B Krockenberger"
+        },
+        {
+          "name": "Geoffrey G Morgan"
+        },
+        {
+          "name": "Joy S Tripovich"
+        },
+        {
+          "name": "Edward Jegasothy"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42191209",
+      "title": "Antidepressant exposure suppresses boldness and behavioural individuality across social contexts in fish.",
+      "summary": "Psychoactive pharmaceuticals have been increasingly detected across the environment worldwide. Alarmingly, these pollutants disrupt ecologically important behaviours in exposed wildlife, both at the population-level and individual-level. Individual-level responses, such as the differences between individuals (i.e. behavioural individuality), are a key facilitator of population resilience and adaptive potential. Nevertheless, the effects of pharmaceutical exposure on behavioural individuality across social contexts are currently poorly understood. To address this, we investigated whether a 21-day exposure to an environmentally realistic level (1 µg l-1) of a ubiquitous pollutant, the antidepressant venlafaxine, caused population- and individual-level behavioural responses in juvenile southern pygmy perch (Nannoperca australis), when tested individually and in the presence of a conspecific. We found that, in the presence of another fish, exposed individuals were less exploratory than controls, but this effect was not observed while in social isolation. Moreover, exposed fish differed less from each other (i.e. lower behavioural individuality) in their activity in the individual trials and their exploration in the paired trials. Lastly, venlafaxine also reduced body condition in exposed fish. Our findings suggest that psychoactive pharmaceuticals can alter body condition and behaviour across ecologically relevant contexts, with potential implications for the adaptive capacity and population resilience of exposed wildlife.",
+      "authors": [
+        {
+          "name": "Raiko Rafeeq"
+        },
+        {
+          "name": "Upama Aich"
+        },
+        {
+          "name": "Minna Saaristo"
+        },
+        {
+          "name": "Bob B M Wong"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42172430",
+      "title": "Position-Dependent External Load Management in Professional Football: An Exploratory Observational Study on the Effects of Microcycle Length.",
+      "summary": "Galiano, C, Nakamura, FY, Ribeiro, J, Asín-Izquierdo, I, and Asian-Clemente, JA. Position-dependent external load management in professional football: an exploratory observational study on the effects of microcycle length. J Strength Cond Res XX(X): 000-000, 2026-The literature shows that professional football players face different external loads during matches based on their playing positions, but it remains unclear whether their weekly accumulated load reflects their specific roles or remains consistent regardless of position. The objectives of this study were to analyze how microcycle length affects the external load ratio across different playing positions in professional football players, and to examine differences in the ratio values depending on players' specific positions and microcycle length. Global Positioning System-based metrics from a professional football club were collected for 2 consecutive seasons, covering a total of 92 matches (68 regular season, 12 European competitions, and 12 national cup). The external load ratio was defined as the accumulated load in the microcycle/match load in competition. The results of the study show that, in most cases, longer microcycles are associated with higher external load ratios across all playing positions and variables analyzed (p < 0.001). However, except for total distance, all external load variables showed similar ratios between 3-day and 4-day microcycles. Furthermore, the ratios between positions remained similar across all playing positions and microcycle lengths evaluated, except for high decelerations in 3- and 6-day microcycles (p < 0.040) and high accelerations in 3-day microcycles (p < 0.001). In conclusion, longer microcycles increase external load ratios across all playing positions, with training loads generally aligned with match demands regardless of position or microcycle length. Effective load monitoring and individualization are essential to optimize performance and reduce injury risk in professional football.",
+      "authors": [
+        {
+          "name": "Carlos Galiano"
+        },
+        {
+          "name": "Fábio Yuzo Nakamura"
+        },
+        {
+          "name": "João Ribeiro"
+        },
+        {
+          "name": "Iván Asín-Izquierdo"
+        },
+        {
+          "name": "Jose Antonio Asian-Clemente"
+        }
+      ],
+      "publishedAt": "2026-05-22",
+      "source": "PubMed"
+    }
+  }
+]
