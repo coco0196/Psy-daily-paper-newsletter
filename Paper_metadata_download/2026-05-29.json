@@ -1,0 +1,25 @@
+[
+  {
+    "paper": {
+      "id": "42190083",
+      "title": "Determinants of Mental Health Help-Seeking Behavior Among Korean Adults: A Population-Based Study Using the 2023 Korea National Health and Nutrition Examination Survey.",
+      "summary": "PURPOSE: To explore key factors influencing mental health help-seeking behavior (MHHSB) among Korean adults, using data from the 2023 Korea National Health and Nutrition Examination Survey (KNHANES).\nMETHOD: A correlational study was conducted with 5,340 adults aged ≥19 years using data from the 2023 KNHANES. Data were analyzed using complex sample procedures, including descriptive statistics, chi-square tests, t tests, and logistic regression.\nRESULTS: Only 4.6% of participants reported MHHSB. Significant predictors included sex, age, marital status, health literacy, activity limitations, depressive mood, perceived stress, suicide risk, and anxiety level. Overall, these variables explained 31% of the variance in MHHSB.\nCONCLUSION: Sociodemographic characteristics, health literacy, physical limitations, and mental health conditions influence MHHSB among community-dwelling adults in Korea, with women, younger adults, and unmarried individuals showing lower service use despite high perceived need. Findings highlight the critical role of psychiatric-mental health nurses in implementing targeted interventions, enhancing health literacy, and leveraging family and community resources to improve timely access and mental health outcomes.",
+      "authors": [
+        {
+          "name": "Moonhee Gang"
+        },
+        {
+          "name": "Ga-Ae Kim"
+        },
+        {
+          "name": "Joonyeong Lee"
+        },
+        {
+          "name": "Farhatun Nisaa Shoeb"
+        }
+      ],
+      "publishedAt": "2026-05-26",
+      "source": "PubMed"
+    }
+  }
+]
