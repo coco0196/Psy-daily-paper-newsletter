@@ -1,0 +1,281 @@
+[
+  {
+    "paper": {
+      "id": "42222252",
+      "title": "COVID-19 testing and mental health service utilization in Ontario: a population-based cohort study.",
+      "summary": "OBJECTIVE: To examine differences in mental health-related healthcare utilization for anxiety and depression between individuals who did and did not undergo COVID-19 PCR testing in Ontario. Background: The COVID-19 pandemic has been associated with changes in mental health and healthcare utilization.\nMETHODS: We conducted a population-based retrospective cohort study using linked ICES data, including 6,175,114 adults (January 2020-March 2021). Exposure was PCR-positive, PCR-negative, or untested. The outcome was time to first mental health-related healthcare use for anxiety and depression, identified using validated codes. Adjusted hazard ratios (aHRs) were estimated using Cox models with propensity score matching.\nRESULTS: Individuals who underwent testing had higher mental health-related healthcare utilization than untested individuals. This was observed in PCR-positive (aHR 6.37; 95% CI 6.25-6.50) and PCR-negative groups (aHR 5.91; 95% CI 5.87-5.95). Higher utilization occurred among younger individuals, females, and socioeconomically disadvantaged groups. Results were consistent in matched analyses.\nCONCLUSION: Individuals underwent testing had higher mental health service utilization; similar estimates across PCR-positive and PCR-negative groups suggest testing reflects underlying vulnerability and healthcare-seeking behavior rather than a causal effect on mental health outcomes.",
+      "authors": [
+        {
+          "name": "Kiran Saqib"
+        },
+        {
+          "name": "Vivek Goel"
+        },
+        {
+          "name": "Joel A Dubin"
+        },
+        {
+          "name": "Jeremy VanderDoes"
+        },
+        {
+          "name": "Zahid Ahmad Butt"
+        }
+      ],
+      "publishedAt": "2026-06-01",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42209176",
+      "title": "[Effects of fasting on anxiety-and depression-like behaviors in mice and the role of the paraventricular thalamus in the underlying mechanism].",
+      "summary": "Objective: To investigate the effects of fasting on anxiety-and depression-like behaviors in mice, and to elucidate the underlying neural mechanisms. Methods: Eight-week-old male C57BL/6J mice (n=44) and Fos-2A-iCreER transgenic mice (n=48) were randomly assigned using a random number table.The male C57BL/6J mice were divided into six groups (n=36): anxiety-like models were established by 2-hour acute restraint stress (ARS), depression-like models were induced by intraperitoneal injection of lipopolysaccharide, and control groups were also set up. Within each model, mice were further divided into a fasting group (24-hour food deprivation) and an ad libitum feeding group. Fasting efficacy was assessed by monitoring changes in body weight and food intake. Anxiety-like behaviors were evaluated using the open field test and elevated plus maze test, while depression-like behaviors were assessed using the tail suspension test and forced swimming test. Whole-brain neuronal activation in response to fasting was detected in both fasted and non-fasted C57BL/6J mice (n=8) was detected through c-Fos immunofluorescence staining. Subsequently, the Fos-2A-iCreER transgenic mice were selected. The targeted recombination into active promoters (TRAP) technique was employed to specifically label fasting-activated neurons, and chemogenetic techniques were employed to activate or inhibit fasting-related neuronal ensembles (n=24 per experiment). Anxiety-like and depression-like models were re-established separately, and mice in each model were divided into a fasting group (24-hour food deprivation) and an ad libitum feeding group, in order to investigate the effects of activating or inhibiting neurons related to fasting on anxiety-and depression-like behaviors. Results: The open field test and the elevated plus maze test provided evidence that anxiety-like models had been successfully established. In addition, the tail suspension test and the forced swimming test provided evidence that depression models had been successfully established. In comparison with the ad libitum feeding group, the mice fasted for 24 h showed lower body weight and higher food intake (all P<0.05). Fasted mice demonstrated increased distance travelled, prolonged duration, and elevated entries in the central area of the open field, as well as greater distance traveled, higher percentage of duration, and more entries in the open arms of the elevated plus maze. Additionally, fasted mice showed shorter immobility times in both the tail suspension test and the forced swimming test. All differences were statistically significant (all P<0.05). c-Fos staining revealed enhanced neuronal activation in the paraventricular thalamus (PVT) region after fasting (all P<0.05). Chemogenetic activation of fasting-related neuronal ensembles in the PVT mimicked the anti-anxiety and anti-depression effects observed following fasting: anxious mice showed greater distance traveled, longer duration, and more entries in the central area of the open field, as well as greater distance traveled, higher percentage of duration, and more entries in the open arms of the elevated plus maze; depressed mice showed shorter immobility times in both the tail suspension test and the forced swim test (all P<0.05).Conversely, chemogenetic inhibition of these neuronal ensembles reversed these effects (all P<0.05). Conclusion: Fasting activates PVT-related neuronal ensembles to elicit anti-anxiety and antidepression effects in mice.",
+      "authors": [
+        {
+          "name": "Z Y Jiang"
+        },
+        {
+          "name": "Y Zhou"
+        },
+        {
+          "name": "Z T Qiu"
+        },
+        {
+          "name": "X Y Pan"
+        },
+        {
+          "name": "X Y Wang"
+        },
+        {
+          "name": "W W Ni"
+        },
+        {
+          "name": "J M Xia"
+        },
+        {
+          "name": "W X Li"
+        },
+        {
+          "name": "Y Han"
+        }
+      ],
+      "publishedAt": "2026-05-29",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42201973",
+      "title": "Neural representations of popularity and leadership status relate to conformity in daily life.",
+      "summary": "Individuals are motivated to increase their social status. To succeed in this pursuit, people must track information about others in their social sphere, monitor group norms, and adjust their behavior strategically. This study employed functional MRI and ecological momentary assessment methods in a sample of 92 college students belonging to 9 social groups to elucidate the neural mechanisms underlying these processes and their relationship to conformity in the context of alcohol use. When young adults passively looked at faces of their real-life social group peers, brain systems implicated in valuation and social cognition spontaneously tracked information about the popularity and leadership status of the social targets in an interdependent manner. Individual differences in these neural valuations were systematically associated with varying levels of conformity. Students who had stronger responses to faces of peers with relatively higher popularity and leadership status than themselves in one key valuation brain region, the ventromedial prefrontal cortex (vmPFC), were more likely to align their drinking behavior with their groups' norms in everyday life. These results provide evidence for how brain systems involved in valuation and social cognition flexibly track information about peers' popularity and leadership status in real-life social groups and contribute to a growing literature on the neural mechanisms through which social comparison processes shape conformity. Our study highlights the vmPFC as a central hub that spontaneously tracks status differences between the self and peers and uses this information to guide behavior to match group norms.",
+      "authors": [
+        {
+          "name": "Ovidia A Stanoi"
+        },
+        {
+          "name": "Danielle Cosme"
+        },
+        {
+          "name": "Mia Jovanova"
+        },
+        {
+          "name": "Yoona Kang"
+        },
+        {
+          "name": "Faustine Corbani"
+        },
+        {
+          "name": "Amanda L McGowan"
+        },
+        {
+          "name": "José Carreras-Tartak"
+        },
+        {
+          "name": "Anthony Resnick"
+        },
+        {
+          "name": "Peter S Bearman"
+        },
+        {
+          "name": "Zachary M Boyd"
+        },
+        {
+          "name": "Dani S Bassett"
+        },
+        {
+          "name": "David M Lydon-Staley"
+        },
+        {
+          "name": "Peter J Mucha"
+        },
+        {
+          "name": "Emily B Falk"
+        },
+        {
+          "name": "Kevin N Ochsner"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42201829",
+      "title": "Cultural beliefs and practices related to skincare and their influence on treatment adherence.",
+      "summary": "The demographics landscape has evolved, resulting in diverse populations with various cultural backgrounds. Within the field of dermatology, dermatological conditions and skin care practices vary widely across patients with different skin tones. Therefore, this article focuses on the cultural beliefs and practices related to skincare among individuals with skin of colour, the challenges they face and the importance of healthcare professionals having the awareness, understanding and ability to recognise the issues they might come across in clinical practice.",
+      "authors": [
+        {
+          "name": "Sandra Lawton"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42201826",
+      "title": "When technology meets teamwork: transforming complex diabetes care with hybrid closed-loop systems.",
+      "summary": "BACKGROUND: Individuals who meet the eligibility criteria for hybrid closed loop technology may not all have equal access, especially those outside conventional acute care pathways. This is particularly the case for people with type 1 diabetes, supported by district nursing services.\nAIMS: This case study discusses the implementation of hybrid closed loop systems for managing blood glucose levels in type 1 diabetes according to the National Institute for Health and Care Excellence TA 943 guideline.\nCASE DESCRIPTION: The patient was a 59-year-old man with a long history of type 1 diabetes. He had experienced a traumatic brain injury in 1997 that had a significant impact on his cognitive abilities and resulted in a significant loss of decision-making capacity regarding his diabetes management. This necessitated daily visits from district nurses for insulin administration and capillary blood glucose level checks. Although eligible for a hybrid closed loop system, he was unable to access it because the district nursing team delivered his insulin.\nOUTCOMES: Glycaemic control and quality of life improved significantly, demonstrating the feasibility of implementing hybrid closed loop systems for patients with complex needs.\nCONCLUSIONS: The successful implementation of hybrid closed loop system indicates the potential of this approach in enhancing diabetes care. This case study presents a unique collaborative model between acute and district nursing teams, which can broaden access to hybrid closed loop systems and improve outcomes in diabetes management, even in the face of existing inequalities driven by workforce limitations and knowledge gaps.\nIMPLICATIONS FOR PRACTICE: The success of initiating hybrid closed loop systems in a community setting, supported by a diversified acute diabetes service and an upskilled district nursing team, demonstrates that access can be broadened with targeted efforts. This implies that the integration and collaboration of community and acute care teams are not only feasible but also crucial in bridging care gaps.",
+      "authors": [
+        {
+          "name": "Katie Hards"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42201354",
+      "title": "Competency-based approaches to sexualized substance use: Addressing curriculum gaps in nurse practitioner education.",
+      "summary": "The rise of chemsex and party-and-play (PnP) among gay, bisexual, and other men who have sex with men (MSM) presents complex challenges for nurse practitioner (NP) delivered care. Research consistently demonstrates that PnP participation contributes to increased sexually transmitted infection (STI) and HIV risk, stimulant and polysubstance dependence, trauma-associated symptoms, and mental health concerns. Despite this evidence, PnP remains largely absent within NP education in the United States. Studies across behavioral health, sexual health, addiction science, and LGBTQ+ health report elevated depressive symptoms, anxiety, emotional vulnerability, and stimulant-driven sexual behaviors among PnP participants. These findings underscore the need for NP graduates to acquire competencies in sexualized drug use, trauma-informed care, harm reduction, social determinants of health (SDOH), and culturally responsive communication. This gap leads to fragmented care, missed diagnoses, and diminished opportunities for early intervention in substance use, sexual health, and mental health. Drawing on 21 studies, this article integrates evidence on PnP-related harm with documented NP curriculum deficiencies and proposes a competency-based educational model. Recommendations include LGBTQ+ health integration, trauma-informed strategies, harm reduction approaches, ethics education, SDOH content, and population-specific competencies aligned with national nursing standards. Preparing NP students to recognize, assess, and manage PnP-related health issues is essential to improving clinical outcomes and advancing health equity for LGBTQ+ communities.",
+      "authors": [
+        {
+          "name": "Joshua Barnes"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42190012",
+      "title": "Reading ability in both deaf and hearing adults is linked to neural representations of abstract phonology derived from visual speech.",
+      "summary": "Reading is central to academic and vocational success. Some deaf children face reading challenges due to limited access to spoken or signed language. Robust phonological representations are key to reading development in hearing children. Spoken language phonology may be one of many contributors to reading development in deaf children. Indeed, speechreading ability correlates with reading skill in both deaf and hearing individuals, suggesting it is linked to reading development regardless of hearing status. Further support for this hypothesis would be provided by evidence that similar neural representations of speech phonology are evoked by visual speech and other language forms (auditory speech and text) and that these neural representations are related to reading proficiency. We used fMRI and representational similarity analysis (RSA) to identify shared neural representations of spoken language phonological structure. A group of deaf adult participants (N = 22), with a mixture of sign language and spoken language backgrounds and reading abilities, were presented with single lexical items as visual speech and dynamic text (cursive text, revealed letter-by-letter to promote a phonological reading strategy). Adult hearing participants (N = 25) were presented with the same words, but as visual speech and auditory speech. Shared neural representations of phonological structure of English words were found in each group in the superior and middle temporal cortex (STC/MTC) and these abstract representations were more similar across different language forms in better readers. Our data provide neurobiological evidence of the contribution of visual speech to abstract phonological representations of spoken language, that relate to reading proficiency, in both deaf and hearing adults.",
+      "authors": [
+        {
+          "name": "Samuel Evans"
+        },
+        {
+          "name": "Cathy J Price"
+        },
+        {
+          "name": "Jörn Diedrichsen"
+        },
+        {
+          "name": "Tae Twomey"
+        },
+        {
+          "name": "Indie Beedie"
+        },
+        {
+          "name": "Maggie Fraser"
+        },
+        {
+          "name": "Mairéad MacSweeney"
+        }
+      ],
+      "publishedAt": "2026-05-26",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42189975",
+      "title": "Impact of sex chromosomes and gonad type in stress susceptibility in corticostriatal brain regions.",
+      "summary": "Major depressive disorder (MDD) is characterized by symptom heterogeneity and sex differences in prevalence. To gain insight into these sex differences, we utilized the subchronic variable stress paradigm (SCVS) in which female mice are susceptible, while males are behaviorally resilient. We used the Four Core Genotypes mice to differentiate between sex chromosome complement (XX vs. XY) and gonad type (ovaries vs. testes) in stress susceptibility, uncoupling these factors by removing the testes-determining SRY gene from the Y chromosome. Mice were subjected to SCVS followed by assays to assess anxiety-/depressive-like behaviors. Regardless of gonads, XX mice were stress susceptible, while XY mice were stress resilient, underscoring the importance of sex chromosome effects to sex differences in susceptibility to SCVS, independent of gonad type. We then performed RNA-sequencing of the prefrontal cortex (PFC) and nucleus accumbens (NAc). Consistent with human MDD and previous rodent SCVS findings, there was little overlap in genes altered by SCVS across sex. In stress susceptible XX mice, stress exposure altered pathways related to immune function, while in resilient XY mice, stress exposure altered pathways involved in neuronal function. There was brain region specificity to how sex chromosome complement and gonad type contributed to sex-specific stress effects. In the NAc, sex chromosome complement was the primary contributor to stress-induced gene expression, while in the PFC, both sex chromosome complement and gonad type contributed. These findings underscore a complex relationship between sex chromosome complement and gonadal factors in shaping stress vulnerability, partly through immune-related pathways.",
+      "authors": [
+        {
+          "name": "Kelly N Barko"
+        },
+        {
+          "name": "Micah A Shelton"
+        },
+        {
+          "name": "Dawson R Kropp"
+        },
+        {
+          "name": "Thien Quy Pham"
+        },
+        {
+          "name": "Jennifer R Rainville"
+        },
+        {
+          "name": "Xiangning Xue"
+        },
+        {
+          "name": "George C Tseng"
+        },
+        {
+          "name": "Georgia E Hodes"
+        },
+        {
+          "name": "Marianne L Seney"
+        }
+      ],
+      "publishedAt": "2026-05-26",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42059068",
+      "title": "Health Care Affordability in the United States, From Crisis to Action: A Presidential Advisory From the American Heart Association.",
+      "summary": "The United States is facing a growing health care affordability crisis. In 2024, national health expenditures totalled $5.3 trillion, or $15 474 per person, accounting for 18.0% of the U.S. economy. Spending on health care continues to rise, propelled by high prices for services, drugs, and devices; growing administrative complexity; chronic underinvestment in prevention, primary care, and public health; and the mounting burden of chronic conditions such as cardiovascular disease. Patients, even those with insurance, frequently face financial hardship, delayed or foregone care, and medical debt because of gaps in coverage and inadequate consumer protections. Addressing this crisis will require coordinated action across the health care system, guided by evidence and a commitment to shared responsibility among key stakeholders. This Presidential Advisory from the American Heart Association draws on interviews and listening sessions with patients, clinicians, payers, employers, health system leaders, and public health experts to examine the many dimensions of affordability and offer a practical framework for action. The Advisory presents 5 core principles to guide efforts to address the affordability crisis: ensuring access to high-quality care without financial hardship; minimizing cost sharing for high-value services; creating shared accountability across the health care system; investing in the workforce, infrastructure, and data systems needed to support progress; and addressing the social and structural factors that make care less affordable for many communities. The evidence, tools, and expertise to combat the health care affordability crisis already exist. What is needed now is the collective will to act.",
+      "authors": [
+        {
+          "name": "Dhruv S Kazi"
+        },
+        {
+          "name": "Joshua A Beckman"
+        },
+        {
+          "name": "Regina M Benjamin"
+        },
+        {
+          "name": "Grace Firestone"
+        },
+        {
+          "name": "Janay C Johnson"
+        },
+        {
+          "name": "Mark B McClellan"
+        },
+        {
+          "name": "Neil Meltzer"
+        },
+        {
+          "name": "Anne Oxrider"
+        },
+        {
+          "name": "Stacey E Rosen"
+        },
+        {
+          "name": "Bertram L Scott"
+        },
+        {
+          "name": "Kevin G Volpp"
+        },
+        {
+          "name": "John J Warner"
+        }
+      ],
+      "publishedAt": "2026-06-01",
+      "source": "PubMed"
+    }
+  }
+]
