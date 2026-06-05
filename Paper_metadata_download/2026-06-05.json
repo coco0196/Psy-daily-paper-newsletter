@@ -1,0 +1,571 @@
+[
+  {
+    "paper": {
+      "id": "42243821",
+      "title": "Beyond the price tag: a scoping review of the determinants of informal payments in health systems and strategies for curbing them.",
+      "summary": "BACKGROUND: Informal payments (IPs) remain a persistent challenge across health systems worldwide and may undermine equity, transparency, and public trust in healthcare delivery. Despite a growing body of research, evidence regarding the determinants of IPs and the strategies proposed to address them remains fragmented and lacks a comprehensive synthesis. This scoping review aimed to: (1) map and synthesize existing evidence on the key determinants of IPs in health systems globally; and (2) identify, categorize, and summarize the range of strategies proposed to curb them.\nMETHODS: Following the Joanna Briggs Institute (JBI) methodology, we conducted a systematic search across five databases-PubMed, Web of Science, Scopus, ProQuest, and ScienceDirect-from database inception through January 2025. Two reviewers independently screened all records against predefined eligibility criteria. Data from the included studies were extracted using a standardized form and thematically analyzed.\nRESULTS: This review synthesized evidence from 68 studies. Determinants of IPs were categorized into five interconnected levels: (1) patient-level factors (e.g., fear of poor-quality care, desire for faster services, and limited knowledge); (2) structural/contextual factors (e.g., underfunding, weak regulation, and type of service); (3) provider-level factors (e.g., low salaries and shortages of supplies); (4) cultural/ethical factors (e.g., norms of gratitude and social acceptance of informal payments); and (5) organizational-level factors (e.g., corruption and lack of accountability). Proposed interventions were grouped into five strategic categories: patient empowerment (education and patient-rights mechanisms); cultural-normative strategies (shifting social norms and fostering trust); financial strategies (improving provider remuneration, formalizing payments, and expanding insurance coverage); structural strategies (strengthening health systems and improving service accessibility); and governance and regulatory strategies (legal frameworks, oversight mechanisms, and sanctions). An analytical framework was developed to illustrate the mechanisms of action and key contextual considerations associated with each strategy, highlighting that implementation processes and outcomes are highly context dependent.\nCONCLUSIONS: IPs are a multifactorial phenomenon rooted in systemic weaknesses, economic incentives, and sociocultural norms. Isolated interventions are unlikely to be effective. Addressing IPs requires integrated, multi-pronged strategies that reduce financial pressures on providers, strengthen governance and transparency, improve service quality and accessibility, empower patients, and reshape cultural norms. This review provides a foundational evidence map to support the design of context-sensitive, system-level policies aimed at reducing and ultimately eliminating informal payments. Future research should evaluate the effectiveness and sustainability of interventions across diverse health system contexts, particularly in underrepresented settings, and further examine the institutional and contextual factors that perpetuate informal payment practices.\nCLINICAL TRIAL NUMBER: Not applicable.",
+      "authors": [
+        {
+          "name": "Faride Sadat Jalali"
+        },
+        {
+          "name": "Najmeh Bordbar"
+        },
+        {
+          "name": "Mohadeseh Ghanbari-Jahromi"
+        },
+        {
+          "name": "Mohsen Bayati"
+        }
+      ],
+      "publishedAt": "2026-06-05",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42243541",
+      "title": "Development and validation of the short form OHIP-TMD (SF-OHIP-TMD): a four-factor eight-item scale for assessing oral health impact in temporomandibular disorders.",
+      "summary": "OBJECTIVE: To develop and validate a short-form version of the Oral Health Impact Profile for Temporomandibular Disorders (SF-OHIP-TMD) that provides an efficient yet comprehensive assessment of TMD-specific oral health-related quality of life.\nMETHODS: An observational cross-sectional study included 1,149 participants diagnosed with TMD according to DC/TMD criteria (397 intra-articular, 240 pain-related, 512 combined TMD). Participants completed the 22-item OHIP-TMD, pain Numeric Rating Scale, Generalized Anxiety Disorder-7, Patient Health Questionnaire-9, and Jaw Function Limitation Scale-8. Parallel analysis and exploratory factor analysis (EFA) were performed on a random split-half sample, followed by confirmatory factor analysis (CFA) on the second split-half. Items were selected based on factor loadings and conceptual coverage. Reliability, validity, and item response theory analyses were conducted.\nRESULTS: Parallel analysis and EFA revealed a four-factor structure (psychological impact, social impact, oral function, orofacial pain) explaining 61% of variance. Eight items with two per factor were selected for the SF-OHIP-TMD. CFA demonstrated excellent model fit (CFI = 0.989, TLI = 0.979, RMSEA = 0.057, SRMR = 0.024). SF-OHIP-TMD showed high reliability (Cronbach's α = 0.87, McDonald's ω = 0.93) and strong correlation with the 22-item version (ρ = 0.959, p < 0.001). Convergent validity (AVE = 0.69) and discriminant validity (HTMT < 0.85) were satisfactory, with strong criterion validity demonstrated through significant correlations between factors and corresponding measures (ρ > 0.4). Item response theory analysis revealed excellent discrimination and differential response patterns between painful and non-painful TMD subtypes.\nCONCLUSION: The 8-item SF-OHIP-TMD maintains the four-factor structure and psychometric robustness of the original 22-item version while significantly reducing assessment burden, making it ideal for routine clinical assessment, longitudinal follow-up and large-scale research applications.",
+      "authors": [
+        {
+          "name": "Yunhao Zheng"
+        },
+        {
+          "name": "Adrian Ujin Yap"
+        },
+        {
+          "name": "Hui Loon Wong"
+        },
+        {
+          "name": "Weijie Tao"
+        },
+        {
+          "name": "Chenlu Liu"
+        },
+        {
+          "name": "Jun Wang"
+        },
+        {
+          "name": "Xin Xiong"
+        }
+      ],
+      "publishedAt": "2026-06-05",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42243525",
+      "title": "Causal attributions shape the formation of novel ability self-beliefs.",
+      "summary": "Healthy individuals typically attribute success to internal and failure to external factors, while people with depression and low self-esteem tend to do the opposite. At the same time, depression and low self-esteem are associated with negatively biased self-related learning and self-beliefs. Here, we used a validated self-related learning task to investigate how internal versus external attributions of performance feedback affect the formation of self-beliefs about ability and how these processes relate to depressive symptoms and self-esteem. Drawing on a computational model that incorporates prediction error valence and causal attributions, we found that participants updated their ability beliefs less when feedback was attributed to external causes. Furthermore, individuals with higher levels of depression and lower self-esteem showed a stronger negativity bias in learning and lower self-esteem was linked to a reduced self-serving attributional bias. These findings provide insight into cognitive mechanisms associated with negative self-related ability beliefs and may help to inform our understanding of processes linked to depressive symptoms.",
+      "authors": [
+        {
+          "name": "Annalina V Mayer"
+        },
+        {
+          "name": "Alexander Schröder"
+        },
+        {
+          "name": "David S Stolz"
+        },
+        {
+          "name": "Nora Czekalla"
+        },
+        {
+          "name": "Frieder M Paulus"
+        },
+        {
+          "name": "Sören Krach"
+        },
+        {
+          "name": "Tobias Kube"
+        },
+        {
+          "name": "Laura Müller-Pinzler"
+        }
+      ],
+      "publishedAt": "2026-06-05",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42243263",
+      "title": "Validation of the modified transplant symptom occurrence and symptom distress scale and exploring symptom burden in Brazilian kidney transplant recipients.",
+      "summary": "Kidney transplant recipients (KTR) may experience burdensome symptoms, including tremor, nausea, and bruises, sometimes caused by immunosuppressive medication, which can negatively influence health-related quality of life. The 59-item Revised Modified Transplant Symptom Occurrence and Symptom Distress scale (MTSOSD-59R) captures patients' symptom experience but has not been validated in Brazil. We evaluated the Brazilian Portuguese MTSOSD-59R regarding content validity (expert panel), internal structure (factor analysis), and associations with other variables (known-groups approach). Symptom occurrence and distress by sex and age were assessed using ridit analyses. 485 KTR (42.2% women; 50.2 ± 12.8 years) were included at median 7.4 [3.2-13.0] years post-transplantation. The expert-rated scale-content validity index was 0.49. Construct validity and known-group associations were confirmed. The most occurring symptoms were anxiety [ridit score: 0.697], tiredness [0.653], and difficulty seeing well [0.652]. The most distressing symptoms were menstrual problems [0.635], difficulty seeing well [0.606], and genital warts [0.595]. Female/younger KTR tended to report more (distress from) psychological/aesthetic symptoms; male/older KTR tended to report more (distress from) physical symptoms. The MTSOSD-59R showed validity for internal structure and relationships to other variables, but insufficient expert-rated content validity for immunosuppression-specific side effects, suggesting it may better reflect general symptom burden in this population.",
+      "authors": [
+        {
+          "name": "Niels L Riemersma"
+        },
+        {
+          "name": "Tim J Knobbe"
+        },
+        {
+          "name": "Renata M C Guedes"
+        },
+        {
+          "name": "Juliana G Ferreira"
+        },
+        {
+          "name": "Luciana A Cabanelas"
+        },
+        {
+          "name": "Kris Denhaerynck"
+        },
+        {
+          "name": "Sabina de Geest"
+        },
+        {
+          "name": "Helady Sanders-Pinheiro"
+        },
+        {
+          "name": "José M Pestana"
+        },
+        {
+          "name": "Renato D Foresto"
+        },
+        {
+          "name": "Stephan J L Bakker"
+        },
+        {
+          "name": "Lúcio R Requião-Moura"
+        }
+      ],
+      "publishedAt": "2026-06-05",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42243240",
+      "title": "Integrating transformer-based credibility signals into neural collaborative filtering for fake review-aware recommendation.",
+      "summary": "Online recommender systems (RS) face growing trust challenges as deceptive reviews distort user feedback. Although RS optimisation and fake review detection have advanced separately, integrating credibility signals directly into recommendation training remains underexplored. This study proposes the Fake-Review-Aware Recommender System (FRARS), which embeds transformer-based deception probabilities into the training objective of a Neural Matrix Factorisation (NeuMF) model. Among several detectors, DeBERTa-v3-base performed best (ROC-AUC = 0.932 on YelpCHI, 0.921 on YelpNYC). FRARS applies these probabilities through two mechanisms: Hard Filtering removes interactions above a deception threshold, while Soft Weighting proportionally down-weights uncertain ones. We evaluate FRARS on two independent Yelp datasets-YelpCHI (67,395 reviews, ~ 49% deceptive) and YelpNYC (359,052 reviews, ~ 10% deceptive). FRARS-Soft improved NDCG@10 by 20.9% on YelpCHI and 19.5% on YelpNYC, with parallel gains in precision and recall; all transformer-based improvements were statistically significant (p < 0.001). Detector quality and recommendation gains exhibited a significant monotonic relationship (Spearman ρ = 0.964 on YelpCHI, 0.929 on YelpNYC). These consistent results across different regions, scales, and deception levels indicate that FRARS offers a practical, modular pathway toward more trustworthy recommendation platforms.",
+      "authors": [
+        {
+          "name": "Yasmeen Abdelmohsen"
+        },
+        {
+          "name": "Khaled Wassif"
+        },
+        {
+          "name": "Nagy Ramadan"
+        }
+      ],
+      "publishedAt": "2026-06-05",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42243169",
+      "title": "Intelligent emotion and behavior recognition for online learners using deep affective computing.",
+      "summary": "Teachers in online classes often have limited visibility into how students are feeling and whether they are staying engaged. This paper presents a practical affective-computing framework that analyses webcam video to recognize both facial emotions and learning-centered behavioral states during live virtual sessions. Student faces are first detected in each frame, then encoded using a convolutional network with an attention module to emphasize informative facial regions. To capture how affect evolves over time, the extracted features are grouped into fixed 16-frame sequences and modelled with a bidirectional GRU to predict four behavioral states: engaged, confused, frustrated and disengaged. We evaluate emotion recognition on the FER2013 benchmark under the standard Train/Public Test/Private Test split, and we evaluate behavior recognition on a publicly available online-learning facial expression dataset (EmoDetect, Kaggle) used for the behavior-recognition experiments from 120 learners (800 annotated temporal segments; inter-annotator agreement κ≈0.75). The proposed model reaches 94.5% accuracy on FER2013 Private Test and achieves 86.9% accuracy with a macro-F1 of 85.4% on the four-class behavior task, improving over facial-expression-only baselines. Profiling further shows that the full pipeline can run at around 25 frames per second on a mid-range GPU, indicating feasibility for real-time monitoring. These results suggest that combining attention-based facial representations with temporal modelling can provide instructors with clearer, webcam-observable indicators of learners' affect and engagement during online teaching.",
+      "authors": [
+        {
+          "name": "Priya K"
+        },
+        {
+          "name": "Pradeep G"
+        },
+        {
+          "name": "Ravimaran S"
+        }
+      ],
+      "publishedAt": "2026-06-05",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42242703",
+      "title": "Introduction to Grant Funding: A Primer for Early-Career Researchers.",
+      "summary": "Early-career hospitalists interested in research often face uncertainty when deciding whether to apply for grant funding. This article provides a practical guide to help early-career researchers navigate early decisions in the grant application process. We review key sources of grants (federal funding, foundations, professional societies, institutional, and commercial), as well as common types of grants (eg, pilot or seed grants, travel grants, career development awards, engagement or community partnership grants, independent research grants) that may be of interest to junior investigators. We take readers through the process of determining whether specific grants are the right fit, how to decide if they should apply, sources of grants, and how to find them. The article addresses the next steps after submission, including interpreting feedback, options for resubmission, or alternative approaches if funding is not secured. Overall, this guide aims to demystify the grant-writing process and support early-career hospitalist researchers in taking their first steps toward funded research. Several helpful tips are also provided. A future article will take readers through the process of writing components of individual grants.",
+      "authors": [
+        {
+          "name": "Alexander F Glick"
+        },
+        {
+          "name": "Carol Duh-Leong"
+        }
+      ],
+      "publishedAt": "2026-06-05",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42234760",
+      "title": "Corrugating van der Waals gaps for decoupling heat and charge transport in layered thermoelectrics.",
+      "summary": "Layered thermoelectric materials face intrinsic challenges in disentangling phonon and electron transport due to their anisotropic bonding networks. Here, we introduce a van der Waals gap engineering strategy that deliberately imposes out-of-plane stress on n-type bismuth telluride (Bi2Te3). Selective interlayer doping creates local charge imbalance, which in turn drives ripple-like lattice corrugations. These structural undulations mimic substrate-induced strain fields, renormalize phonon dispersion, and substantially reduce phonon velocity, thereby suppressing lattice thermal conductivity. The corrugation amplitude is far smaller than the electronic mean free path, ensuring negligible additional electron scattering. As a result, the material reaches a peak zT of 1.43 at 350 kelvin, while the fabricated module delivers a conversion efficiency of 7.5% under a 250-kelvin temperature gradient-both representing state-of-the-art performances for n-type Bi2Te3 systems. More broadly, this work establishes interlayer stress as a general strategy to manipulate phonons in van der Waals solids, providing previously unidentified design principles for high-efficiency thermoelectrics.",
+      "authors": [
+        {
+          "name": "Chuan-Dong Zhou"
+        },
+        {
+          "name": "Jianfeng Cai"
+        },
+        {
+          "name": "Minhui Yuan"
+        },
+        {
+          "name": "Rong Huang"
+        },
+        {
+          "name": "Dongxiang Lv"
+        },
+        {
+          "name": "Yue Wu"
+        },
+        {
+          "name": "Rui-Jie Li"
+        },
+        {
+          "name": "Zongwei Zhang"
+        },
+        {
+          "name": "Xiaojian Tan"
+        },
+        {
+          "name": "Guo-Qiang Liu"
+        },
+        {
+          "name": "Qiang Zhang"
+        },
+        {
+          "name": "Bo Liang"
+        },
+        {
+          "name": "Jun Jiang"
+        }
+      ],
+      "publishedAt": "2026-06-03",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42234756",
+      "title": "Intramolecular hydrogen bond enables ultranarrowband multiple resonance luminescence with refined emission profiles.",
+      "summary": "Ultrahigh-definition displays urgently demand narrowband emitters with ideal Gaussian emission profiles. Multiple resonance (MR) systems are highly competitive yet face a formidable bottleneck: The minimum achievable emission linewidth has become an elusive threshold that cannot be further broken for existing systems. Here, the study proposes a pioneering strategy via intramolecular hydrogen bond construction to break the spectral limit of indolocarbazole (ICz) emitters and develops rotary chiral ICz-fused enantiomeric isomers. This chirality-modified ICz emitter concurrently achieves an emissive peak of 466 nanometers, a full width at half maximum (FWHM) of 56 milli-electron volts, and a suppressed shoulder peak in dilute toluene, impressively achieving the narrowest emission among all reported circularly polarized MR emitters to date. The corresponding electroluminescence device exhibits ultrapure deep-blue emission with a peak wavelength of 469 nanometers and an FWHM of 15 nanometers, as well as high maximum external quantum efficiency of 32.5% with minimal roll-off (20.6% at 10,000 candelas per square meter).",
+      "authors": [
+        {
+          "name": "Qian Wang"
+        },
+        {
+          "name": "Jianping Zhou"
+        },
+        {
+          "name": "Hai Zhang"
+        },
+        {
+          "name": "Chenglong Li"
+        },
+        {
+          "name": "Minqiang Mai"
+        },
+        {
+          "name": "Xuewen Wang"
+        },
+        {
+          "name": "Meng Li"
+        },
+        {
+          "name": "Dongdong Zhang"
+        },
+        {
+          "name": "Lian Duan"
+        }
+      ],
+      "publishedAt": "2026-06-03",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42231552",
+      "title": "Optimizing the dentist-chair coupling constraint in high-volume dental operations: a system dynamics-based decision support approach.",
+      "summary": "PURPOSE: High-volume dental healthcare settings face capacity challenges governed by the rigid coupling constraint between dentists and dental chairs. This study aims to analyze these complex resource interdependencies and evaluate the long-term impacts of capacity management strategies on medical revenue, resource investment, dentist workload and service quality.\nDESIGN/METHODOLOGY/APPROACH: A system dynamics modeling approach was applied to capture the non-linear dynamics and feedback delays. The model was constructed integrating qualitative causal loop diagrams with quantitative stock-flow modeling based on operational data from 2023 to 2025 collected at a large-scale stomatological center in China. Validation was conducted using historical data, achieving a mean absolute percentage error of 2.19% for outpatient visits and 3.09% for medical revenue.\nFINDINGS: Simulation results reveal that capacity expansion alone is insufficient to resolve the supply-demand gap. Aggressive expansion leads to diminishing financial returns and underutilized assets due to high fixed costs. In contrast, an internal optimization strategy satisfies demand earlier, generates the highest net surplus and stabilizes workforce stress more effectively.\nPRACTICAL IMPLICATIONS: The study provides a practical decision-support tool enabling healthcare administrators to transition from experience-based static planning to data-driven dynamic management. It suggests that improving coordination efficiency of coupled resources yields a higher return on investment than simple scale expansion.\nORIGINALITY/VALUE: This research conceptualizes dentist-chair coupling as a dynamic binding constraint within a system dynamics framework and models the interplay between resource constraints and operational feedback loops that drive the long-term capacity, financial performance, and workforce sustainability of dental healthcare organizations.",
+      "authors": [
+        {
+          "name": "Jiakun Fang"
+        },
+        {
+          "name": "Min Yao"
+        },
+        {
+          "name": "Yannan Sun"
+        }
+      ],
+      "publishedAt": "2026-06-03",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "42107748",
+      "title": "Development of AI-assisted 3D-printed degradable hydrogel microneedles for transdermal delivery of progesterone-loaded solid lipid nanoparticles: a novel approach to slowing Alzheimer's disease progression.",
+      "summary": "Progesterone (PG) is used to slow the progression of neurodegenerative diseases, particularly Alzheimer's disease (AD) in postmenopausal women. However, PG exhibits high lipophilicity, resulting in strong binding to skin tissues and plasma proteins, which may limit its systemic transport via transdermal routes. Solid lipid nanoparticles (SLNs) have been highlighted for their potential to enhance drug solubility and facilitate brain-targeted drug delivery for AD treatment. Microneedles (MNs) offer an advanced microtechnology for transdermal drug delivery, significantly improving drug permeation into the skin. However, traditional MNs fabrication methods face challenges related to shape control, dosage precision, high costs, and time consumption. Recent advancements in 3D printing technology offer a promising solution to these limitations. This study aimed to design and evaluate 3D-printed MNs-loaded with PG-SLNs for AD treatment. Biodegradable resin was utilized to fabricate MNs, aided by a Convolutional Neural Networks (CNNs) prediction model for improved accuracy. Mechanical strength, penetration efficiency, degradation, in vitro and in vivo drug delivery efficiency, cellular toxicity, and stability were evaluated. The optimized MNs, with a height of 756.98 ± 14.78 µm, effectively penetrated the skin barrier. SLNs exhibited a particle size of 308.91 ± 1.66 nm, PDI of 0.19 ± 0.08, and ZP of -30.03 ± 1.19 mV. The MNs retained sufficient mechanical strength post-drug loading, enabled efficient transdermal PG delivery, exhibited no cytotoxicity to neuronal cells, and remained physicochemically stable for up to 3 months. This study highlights the potential of 3D-printed MN patches as a novel transdermal drug delivery system, demonstrating practical feasibility for medical applications.",
+      "authors": [
+        {
+          "name": "Phuvamin Suriyaamporn"
+        },
+        {
+          "name": "Pawaris Wongprayoon"
+        },
+        {
+          "name": "Warut Pannakkong"
+        },
+        {
+          "name": "Boonnada Pamornpathomkul"
+        },
+        {
+          "name": "Tanasait Ngawhirunpat"
+        },
+        {
+          "name": "Theerasak Rojanarata"
+        },
+        {
+          "name": "Praneet Opanasopit"
+        }
+      ],
+      "publishedAt": "2026-05-27",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41935793",
+      "title": "Behavioral and emotional abnormalities in mice with orthotopic colitis-associated colorectal cancer.",
+      "summary": "BACKGROUND: Colorectal cancer (CRC) is usually accompanied by emotional and behavioral changes in patients, yet the underlying neurobiological mechanisms remain unclear. There is a lack of robust experimental models to investigate how tumor progression may influence brain function and behavior.\nMETHODS: The azoxymethane (AOM) and dextran sulfate sodium (DSS) were used to induce the orthotopic colitis-associated CRC (CAC) mouse models. Then we performed a range of behavioral tests including the sucrose preference test (SPT), elevated plus maze (EPM), tail suspension test (TST), novel object recognition test (NORT), resident-intruder assay, and tube test to evaluate abnormal behaviors of depression, memory impairment, and irritability.\nRESULTS: CAC mice exhibited a marked reduction in body weight accompanied by pronounced colon shortening. Histopathological examination using hematoxylin and eosin staining revealed the presence of colonic adenomas and atypical hyperplasia. Behavioral tests using the EPM and TST indicated heightened depressive-like behavior, while the NORT revealed significant memory impairment compared to controls. Meanwhile, the resident-intruder assay and tube tests showed that CAC mice exhibited irritability and aggression. TUNEL staining showed a marked increase in TUNEL-positive cells in the hippocampus of CAC mice, while Western blots revealed downregulated anti-apoptotic Bcl-2 and upregulated pro-apoptotic Bak, Bad, and cleaved PARP. Real-time quantitative polymerase chain reaction further revealed increased expression of IL-6 and IBA-1 in the hippocampus of CAC mice.\nCONCLUSION: The AOM/DSS-induced CAC mouse model recapitulates tumor-associated behavioral and neurobiological alterations, underscoring its application in neuropsychiatric oncology research.",
+      "authors": [
+        {
+          "name": "Yunfei Tan"
+        },
+        {
+          "name": "Ruoyu Zhang"
+        },
+        {
+          "name": "Hao Hao"
+        },
+        {
+          "name": "Yongjiu Chen"
+        },
+        {
+          "name": "Dewei Kong"
+        },
+        {
+          "name": "Liming Wang"
+        },
+        {
+          "name": "Aiwen Wu"
+        }
+      ],
+      "publishedAt": "2026-04-12",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41935792",
+      "title": "Dissociation of spatial and contextual memory encoding under fear and pain in mice.",
+      "summary": "Negative emotional states strongly modulate memory formation, yet the relative contributions of spatial and contextual encoding under fear and pain remain insufficiently understood. In this study, we developed a modular three-chamber Y-maze paradigm that enables independent manipulation of spatial and contextual cues. Using this paradigm, we systematically compared memory encoding induced by foot-shock fear and formalin-evoked pain in mice. Behavioral analyses revealed that foot-shock supported the formation of composite aversive memories integrating both spatial and contextual features, such that animals avoided the shock-paired location even when contextual cues were removed. In contrast, formalin-induced pain memory was primarily context-dependent, with mice failing to discriminate spatial positions once contextual information was absent. Lesions of the dorsal hippocampus (dHPC) selectively abolished spatial but not contextual avoidance, confirming its critical role in spatial memory encoding. Furthermore, when spatial and contextual cues were placed in conflict, avoidance was preferentially guided by contextual features. These findings demonstrate that fear and pain bias memory encoding toward distinct information domains, with spatial memory critically dependent on the dHPC. The present paradigm provides a powerful tool for dissociating memory components under aversive conditions and offers a methodological framework for investigating maladaptive memory processes in chronic pain and post-traumatic stress disorder.",
+      "authors": [
+        {
+          "name": "Yichen Cai"
+        },
+        {
+          "name": "Zheping Cai"
+        },
+        {
+          "name": "Ruiqing Hou"
+        },
+        {
+          "name": "Yuanfeng Weng"
+        },
+        {
+          "name": "Trevor W Robbins"
+        },
+        {
+          "name": "Nan Chen"
+        },
+        {
+          "name": "Xiao Xiao"
+        }
+      ],
+      "publishedAt": "2026-04-12",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41912094",
+      "title": "Neural correlates of rumination in psychiatric disorders: A systematic review of fMRI evidence.",
+      "summary": "BACKGROUND: Rumination is a transdiagnostic, persistent factor across many psychiatric conditions. Mapping its neural mechanisms may help differentiate ruminative profiles.\nOBJECTIVE: To systematically review fMRI studies that evaluated rumination in psychiatric populations METHODS: We searched four databases (PubMed, EMBASE, Web of Science, Scopus) and included studies that integrated rumination measures with fMRI data.\nRESULTS: Thirty-two articles met criteria; most were non-randomized (n = 31, 97%) and focused on depression (n = 24, 75%). Across disorders, clinical groups showed higher rumination than healthy controls, including in euthymic participants. In major depressive disorder, neural alterations implicated the default mode network, limbic and striatal regions, dorsolateral prefrontal cortex, and anterior cingulate cortex consistent with maladaptive ongoing processing. Neural signatures often persisted in remitted patients, suggesting possible trait markers of vulnerability. Intervention studies (n = 7) support using neuroimaging to track ruminative profiles and to inform more personalized interventions.\nCONCLUSION: This review highlights the importance of examining rumination, here measured via trait questionnaires, state-induction paradigms, cognitive tasks, or resting-state fMRI, using more consistent conceptual and methodological approaches. Although rumination is transdiagnostic, implicated brain regions and networks may show disorder-specific patterns. Given heterogeneity in the literature, future work should prioritize controlled and interventional studies to clarify neural mechanisms and guide circuit-based, targeted treatments. PROSPERO REGISTRATION: #CRD532512.",
+      "authors": [
+        {
+          "name": "Adriana Munhoz Carneiro"
+        },
+        {
+          "name": "Valquiria Aparecida da Silva"
+        },
+        {
+          "name": "Lais B Razza"
+        },
+        {
+          "name": "Marie-Anne Vanderhasselt"
+        },
+        {
+          "name": "André Russowsky Brunoni"
+        },
+        {
+          "name": "Pedro Henrique Rodrigues da Silva"
+        }
+      ],
+      "publishedAt": "2026-04-12",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41905718",
+      "title": "Non-canonical K27 polyubiquitination is a sex-specific regulator of contextual fear memory in the hippocampus but not the amygdala.",
+      "summary": "Polyubiquitination is a process whereby multiple ubiquitin proteins link to each other on a target substrate, marking that substate for various cellular processes of which protein degradation via the proteasome is the most common. Recently, evidence has emerged suggesting that the most common forms of proteasome-dependent (K48) and proteasome-independent (K63, M1) polyubiquitination have sex-specific roles in contextual fear memory formation in the amygdala and hippocampus. However, there are 8 different linkage sites at which polyubiquitin chains can form, most of which have not been studied in the brain. Lysine 27 (K27) polyubiquitination is a less common, non-canonical mark that has not been well studied and may be connected to the protein degradation process. To date, K27 polyubiquitination has never been examined in the brain under any condition. Here, we found that K27 polyubiquitination was selectively increased in the hippocampus after contextual fear conditioning in female, but not male, rats, though neither sex showed changes in this polyubiquitin mark in the amygdala. Consistent with this, CRISPR-dCas13-mediated knockdown of K27 polyubiquitination in the hippocampus selectively impaired contextual fear memory retention in the hippocampus of females, but not males. Proteomic analyses revealed ACAT1 as a target of K27 polyubiquitination in the female hippocampus following fear conditioning, though this mark was not associated with degradation of the target protein. Together, these data suggest that K27 polyubiquitination has a sex-selective role in fear memory formation in the hippocampus. These findings advance our understanding of molecular mechanisms of fear memory formation and the importance of sex as a biological variable in this process.",
+      "authors": [
+        {
+          "name": "Morgan B Patrick"
+        },
+        {
+          "name": "Shannon E Kincaid"
+        },
+        {
+          "name": "Kaiser C Arndt"
+        },
+        {
+          "name": "Yeeun Bae"
+        },
+        {
+          "name": "Olivia N Ball"
+        },
+        {
+          "name": "Adam Cummings"
+        },
+        {
+          "name": "Jennifer R Abraham"
+        },
+        {
+          "name": "Gitali Bhanot"
+        },
+        {
+          "name": "W Keith Ray"
+        },
+        {
+          "name": "Timothy J Jarome"
+        }
+      ],
+      "publishedAt": "2026-04-12",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41880835",
+      "title": "Medicinal chemistry strategies targeting viral proteases: From classical design to next-generation therapeutics.",
+      "summary": "Viral proteases are central targets in antiviral drug discovery and development because they play essential roles in viral replication and maturation. Although protease inhibitors have achieved major clinical success, traditional design strategies face challenges, including resistance development, poor oral exposure of early peptidomimetics, and off-target toxicity of highly reactive covalent warheads. Classical approaches, such as peptidomimetics, macrocyclization, and covalent warhead engineering, are discussed alongside contemporary strategies, including allosteric modulation and targeted protease degradation via proteolysis-targeting chimeras (PROTAC) technology. Particular emphasis is placed on how these strategies address key obstacles, such as resistance evolution, selectivity, metabolic stability, and oral bioavailability. Several quantitative case studies have also demonstrated the growing significance of computational tools in contemporary antiviral discovery. For SARS-CoV-2 main protease (Mpro), these workflows were enabled by the rapid availability of high-resolution experimental crystal structures of the target protein. The evolution of a weak fragment (Kd ≈ 1.7 mM; ΔG ≈ -3.6 kcal/mol) into a covalent inhibitor (QUB-00006-Int-07) with enzymatic inhibition (IC50 ≈ 830 nM) was successfully guided by molecular dynamics (MD) simulations and absolute binding free energy calculations. This was subsequently confirmed experimentally using NMR, ESI-MS, and FRET assays. Furthermore, out of 25 computationally prioritized candidates with Ki values less than 4 μM, 15 active Mpro inhibitors were identified using accelerated free-energy perturbation-based repurposing campaigns. Long-range allosteric pathways connecting the catalytic site to resistance-associated regions and experimentally verified allosteric pockets have also been discovered using dynamic nonequilibrium MD. Together, these integrated in silico approaches enable the early prioritization of high-affinity ligands, mechanistic understanding of resistance, and significant reduction of late-stage attrition in antiviral drug discovery. Through detailed case studies on SARS-CoV-2 main protease (Mpro), Zika virus NS2B-NS3 protease, and Dengue virus NS2B-NS3 protease, the review illustrates how medicinal chemistry principles translate molecular insights into clinically relevant antivirals. Finally, a forward-looking development roadmap is proposed that integrates potency, selectivity, pharmacokinetics, manufacturability, and resistance management toward the goal of broad-spectrum, durable, and adaptable protease-targeted therapeutics development.",
+      "authors": [
+        {
+          "name": "Mansour S Alturki"
+        },
+        {
+          "name": "Mohamed S Gomaa"
+        }
+      ],
+      "publishedAt": "2026-04-10",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41861419",
+      "title": "The role of prefrontal cortex in emotion regulation: A more naturalistic magnetoencephalographic study.",
+      "summary": "Emotion regulation is aimed to control emotional states through various strategies, among which reappraisal and suppression have been extensively studied up to date. Nevertheless, physiological correlates of this process are still debatable, since findings on both brain and peripheral activity are contradictory. In the present work, we were first to investigate neural sources and inter-subject correlations (a measure of synchronized neural activity) during natural watching of neutral and negative one-minute videos, regulation via reappraisal and suppression strategies utilizing magnetoencephalography. In the results, first, free watching of negative videos led to a higher average inter-subject correlation compared to the other conditions, including the regulatory ones, which indicates higher neural synchrony between subjects. Second, we also revealed an increased inter-subject correlation during usage of both reappraisal and suppression strategies, but in relation to the specific sources of neural activity. A number of identified sources were located in the prefrontal cortex, which potentially implies the involvement of this area in emotion regulation, regardless of applied strategies. In summary, different neural patterns (especially, frontal) of synchrony in relation to negative emotion experience and regulation processes using naturalistic stimuli were demonstrated by means of magnetoencephalographic neuroimaging.",
+      "authors": [
+        {
+          "name": "Aleksandra Medvedeva"
+        },
+        {
+          "name": "Nikita Rudenkiy"
+        },
+        {
+          "name": "Danila Shelepenkov"
+        },
+        {
+          "name": "Vladimir Kosonogov"
+        }
+      ],
+      "publishedAt": "2026-04-12",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41850407",
+      "title": "Left hippocampal subiculum-hypothalamus hyperconnectivity as a neural correlate of stress vulnerability.",
+      "summary": "BACKGROUND: The neurobiological mechanisms underlying individual differences in susceptibility to depression remain unclear. This study combined behavioral tests and resting-state functional magnetic resonance imaging (r-fMRI) to investigate how chronic unpredictable mild stress (CUMS) affects brain function and behavior in rats, and to identify neural markers that distinguish depression-susceptible (SUS) from resilient (RES) individuals.\nMETHODS: Thirty-one rats (CTRL group, n = 9; CUMS group, n = 22) underwent baseline r-fMRI scans before CUMS exposure. After 5 weeks of CUMS, behavioral tests, including sucrose preference test (SPT), forced swim test (FST), open field test (OFT), elevated plus maze (EPM), and novel object recognition test (NORT) were conducted, followed by post-stress r-fMRI. Rats were classified into SUS and RES groups based primarily on SPT and FST performance.\nRESULTS: CUMS induced depression-like behaviors in SUS rats, such as reduced sucrose preference, while RES rats remained comparable to controls. RsFC analysis revealed that SUS rats exhibited enhanced functional connectivity between the hippocampal subiculum and right hypothalamus/left hypothalamus after CUMS. Critically, at baseline, SUS rats already showed stronger left subiculum-left hypothalamic connectivity than RES rats, a difference not observed on the right side.\nCONCLUSION: These findings reveal that individual susceptibility to depression is associated with distinct patterns of functional connectivity involving the hippocampal subiculum, hypothalamus, and amygdala. Critically, pre-existing hyperconnectivity between the left subiculum and left medial hypothalamus may distinguish SUS from RES rats before stress exposure. This specific neural signature may represent a potential vulnerability factor and could inform the development of biomarkers for early risk identification.",
+      "authors": [
+        {
+          "name": "Yaqiu Tang"
+        },
+        {
+          "name": "Bei-Bei Huo"
+        },
+        {
+          "name": "Jia-Jia Wu"
+        },
+        {
+          "name": "Dong-Dong Shi"
+        },
+        {
+          "name": "Zhen Wang"
+        }
+      ],
+      "publishedAt": "2026-04-12",
+      "source": "PubMed"
+    }
+  },
+  {
+    "paper": {
+      "id": "41762553",
+      "title": "High-throughput screening for the discovery of antidepressants targeting adenosine A2A receptors.",
+      "summary": "The adenosine A2A receptor (A2AR) is a promising therapeutic target for depression, as evidenced by the notable antidepressant-like efficacy of its antagonists. However, conventional screening methods for A2AR ligands are hampered by low throughput and operational complexity. To address this, we developed a high-throughput screening (HTS) strategy based on the detection of calcium flow fluorescence signals in engineered HEK-ADORA2A cells. After rigorous optimization, this HTS platform was deployed to screen a structurally diverse library of ∼20,784 compounds, leading to the identification of potent candidates. The binding affinity of these hits for A2AR was confirmed in vitro using bio-layer interferometry (BLI). We evaluated the compounds using a series of behavioral tests, including the tail suspension test (TST), spontaneous activity test (SAT), forced swim test (FST), and open field test (OFT). The results demonstrated that a single administration of either Compound 10 or Compound 21 effectively reversed corticosterone (CORT)-induced depression-like behaviors. Remarkably, these compounds exhibited rapid-onset antidepressant effects within 1 h, without obvious abnormal behaviors or mortality, and their efficacy was comparable to the A2AR antagonist istradefylline (KW6002). In summary, we have established a robust HTS method for the efficient discovery of A2AR-targeting compounds. This work has led to the identification of novel antagonist compounds with rapid-acting antidepressant-like potential, thereby providing a solid foundation for the development of new antidepressant therapeutics.",
+      "authors": [
+        {
+          "name": "Yuanqing Chen"
+        },
+        {
+          "name": "Bingqian Zhang"
+        },
+        {
+          "name": "Yuxin Lin"
+        },
+        {
+          "name": "Jingjing Shi"
+        },
+        {
+          "name": "Yi Zhang"
+        },
+        {
+          "name": "Liqin Li"
+        },
+        {
+          "name": "Ruihua Zhang"
+        },
+        {
+          "name": "Miao Wang"
+        }
+      ],
+      "publishedAt": "2026-03-10",
+      "source": "PubMed"
+    }
+  }
+]
