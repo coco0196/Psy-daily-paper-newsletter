@@ -4,14 +4,14 @@ import json
 import html
 import time
 import datetime
-import pytz
 import requests
 import argparse
 import xml.etree.ElementTree as ET
 from requests.adapters import HTTPAdapter
 from urllib3.exceptions import ProtocolError
 from urllib3.util.retry import Retry
-from utils import setup_logger
+from utils import setup_logger, get_last_week_range, weekly_basename, iter_date_range
+from journal_registry import filter_by_journal
 
 # 设置日志记录器
 logger = setup_logger()
@@ -183,6 +183,9 @@ def _parse_pubmed_xml_batch(xml_bytes):
         abstract_parts = []
         authors_out = []
         published_at = ""
+        journal_title = ""
+        journal_abbrev = ""
+        journal_issns = []
 
         medline = None
         pubmed_data = None
@@ -288,6 +291,24 @@ def _parse_pubmed_xml_batch(xml_bytes):
                 if published_at:
                     break
 
+        if medline is not None:
+            for mc in medline:
+                if _local_name(mc) != "Article":
+                    continue
+                for ac in mc:
+                    if _local_name(ac) != "Journal":
+                        continue
+                    for jc in ac:
+                        jln = _local_name(jc)
+                        if jln == "ISSN":
+                            issn_val = (jc.text or "").strip()
+                            if issn_val:
+                                journal_issns.append(issn_val)
+                        elif jln == "Title":
+                            journal_title = "".join(jc.itertext()).strip() or journal_title
+                        elif jln == "ISOAbbreviation":
+                            journal_abbrev = (jc.text or "").strip() or journal_abbrev
+
         if medline is not None and not published_at:
             for mc in medline:
                 if _local_name(mc) != "Article":
@@ -308,6 +329,20 @@ def _parse_pubmed_xml_batch(xml_bytes):
         if not pmid:
             continue
 
+        journal_name = journal_title or journal_abbrev
+        if not filter_by_journal(
+            journal_names=[journal_title, journal_abbrev],
+            issns=journal_issns,
+        ):
+            logger.debug(
+                "PubMed 期刊过滤丢弃 PMID=%s, journal=%r, abbrev=%r, issns=%r",
+                pmid,
+                journal_title,
+                journal_abbrev,
+                journal_issns,
+            )
+            continue
+
         results.append(
             {
                 "pmid": pmid,
@@ -315,6 +350,8 @@ def _parse_pubmed_xml_batch(xml_bytes):
                 "abstract": abstract,
                 "authors": authors_out,
                 "published_at": published_at,
+                "journal": journal_name,
+                "issns": journal_issns,
             }
         )
 
@@ -422,6 +459,22 @@ def _fetch_crossref(session, date_str, retmax=80):
             doi = (item.get("DOI") or "").strip()
             titles = item.get("title") or []
             title = (titles[0] if titles else "").strip()
+            container_titles = item.get("container-title") or []
+            journal_name = (container_titles[0] if container_titles else "").strip()
+            if not journal_name:
+                short_titles = item.get("short-container-title") or []
+                journal_name = (short_titles[0] if short_titles else "").strip()
+            item_issns = item.get("ISSN") or []
+            if isinstance(item_issns, str):
+                item_issns = [item_issns]
+            if not filter_by_journal(journal_name=journal_name, issns=item_issns):
+                logger.debug(
+                    "Crossref 期刊过滤丢弃 DOI=%s, journal=%r, issns=%r",
+                    doi,
+                    journal_name,
+                    item_issns,
+                )
+                continue
             raw_abs = item.get("abstract")
             if raw_abs is None:
                 continue
@@ -448,6 +501,8 @@ def _fetch_crossref(session, date_str, retmax=80):
                         "authors": authors_out,
                         "publishedAt": date_str,
                         "source": "Crossref",
+                        "journal": journal_name,
+                        "issns": item_issns,
                     }
                 }
             )
@@ -460,147 +515,219 @@ def _fetch_crossref(session, date_str, retmax=80):
         return []
 
 
-def download_papers(date_str=None, retmax=10000):
-    """
-    从 PubMed（NCBI E-utilities）与 Crossref 下载指定日期的论文元数据，合并后映射为统一 JSON 结构。
+def _validate_and_save_papers(papers, output_file, label):
+    """校验论文字段并写入 JSON 文件。"""
+    valid_papers = []
+    skipped_papers = []
 
-    Args:
-        date_str: 可选，指定要下载的日期，格式为 YYYY-MM-DD。如果不指定，则使用北京时间当前日期。
-        retmax: PubMed esearch 返回的最大 PMID 条数，默认 10000；Crossref 条数由环境变量 CROSSREF_ROWS 控制（默认 80，上限 100）。
-    """
-    target_date = None
-    try:
-        retmax = int(retmax)
-        if retmax < 1:
-            retmax = 1
-        if retmax > 100000:
-            logger.warning("retmax 超过 100000，已截断为 100000（贴近 NCBI esearch 实务上限）")
-            retmax = 100000
+    for paper in papers:
+        paper_info = paper.get("paper", {})
+        paper_id = paper_info.get("id", "unknown")
 
-        if date_str is None:
-            beijing_tz = pytz.timezone("Asia/Shanghai")
-            current_time = datetime.datetime.now(beijing_tz)
-            target_date = current_time.strftime("%Y-%m-%d")
+        is_valid = True
+        reasons = []
+
+        if not paper_info:
+            is_valid = False
+            reasons.append("缺少paper字段")
         else:
-            target_date = date_str
-
-        logger.info(
-            f"正在获取 {target_date} 的论文数据：PubMed（retmax={retmax}）+ Crossref"
-        )
-
-        pubmed_papers = []
-        crossref_papers = []
-        inter_delay = float(os.getenv("NCBI_INTER_REQUEST_DELAY_SEC", "0.35"))
-        crossref_rows = int(os.getenv("CROSSREF_ROWS", "80"))
-        session = _make_api_session()
-        try:
-            try:
-                pmids = _esearch_pubmed(session, target_date, retmax=retmax)
-                logger.info(f"PubMed esearch 返回 PMID 数量: {len(pmids)}")
-                if pmids:
-                    if inter_delay > 0:
-                        time.sleep(inter_delay)
-                    parsed = _efetch_pubmed_parsed(session, pmids)
-                    by_pmid = {p["pmid"]: p for p in parsed if p.get("pmid")}
-                    for pmid in pmids:
-                        rec = by_pmid.get(pmid)
-                        if not rec:
-                            continue
-                        pubmed_papers.append(
-                            {
-                                "paper": {
-                                    "id": rec["pmid"],
-                                    "title": rec["title"],
-                                    "summary": rec["abstract"],
-                                    "authors": rec["authors"],
-                                    "publishedAt": rec["published_at"] or target_date,
-                                    "source": "PubMed",
-                                }
-                            }
-                        )
-            except requests.RequestException as e:
-                logger.error(f"PubMed 请求失败（将仅使用 Crossref 若可用）: {e}")
-            except ET.ParseError as e:
-                logger.error(f"解析 PubMed XML 失败: {e}")
-
-            crossref_papers = _fetch_crossref(session, target_date, retmax=crossref_rows)
-            logger.info(f"Crossref 返回条目数量: {len(crossref_papers)}")
-        finally:
-            session.close()
-
-        papers = pubmed_papers + crossref_papers
-        if not papers:
-            logger.warning(f"{target_date} PubMed 与 Crossref 均无可用论文数据")
-            return {"status": "no_data", "date": target_date}
-
-        logger.info(
-            f"合并后原始条目: PubMed {len(pubmed_papers)} 篇 + Crossref {len(crossref_papers)} 篇 = {len(papers)} 篇"
-        )
-
-        valid_papers = []
-        skipped_papers = []
-
-        for paper in papers:
-            paper_info = paper.get("paper", {})
-            paper_id = paper_info.get("id", "unknown")
-
-            is_valid = True
-            reasons = []
-
-            if not paper_info:
+            if not paper_info.get("title"):
                 is_valid = False
-                reasons.append("缺少paper字段")
-            else:
-                if not paper_info.get("title"):
-                    is_valid = False
-                    reasons.append("缺少标题")
-                if not paper_info.get("summary"):
-                    is_valid = False
-                    reasons.append("缺少摘要")
-                if not paper_info.get("id"):
-                    is_valid = False
-                    reasons.append("缺少ID")
-                if not paper_info.get("authors"):
-                    is_valid = False
-                    reasons.append("缺少作者信息")
-                if not paper_info.get("publishedAt"):
-                    is_valid = False
-                    reasons.append("缺少发布时间")
+                reasons.append("缺少标题")
+            if not paper_info.get("summary"):
+                is_valid = False
+                reasons.append("缺少摘要")
+            if not paper_info.get("id"):
+                is_valid = False
+                reasons.append("缺少ID")
+            if not paper_info.get("authors"):
+                is_valid = False
+                reasons.append("缺少作者信息")
+            if not paper_info.get("publishedAt"):
+                is_valid = False
+                reasons.append("缺少发布时间")
 
-            if is_valid:
-                valid_papers.append(paper)
-                logger.debug(f"接受论文: {paper_id}")
-            else:
-                skipped_papers.append({"id": paper_id, "reasons": reasons})
-                logger.warning(f"跳过论文 {paper_id}: {', '.join(reasons)}")
+        if is_valid:
+            valid_papers.append(paper)
+            logger.debug(f"接受论文: {paper_id}")
+        else:
+            skipped_papers.append({"id": paper_id, "reasons": reasons})
+            logger.warning(f"跳过论文 {paper_id}: {', '.join(reasons)}")
 
-        logger.info(f"原始数据: {len(papers)}篇")
-        logger.info(f"有效论文: {len(valid_papers)}篇")
-        logger.info(f"跳过论文: {len(skipped_papers)}篇")
+    logger.info(f"{label} 原始数据: {len(papers)}篇")
+    logger.info(f"{label} 有效论文: {len(valid_papers)}篇")
+    logger.info(f"{label} 跳过论文: {len(skipped_papers)}篇")
 
-        if skipped_papers:
-            logger.info("跳过的论文详情:")
-            for skip_info in skipped_papers:
-                logger.info(f"  ID: {skip_info['id']}, 原因: {', '.join(skip_info['reasons'])}")
+    if skipped_papers:
+        logger.info("跳过的论文详情:")
+        for skip_info in skipped_papers:
+            logger.info(f"  ID: {skip_info['id']}, 原因: {', '.join(skip_info['reasons'])}")
 
-        if valid_papers:
-            os.makedirs("Paper_metadata_download", exist_ok=True)
-            output_file = os.path.join("Paper_metadata_download", f"{target_date}.json")
-            with open(output_file, "w", encoding="utf-8") as f:
-                json.dump(valid_papers, f, ensure_ascii=False, indent=2)
-            logger.info(f"成功保存 {len(valid_papers)} 篇有效论文数据到文件")
-            return {"status": "success", "date": target_date}
-        logger.warning(f"{target_date} 没有有效的论文数据")
-        return {"status": "no_data", "date": target_date}
+    if not valid_papers:
+        return []
+
+    os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(valid_papers, f, ensure_ascii=False, indent=2)
+    logger.info(f"成功保存 {len(valid_papers)} 篇有效论文数据到 {output_file}")
+    return valid_papers
+
+
+def download_papers_for_date(date_str, retmax=10000):
+    """
+    从 PubMed 与 Crossref 下载指定日期的论文元数据（已按目标期刊过滤）。
+    返回 list[dict] 或空列表。
+    """
+    retmax = int(retmax)
+    if retmax < 1:
+        retmax = 1
+    if retmax > 100000:
+        logger.warning("retmax 超过 100000，已截断为 100000（贴近 NCBI esearch 实务上限）")
+        retmax = 100000
+
+    target_date = date_str
+    logger.info(
+        f"正在获取 {target_date} 的论文数据：PubMed（retmax={retmax}）+ Crossref"
+    )
+
+    pubmed_papers = []
+    crossref_papers = []
+    inter_delay = float(os.getenv("NCBI_INTER_REQUEST_DELAY_SEC", "0.35"))
+    crossref_rows = int(os.getenv("CROSSREF_ROWS", "80"))
+    session = _make_api_session()
+    try:
+        try:
+            pmids = _esearch_pubmed(session, target_date, retmax=retmax)
+            logger.info(f"PubMed esearch 返回 PMID 数量: {len(pmids)}")
+            if pmids:
+                if inter_delay > 0:
+                    time.sleep(inter_delay)
+                parsed = _efetch_pubmed_parsed(session, pmids)
+                by_pmid = {p["pmid"]: p for p in parsed if p.get("pmid")}
+                for pmid in pmids:
+                    rec = by_pmid.get(pmid)
+                    if not rec:
+                        continue
+                    pubmed_papers.append(
+                        {
+                            "paper": {
+                                "id": rec["pmid"],
+                                "title": rec["title"],
+                                "summary": rec["abstract"],
+                                "authors": rec["authors"],
+                                "publishedAt": rec["published_at"] or target_date,
+                                    "source": "PubMed",
+                                    "journal": rec.get("journal", ""),
+                                    "issns": rec.get("issns", []),
+                                }
+                        }
+                    )
+        except requests.RequestException as e:
+            logger.error(f"PubMed 请求失败（将仅使用 Crossref 若可用）: {e}")
+        except ET.ParseError as e:
+            logger.error(f"解析 PubMed XML 失败: {e}")
+
+        crossref_papers = _fetch_crossref(session, target_date, retmax=crossref_rows)
+        logger.info(f"Crossref 返回条目数量: {len(crossref_papers)}")
+    finally:
+        session.close()
+
+    papers = pubmed_papers + crossref_papers
+    if not papers:
+        logger.warning(f"{target_date} PubMed 与 Crossref 均无可用论文数据")
+        return []
+
+    logger.info(
+        f"{target_date} 合并后原始条目: PubMed {len(pubmed_papers)} 篇 + Crossref {len(crossref_papers)} 篇 = {len(papers)} 篇"
+    )
+    return papers
+
+
+def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000):
+    """
+    下载论文元数据并保存为 JSON。
+
+    - 未指定任何日期时：自动获取上周一至上周日，合并为周报文件。
+    - 指定 start_date / end_date：下载该区间内每天的数据并合并。
+    - 指定 date_str：兼容单日下载（写入 {date}.json）。
+    """
+    target_start = start_date
+    target_end = end_date
+
+    try:
+        if date_str:
+            papers = download_papers_for_date(date_str, retmax=retmax)
+            if not papers:
+                return {"status": "no_data", "date": date_str}
+            output_file = os.path.join("Paper_metadata_download", f"{date_str}.json")
+            valid = _validate_and_save_papers(papers, output_file, date_str)
+            if not valid:
+                return {"status": "no_data", "date": date_str}
+            return {"status": "success", "date": date_str, "count": len(valid)}
+
+        if target_start is None and target_end is None:
+            target_start, target_end = get_last_week_range()
+        elif target_start and not target_end:
+            target_end = target_start
+        elif target_end and not target_start:
+            target_start = target_end
+
+        logger.info(f"周报模式：下载 {target_start} 至 {target_end} 的论文数据")
+        merged = []
+        seen_ids = set()
+        for day in iter_date_range(target_start, target_end):
+            day_papers = download_papers_for_date(day, retmax=retmax)
+            for paper in day_papers:
+                paper_id = paper.get("paper", {}).get("id")
+                if paper_id and paper_id in seen_ids:
+                    continue
+                if paper_id:
+                    seen_ids.add(paper_id)
+                merged.append(paper)
+
+        basename = weekly_basename(target_start, target_end)
+        output_file = os.path.join("Paper_metadata_download", f"{basename}_weekly.json")
+
+        if not merged:
+            logger.warning(f"{target_start} 至 {target_end} 无可用论文数据")
+            return {
+                "status": "no_data",
+                "start_date": target_start,
+                "end_date": target_end,
+            }
+
+        valid = _validate_and_save_papers(merged, output_file, basename)
+        if not valid:
+            return {
+                "status": "no_data",
+                "start_date": target_start,
+                "end_date": target_end,
+            }
+
+        return {
+            "status": "success",
+            "start_date": target_start,
+            "end_date": target_end,
+            "count": len(valid),
+            "file": output_file,
+        }
 
     except Exception as e:
         logger.error(f"下载论文数据时发生错误: {str(e)}")
-        return {"status": "error", "date": target_date or date_str, "message": str(e)}
+        return {
+            "status": "error",
+            "date": date_str,
+            "start_date": target_start,
+            "end_date": target_end,
+            "message": str(e),
+        }
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="从 PubMed 与 Crossref 下载每日论文元数据")
-    parser.add_argument("--date", type=str, help="指定要下载的日期 (YYYY-MM-DD格式)")
+    parser = argparse.ArgumentParser(description="从 PubMed 与 Crossref 下载论文元数据（默认周报模式）")
+    parser.add_argument("--date", type=str, help="单日下载 (YYYY-MM-DD)，写入 {date}.json")
+    parser.add_argument("--start-date", type=str, help="周报起始日期 (YYYY-MM-DD)")
+    parser.add_argument("--end-date", type=str, help="周报结束日期 (YYYY-MM-DD)")
     parser.add_argument(
         "--retmax",
         type=int,
@@ -609,7 +736,12 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    result = download_papers(args.date, retmax=args.retmax)
+    result = download_papers(
+        start_date=args.start_date,
+        end_date=args.end_date,
+        date_str=args.date,
+        retmax=args.retmax,
+    )
     logger.info(f"下载结果: {result}")
     if result["status"] == "error":
         exit(1)

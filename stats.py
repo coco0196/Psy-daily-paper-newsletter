@@ -15,8 +15,75 @@ logger = get_logger()
 # 中文停用词列表
 STOPWORDS = {'的', '了', '和', '是', '在', '我们', '通过', '使用', '基于', '提出', '本文', '一个', '方法', '进行', '可以', '以及', '等', '与', '该', '这个', '为', '并', '对', '从', '将', '同时', '或', '由', '及', '上', '中', '下', '等等', '更', '能', '都', '把', '被', '比', '这', '那', '有', '就', '而', '且', '但', '并且', '或者', '不', '也', '还', '个', '之', '于', '这些', '这样', '一些', '一种', '这种', '另', '另外', '另一', '可能', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'}
 
-def analyze_papers(start_date=None, end_date=None):
+
+def _analyze_weekly_file(weekly_file, start_date, end_date, weekly_key):
+    """从周报合并 JSON 直接生成统计。"""
+    stats_dir = 'stats'
+    os.makedirs(stats_dir, exist_ok=True)
+
+    try:
+        with open(weekly_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except Exception as e:
+        logger.error(f"读取周报数据时出错：{str(e)}")
+        return None
+
+    if not isinstance(data, list) or len(data) == 0:
+        logger.warning("周报文件无有效论文数据")
+        return None
+
+    stats = {
+        'total_papers': len(data),
+        'keywords': Counter(),
+        'daily_counts': {weekly_key: len(data)},
+        'titles': [],
+    }
+
+    for paper in data:
+        translation = paper.get('translation', '')
+        words = jieba.cut(translation)
+        keywords = [
+            w for w in words
+            if len(w) > 1 and not w.isspace() and w not in STOPWORDS and not w.isdigit()
+        ]
+        stats['keywords'].update(keywords)
+
+        title_match = re.search(r"标题[:：](.*?)(?=\n摘要[:：]|\Z)", translation, re.DOTALL)
+        if title_match:
+            title = title_match.group(1).strip()
+            if title not in stats['titles']:
+                stats['titles'].append(title)
+
+    try:
+        generate_stats_visualizations(stats, start_date, end_date)
+        logger.info("统计图表生成完成")
+        report = {
+            'period': f"{start_date} 至 {end_date}",
+            'total_papers': stats['total_papers'],
+            'daily_average': stats['total_papers'],
+            'top_keywords': dict(stats['keywords'].most_common(20)),
+            'daily_counts': stats['daily_counts'],
+            'titles': stats['titles'],
+        }
+        with open(os.path.join(stats_dir, 'stats_report.json'), 'w', encoding='utf-8') as f:
+            json.dump(report, f, ensure_ascii=False, indent=4)
+        return stats
+    except Exception as e:
+        logger.error(f"生成统计图表时出错：{str(e)}")
+        return None
+
+
+def analyze_papers(start_date=None, end_date=None, weekly_key=None):
     """分析指定日期范围内的论文数据"""
+    if weekly_key:
+        if "_to_" in weekly_key and (not start_date or not end_date):
+            start_date, end_date = weekly_key.split("_to_", 1)
+        weekly_file = os.path.join(
+            'Psy-day-paper-deepseek', f"{weekly_key}_Psy_deepseek_clean.json"
+        )
+        if os.path.exists(weekly_file):
+            return _analyze_weekly_file(weekly_file, start_date, end_date, weekly_key)
+
     if not start_date:
         start_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
     if not end_date:
@@ -259,10 +326,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='分析HuggingFace每日论文数据')
     parser.add_argument('--start-date', type=str, help='分析开始日期 (YYYY-MM-DD格式)')
     parser.add_argument('--end-date', type=str, help='分析结束日期 (YYYY-MM-DD格式)')
+    parser.add_argument('--weekly-key', type=str, help='周报文件基名，如 2026-05-26_to_2026-06-01')
     args = parser.parse_args()
 
-    # 使用指定的日期范围或默认使用最近7天
-    stats = analyze_papers(args.start_date, args.end_date)
+    stats = analyze_papers(args.start_date, args.end_date, weekly_key=args.weekly_key)
     if not stats:
         exit(1)
     exit(0) 

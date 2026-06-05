@@ -7,8 +7,12 @@ on:
       - completed
   workflow_dispatch:
     inputs:
-      date:
-        description: '指定要处理的历史数据日期 (YYYY-MM-DD格式)'
+      start_date:
+        description: '周报起始日期 (YYYY-MM-DD)，留空则自动取上周一'
+        required: false
+        type: string
+      end_date:
+        description: '周报结束日期 (YYYY-MM-DD)，留空则自动取上周日'
         required: false
         type: string
 
@@ -39,11 +43,8 @@ jobs:
     - name: Verify repository
       id: check_repo
       run: |
-        # 获取仓库URL
         REPO_URL=$(git config --get remote.origin.url)
         echo "Repository URL: $REPO_URL"
-        
-        # 强制放行（已解锁）
         echo "is_authorized=true" >> $GITHUB_OUTPUT
         echo "Repository is authorized"
   
@@ -97,78 +98,58 @@ jobs:
             fs.writeFileSync('${{github.workspace}}/workflow-data.zip', Buffer.from(download.data));
           }
     
-    - name: Set date
+    - name: Set weekly date range
       id: set-date
       run: |
-        # 设置时区为北京时间
         export TZ='Asia/Shanghai'
-        
-        # 获取当前日期作为默认值
-        DEFAULT_DATE=$(date +'%Y-%m-%d')
-        
-        # 如果是手动触发且指定了日期，则使用指定日期，否则使用当前日期
+
         if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-          if [ "${{ github.event.inputs.date }}" != "" ]; then
-            PROCESS_DATE="${{ github.event.inputs.date }}"
-            echo "Using manually specified date: $PROCESS_DATE"
+          if [ -n "${{ github.event.inputs.start_date }}" ] && [ -n "${{ github.event.inputs.end_date }}" ]; then
+            START_DATE="${{ github.event.inputs.start_date }}"
+            END_DATE="${{ github.event.inputs.end_date }}"
           else
-            PROCESS_DATE="$DEFAULT_DATE"
-            echo "No date specified, using current date: $PROCESS_DATE"
+            read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; s,e=get_last_week_range(); print(s, e)")
           fi
-        # 如果是工作流触发，尝试从前一个工作流获取日期
         elif [ "${{ github.event_name }}" == "workflow_run" ]; then
           if [ -f "workflow-data.zip" ]; then
             unzip -o workflow-data.zip
-            if [ -f "date.txt" ] && [ -s "date.txt" ]; then
-              # 文件存在且不为空
-              PROCESS_DATE=$(cat date.txt | tr -d '[:space:]')
-              if [ ! -z "$PROCESS_DATE" ]; then
-                echo "Found valid date from previous workflow: $PROCESS_DATE"
-              else
-                PROCESS_DATE="$DEFAULT_DATE"
-                echo "Empty date in date.txt, using current date: $PROCESS_DATE"
-              fi
+            if [ -f "weekly_range.txt" ] && [ -s "weekly_range.txt" ]; then
+              START_DATE=$(sed -n '1p' weekly_range.txt | tr -d '[:space:]')
+              END_DATE=$(sed -n '2p' weekly_range.txt | tr -d '[:space:]')
             else
-              PROCESS_DATE="$DEFAULT_DATE"
-              echo "Invalid or empty date.txt, using current date: $PROCESS_DATE"
+              read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; s,e=get_last_week_range(); print(s, e)")
             fi
           else
-            PROCESS_DATE="$DEFAULT_DATE"
-            echo "No workflow-data.zip found, using current date: $PROCESS_DATE"
+            read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; s,e=get_last_week_range(); print(s, e)")
           fi
-        # 定时任务或其他触发方式，使用当前日期
         else
-          PROCESS_DATE="$DEFAULT_DATE"
-          echo "Using current date: $PROCESS_DATE"
+          read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; s,e=get_last_week_range(); print(s, e)")
         fi
-        
-        # 验证日期格式
-        if [[ ! $PROCESS_DATE =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-          echo "Invalid date format: '$PROCESS_DATE'"
-          echo "Falling back to current date: $DEFAULT_DATE"
-          PROCESS_DATE="$DEFAULT_DATE"
+
+        if [[ ! $START_DATE =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || [[ ! $END_DATE =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+          read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; s,e=get_last_week_range(); print(s, e)")
         fi
-        
-        # 输出日期供后续步骤使用
-        echo "date=$PROCESS_DATE" >> $GITHUB_OUTPUT
-        echo "Final processing date set to: $PROCESS_DATE"
+
+        WEEKLY_KEY="${START_DATE}_to_${END_DATE}"
+        echo "start_date=$START_DATE" >> $GITHUB_OUTPUT
+        echo "end_date=$END_DATE" >> $GITHUB_OUTPUT
+        echo "weekly_key=$WEEKLY_KEY" >> $GITHUB_OUTPUT
+        echo "Final weekly range: $START_DATE to $END_DATE"
     
     - name: Check for paper data
       id: check_data
       run: |
-        DATE="${{ steps.set-date.outputs.date }}"
-        echo "Processing date: $DATE"
-        FILE="Paper_metadata_download/${DATE}.json"
+        START_DATE="${{ steps.set-date.outputs.start_date }}"
+        END_DATE="${{ steps.set-date.outputs.end_date }}"
+        WEEKLY_KEY="${{ steps.set-date.outputs.weekly_key }}"
+        FILE="Paper_metadata_download/${WEEKLY_KEY}_weekly.json"
+        echo "Processing weekly range: ${START_DATE} to ${END_DATE}"
         if [ -f "$FILE" ]; then
           if [ -s "$FILE" ]; then
-            echo "Found paper data for ${DATE}"
-            # 检查文件内容是否为有效的JSON数组且包含数据
             if PAPER_COUNT=$(python -c "import json; f=open('$FILE'); data=json.load(f); print(len(data)); f.close()"); then
               if [ "$PAPER_COUNT" -gt 0 ]; then
                 echo "Found $PAPER_COUNT papers in data file"
                 echo "has_data=true" >> $GITHUB_OUTPUT
-                echo "file=${FILE}" >> $GITHUB_OUTPUT
-                echo "paper_count=$PAPER_COUNT" >> $GITHUB_OUTPUT
               else
                 echo "No valid papers found in data file"
                 echo "has_data=false" >> $GITHUB_OUTPUT
@@ -178,11 +159,11 @@ jobs:
               echo "has_data=false" >> $GITHUB_OUTPUT
             fi
           else
-            echo "Empty paper data file for ${DATE}"
+            echo "Empty paper data file"
             echo "has_data=false" >> $GITHUB_OUTPUT
           fi
         else
-          echo "No paper data found for ${DATE}"
+          echo "No paper data found: $FILE"
           echo "has_data=false" >> $GITHUB_OUTPUT
         fi
     
@@ -191,52 +172,61 @@ jobs:
       env:
         DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         GITHUB_REPOSITORY: ${{ github.repository }}
-        PROCESS_DATE: ${{ steps.set-date.outputs.date }}
+        START_DATE: ${{ steps.set-date.outputs.start_date }}
+        END_DATE: ${{ steps.set-date.outputs.end_date }}
+        WEEKLY_KEY: ${{ steps.set-date.outputs.weekly_key }}
       run: |
-        echo "Starting paper processing for ${PROCESS_DATE}"
-        python Psy-day-paper-deepseek.py --date ${PROCESS_DATE}
-        echo "Paper processing completed"
+        python Psy-day-paper-deepseek.py \
+          --start-date "${START_DATE}" \
+          --end-date "${END_DATE}" \
+          --weekly-key "${WEEKLY_KEY}"
     
     - name: Generate stats and newsletter
       if: steps.check_data.outputs.has_data == 'true'
       env:
         GITHUB_REPOSITORY: ${{ github.repository }}
-        PROCESS_DATE: ${{ steps.set-date.outputs.date }}
+        START_DATE: ${{ steps.set-date.outputs.start_date }}
+        END_DATE: ${{ steps.set-date.outputs.end_date }}
+        WEEKLY_KEY: ${{ steps.set-date.outputs.weekly_key }}
       run: |
-        echo "Generating statistics..."
-        python stats.py
-        echo "Generating newsletter..."
-        python newsletter.py --date ${PROCESS_DATE}
-        echo "Generation completed"
+        python stats.py \
+          --start-date "${START_DATE}" \
+          --end-date "${END_DATE}" \
+          --weekly-key "${WEEKLY_KEY}"
+        python newsletter.py \
+          --start-date "${START_DATE}" \
+          --end-date "${END_DATE}" \
+          --weekly-key "${WEEKLY_KEY}"
     
     - name: Generate TTS
       if: steps.check_data.outputs.has_data == 'true'
       env:
         GITHUB_REPOSITORY: ${{ github.repository }}
-        PROCESS_DATE: ${{ steps.set-date.outputs.date }}
+        START_DATE: ${{ steps.set-date.outputs.start_date }}
+        END_DATE: ${{ steps.set-date.outputs.end_date }}
+        WEEKLY_KEY: ${{ steps.set-date.outputs.weekly_key }}
       run: |
-        echo "Generating TTS..."
-        python tts.py --date ${PROCESS_DATE}
-        echo "TTS generation completed"
+        python tts.py \
+          --start-date "${START_DATE}" \
+          --end-date "${END_DATE}" \
+          --weekly-key "${WEEKLY_KEY}"
     
     - name: Commit and push if there are changes
       if: steps.check_data.outputs.has_data == 'true'
       env:
-        PROCESS_DATE: ${{ steps.set-date.outputs.date }}
+        START_DATE: ${{ steps.set-date.outputs.start_date }}
+        END_DATE: ${{ steps.set-date.outputs.end_date }}
+        WEEKLY_KEY: ${{ steps.set-date.outputs.weekly_key }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         
-        # 添加所有更改
         git add -A
         
-        # 检查是否有更改需要提交
         if ! git diff --cached --quiet; then
-          # 有更改需要提交
           echo "Changes detected, committing..."
-          git commit -m "Update daily paper report for ${PROCESS_DATE}"
+          git commit -m "Update weekly paper report for ${START_DATE} to ${END_DATE}"
           
-          # 拉取最新更改并尝试推送
           n=0
           until [ $n -ge 3 ]
           do

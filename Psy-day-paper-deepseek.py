@@ -1,7 +1,6 @@
 import os
 import json
 import datetime
-import pytz
 from tqdm import tqdm
 from openai import OpenAI
 from PIL import Image, ImageDraw, ImageFont
@@ -12,10 +11,11 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 import asyncio
 from utils import (
     setup_logger, require_auth, is_original_repo,
-    get_model_name, SUPPORTED_MODELS
+    get_model_name, SUPPORTED_MODELS,
+    get_last_week_range, weekly_basename,
 )
 from stats import analyze_papers
-from tts import generate_daily_paper_audio
+from tts import generate_weekly_paper_audio
 from newsletter import NewsletterGenerator
 
 # 设置日志记录器
@@ -136,7 +136,12 @@ def call_deepseek_api(prompt):
         logger.error(f"API 调用出错: {str(e)}")
         raise
 
-def create_poster(results, date_str, output_folder):
+def create_poster(results, weekly_key, output_folder):
+    if "_to_" in weekly_key:
+        start_date, end_date = weekly_key.split("_to_", 1)
+        date_range = f"{start_date} 至 {end_date}"
+    else:
+        date_range = weekly_key
     # 创建海报
     width = 3200  # 增加宽度到最大
     min_height = 3200  # 相应增加最小高度
@@ -247,7 +252,7 @@ def create_poster(results, date_str, output_folder):
     draw.rectangle([0, 0, width, 240], fill=primary_color)  # 增加顶部装饰条高度
     
     # 绘制标题
-    title = f"PubMed {date_str} 论文日报"
+    title = f"PubMed {date_range} 论文周报"
     title_bbox = draw.textbbox((0, 0), title, font=title_font)
     title_width = title_bbox[2] - title_bbox[0]
     
@@ -340,50 +345,51 @@ def create_poster(results, date_str, output_folder):
     
     # 保存图片
     os.makedirs(output_folder, exist_ok=True)
-    output_path = os.path.join(output_folder, f"{date_str}_poster.png")
+    output_path = os.path.join(output_folder, f"{weekly_key}_poster.png")
     image.save(output_path)
     print(f"海报保存到：{output_path}")
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
-def process_papers(date_str=None):
+def process_papers(start_date=None, end_date=None, weekly_key=None):
     """
-    处理论文数据
-    Args:
-        date_str: 可选，指定要处理的日期，格式为YYYY-MM-DD。如果不指定，则使用当前日期。
+    处理周报论文数据。
+    未指定日期时默认处理上周一至上周日的合并数据。
     """
     try:
-        # 如果没有指定日期，使用北京时间当前日期
-        if date_str is None:
-            beijing_tz = pytz.timezone('Asia/Shanghai')
-            current_time = datetime.datetime.now(beijing_tz)
-            date_str = current_time.strftime('%Y-%m-%d')
-        
-        logger.info(f"正在处理 {date_str} 的论文数据")
-        
-        # 读取论文数据
-        input_file = os.path.join('Paper_metadata_download', f"{date_str}.json")
+        if not weekly_key:
+            if not start_date or not end_date:
+                start_date, end_date = get_last_week_range()
+            weekly_key = weekly_basename(start_date, end_date)
+        elif not start_date or not end_date:
+            if "_to_" in weekly_key:
+                start_date, end_date = weekly_key.split("_to_", 1)
+            else:
+                start_date, end_date = get_last_week_range()
+
+        date_range = f"{start_date} 至 {end_date}"
+        logger.info(f"正在处理 {date_range} 的周报论文数据")
+
+        input_file = os.path.join('Paper_metadata_download', f"{weekly_key}_weekly.json")
         if not os.path.exists(input_file):
-            logger.error(f"找不到 {date_str} 的论文数据文件")
+            logger.error(f"找不到 {date_range} 的论文数据文件: {input_file}")
             return False
-            
+
         with open(input_file, 'r', encoding='utf-8') as f:
             papers = json.load(f)
-        
+
         if not papers:
-            logger.warning(f"{date_str} 没有可用的论文数据")
+            logger.warning(f"{date_range} 没有可用的论文数据")
             return False
-            
+
         logger.info(f"读取到 {len(papers)} 篇论文数据")
-        
-        # 创建输出目录
+
         os.makedirs('Psy-day-paper-deepseek', exist_ok=True)
         os.makedirs('posters', exist_ok=True)
         os.makedirs('newsletters', exist_ok=True)
         os.makedirs('audio', exist_ok=True)
-        
-        # 检查是否存在中间结果文件；另存「已被 AI 过滤」的标题，避免断点续跑时重复调用 API
-        temp_file = os.path.join('Psy-day-paper-deepseek', f"{date_str}_temp.json")
-        filtered_file = os.path.join('Psy-day-paper-deepseek', f"{date_str}_filtered_titles.json")
+
+        temp_file = os.path.join('Psy-day-paper-deepseek', f"{weekly_key}_temp.json")
+        filtered_file = os.path.join('Psy-day-paper-deepseek', f"{weekly_key}_filtered_titles.json")
         if os.path.exists(temp_file):
             try:
                 with open(temp_file, 'r', encoding='utf-8') as f:
@@ -537,7 +543,7 @@ def process_papers(date_str=None):
         logger.info(f"论文处理统计：总数 {len(papers)}，成功 {success_count}，失败 {error_count}")
         
         # 处理完成后，保存最终结果
-        output_file = os.path.join('Psy-day-paper-deepseek', f"{date_str}_Psy_deepseek_clean.json")
+        output_file = os.path.join('Psy-day-paper-deepseek', f"{weekly_key}_Psy_deepseek_clean.json")
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
         
@@ -547,18 +553,22 @@ def process_papers(date_str=None):
         
         # 如果成功处理了论文，继续生成其他内容
         if results:
-            # 生成海报
-            create_poster(results, date_str, 'posters')
-            
-            # 生成统计数据
-            analyze_papers()
-            
-            # 生成通讯
+            create_poster(results, weekly_key, 'posters')
+
+            analyze_papers(start_date=start_date, end_date=end_date, weekly_key=weekly_key)
+
             newsletter_gen = NewsletterGenerator()
-            newsletter_gen.generate_newsletter(date_str)
-            
-            # 生成音频
-            generate_daily_paper_audio(date_str)
+            newsletter_gen.generate_newsletter(
+                start_date=start_date,
+                end_date=end_date,
+                weekly_key=weekly_key,
+            )
+
+            generate_weekly_paper_audio(
+                start_date=start_date,
+                end_date=end_date,
+                weekly_key=weekly_key,
+            )
             
             return True
         else:
@@ -570,13 +580,17 @@ def process_papers(date_str=None):
         return False
 
 if __name__ == "__main__":
-    # 解析命令行参数
-    parser = argparse.ArgumentParser(description='处理 PubMed 每日论文数据（DeepSeek 翻译）')
-    parser.add_argument('--date', type=str, help='指定要处理的日期 (YYYY-MM-DD格式)')
+    parser = argparse.ArgumentParser(description='处理心理学论文周报数据（DeepSeek 翻译）')
+    parser.add_argument('--start-date', type=str, help='周报起始日期 (YYYY-MM-DD格式)')
+    parser.add_argument('--end-date', type=str, help='周报结束日期 (YYYY-MM-DD格式)')
+    parser.add_argument('--weekly-key', type=str, help='周报文件基名，如 2026-05-26_to_2026-06-01')
     args = parser.parse_args()
 
-    # 使用指定的日期或默认使用当前日期
-    success = process_papers(args.date)
+    success = process_papers(
+        start_date=args.start_date,
+        end_date=args.end_date,
+        weekly_key=args.weekly_key,
+    )
     if not success:
         exit(1)
     exit(0) 
