@@ -9,7 +9,7 @@
 
 ## 产物
 
-每次运行会把原始元数据、DeepSeek 中文解读、Markdown/HTML 周报、词云、趋势图、海报和中文 MP3 写入仓库。工具本身不发送电子邮件。
+每次运行会把原始元数据、DeepSeek 中文解读、Markdown/HTML 周报、词云、趋势图和海报写入仓库。工具本身不发送电子邮件或音频。
 
 ## 工作流
 
@@ -59,4 +59,4 @@ python Paper_metadata_download.py --start-date 2026-08-17 --end-date 2026-08-23
 python Psy-day-paper-deepseek.py --start-date 2026-08-17 --end-date 2026-08-23
 ```
 
-第二个命令会依次生成海报、统计、周报与语音。
+第二个命令会依次生成海报、统计与周报。
