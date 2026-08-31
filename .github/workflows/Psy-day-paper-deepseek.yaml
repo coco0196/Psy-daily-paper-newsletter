@@ -1,8 +1,8 @@
-name: Psy-day-paper-deepseek
+name: Generate heart-brain and digital mental-health report
 
 on:
   workflow_run:
-    workflows: ["Paper_metadata_download"]
+    workflows: ["Download tracker metadata"]
     types:
       - completed
   workflow_dispatch:
@@ -177,36 +177,6 @@ jobs:
         WEEKLY_KEY: ${{ steps.set-date.outputs.weekly_key }}
       run: |
         python Psy-day-paper-deepseek.py \
-          --start-date "${START_DATE}" \
-          --end-date "${END_DATE}" \
-          --weekly-key "${WEEKLY_KEY}"
-    
-    - name: Generate stats and newsletter
-      if: steps.check_data.outputs.has_data == 'true'
-      env:
-        GITHUB_REPOSITORY: ${{ github.repository }}
-        START_DATE: ${{ steps.set-date.outputs.start_date }}
-        END_DATE: ${{ steps.set-date.outputs.end_date }}
-        WEEKLY_KEY: ${{ steps.set-date.outputs.weekly_key }}
-      run: |
-        python stats.py \
-          --start-date "${START_DATE}" \
-          --end-date "${END_DATE}" \
-          --weekly-key "${WEEKLY_KEY}"
-        python newsletter.py \
-          --start-date "${START_DATE}" \
-          --end-date "${END_DATE}" \
-          --weekly-key "${WEEKLY_KEY}"
-    
-    - name: Generate TTS
-      if: steps.check_data.outputs.has_data == 'true'
-      env:
-        GITHUB_REPOSITORY: ${{ github.repository }}
-        START_DATE: ${{ steps.set-date.outputs.start_date }}
-        END_DATE: ${{ steps.set-date.outputs.end_date }}
-        WEEKLY_KEY: ${{ steps.set-date.outputs.weekly_key }}
-      run: |
-        python tts.py \
           --start-date "${START_DATE}" \
           --end-date "${END_DATE}" \
           --weekly-key "${WEEKLY_KEY}"

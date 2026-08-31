@@ -17,6 +17,7 @@ from utils import (
 from stats import analyze_papers
 from tts import generate_weekly_paper_audio
 from newsletter import NewsletterGenerator
+from domain_config import REPORT_TITLE
 
 # 设置日志记录器
 logger = setup_logger()
@@ -252,7 +253,7 @@ def create_poster(results, weekly_key, output_folder):
     draw.rectangle([0, 0, width, 240], fill=primary_color)  # 增加顶部装饰条高度
     
     # 绘制标题
-    title = f"PubMed {date_range} 论文周报"
+    title = f"{REPORT_TITLE}（{date_range}）"
     title_bbox = draw.textbbox((0, 0), title, font=title_font)
     title_width = title_bbox[2] - title_bbox[0]
     
@@ -448,16 +449,18 @@ def process_papers(start_date=None, end_date=None, weekly_key=None):
                 
                 logger.info(f"正在处理第 {index}/{len(papers)} 篇论文")
                 
-                # 构建提示（相关性预审 + 翻译与关键词）
+                # 构建提示（四条主题线独立收录；交叉论文重点推荐）
                 prompt = f"""你是一个专业的学术评审专家。请阅读以下论文的标题和摘要。
 
 【核心筛选标准】
-我们需要寻找高度聚焦于以下领域的论文：
-1. 情绪/情感的心理学或神经科学研究（Emotion, Affect, 情绪感知/表达/体验等）
-2. 面部表情或语音表情（Facial/Vocal Expression）
-3. 社会认知、人际关系、印象形成或人格
-4. 人工智能（AI、机器学习、深度学习）在上述心理/情绪/认知领域的交叉应用。
-⚠️ 排除标准：如果是纯粹的临床躯体疾病（如糖尿病、骨折、肿瘤）、纯细胞生物学机制、或者AI仅用于无关的普通医学图像识别，请严格判定为不相关。
+本周报完整追踪下列四条主题线；论文只要对其中任意一条有实质贡献即可判定为相关：
+1. 心脑轴/心脑耦合：心脑相互作用、神经内脏整合、中央自主神经网络、HRV/RSA、心搏诱发电位等。
+2. EMA/ESM 与密集纵向测量：生态瞬时评估、经验取样、日常生活或动态测量。
+3. EMI/JITAI 与微干预：生态瞬时干预、即时自适应干预、微随机试验、数字表型、被动感知、个体化数字干预。
+4. 心理健康与数字心理干预：心理健康/幸福感、情绪调节、复原力，以及自助、移动或数字化心理干预。
+
+若论文同时实质涉及两条或以上主题线，或直接研究心脑指标在日常生活心理健康干预中的作用，应标为“重点推荐”。
+⚠️ 排除：仅泛泛提及上述概念、与心理/行为或方法学无关的纯躯体疾病研究、纯细胞机制研究，及与上述主题无关的普通医学影像 AI 研究。
 
 标题：{title}
 摘要：{summary}
@@ -466,6 +469,8 @@ def process_papers(start_date=None, end_date=None, weekly_key=None):
 请先判断相关性。如果根据标准判定为不相关，请仅回复四个字：“相关性：否”。
 如果判定为高度相关，请严格按照以下格式返回（必须保留相关性标签）：
 相关性：是
+主题标签：[从“心脑轴/心脑耦合”“EMA/ESM 与密集纵向测量”“EMI/JITAI 与微干预”“心理健康与数字心理干预”中选择一个或多个]
+优先级：[重点推荐 或 常规收录]
 标题：[中文标题]
 摘要：[中文摘要]
 关键词：[提取3-5个中文核心关键词]"""

@@ -12,6 +12,7 @@ from urllib3.exceptions import ProtocolError
 from urllib3.util.retry import Retry
 from utils import setup_logger, get_last_week_range, weekly_basename, iter_date_range
 from journal_registry import filter_by_journal
+from domain_config import CROSSREF_QUERY_TERMS, iter_topic_terms
 
 # 设置日志记录器
 logger = setup_logger()
@@ -19,34 +20,6 @@ logger = setup_logger()
 EUTILS_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 CROSSREF_WORKS_URL = "https://api.crossref.org/works"
 CROSSREF_USER_AGENT = "hf-daily-paper-bot/1.0 (mailto:zhugamen@gmail.com)"
-
-# 垂直领域：标题/摘要中需匹配的关键词（OR 组合，与当日 [dp] 联检）
-KEYWORDS = [
-    "Cross-culture",
-    "Impression",
-    "Emotion",
-    "Face",
-    "Voice",
-    "Feeling",
-    "Mood",
-    "Social Cognition",
-    "Emotion Perception",
-    "Emotion Expression",
-    "Emotion Experience",
-    "Facial Expression",
-    "Vocal Expression",
-    "Interpersonal Relationship",
-    "Personality",
-    "anger",
-    "fear",
-    "happiness",
-    "surprise",
-    "disgust",
-    "sadness",
-    "anxiety",
-    "depression"
-]
-
 
 def _make_api_session():
     """
@@ -360,7 +333,9 @@ def _parse_pubmed_xml_batch(xml_bytes):
 
 def _esearch_pubmed(session, date_str, retmax=10000):
     """按日期 + 标题/摘要关键词检索 PubMed；retmax 默认 10000。"""
-    keyword_query = " OR ".join([f'"{kw}"[Title/Abstract]' for kw in KEYWORDS])
+    keyword_query = " OR ".join(
+        f'"{term}"[Title/Abstract]' for term in iter_topic_terms()
+    )
     term = f'"{date_str}"[dp] AND ({keyword_query})'
     url = f"{EUTILS_BASE}/esearch.fcgi"
     params = {
@@ -424,8 +399,8 @@ def _crossref_query_params():
     避免将全部关键词 AND 进 query 导致空结果或无效查询。
     """
     max_kw = int(os.getenv("CROSSREF_QUERY_KEYWORDS_MAX", "10"))
-    max_kw = max(1, min(max_kw, len(KEYWORDS)))
-    kw_subset = KEYWORDS[:max_kw]
+    max_kw = max(1, min(max_kw, len(CROSSREF_QUERY_TERMS)))
+    kw_subset = CROSSREF_QUERY_TERMS[:max_kw]
     abstract_query = " OR ".join(kw_subset)
     return {"query.abstract": abstract_query}
 

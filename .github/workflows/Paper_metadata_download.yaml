@@ -1,4 +1,4 @@
-name: Paper_metadata_download
+name: Download tracker metadata
 
 on:
   schedule:
@@ -64,6 +64,10 @@ jobs:
       env:
         START_DATE: ${{ steps.set-date.outputs.start_date }}
         END_DATE: ${{ steps.set-date.outputs.end_date }}
+        NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+        NCBI_EMAIL: ${{ secrets.NCBI_EMAIL }}
+        CROSSREF_MAILTO: ${{ vars.CROSSREF_MAILTO }}
+        JOURNAL_FILTER_ENABLED: ${{ vars.JOURNAL_FILTER_ENABLED }}
       run: |
         python Paper_metadata_download.py --start-date "$START_DATE" --end-date "$END_DATE"
         DOWNLOAD_STATUS=$?
