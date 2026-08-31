@@ -5,6 +5,7 @@ ISSN 来源：NLM Catalog、APA PsycArticles、ISSN Portal、出版社官网（2
 筛选策略：ISSN 精确匹配优先；仅当文献缺失 ISSN 时，才回退到期刊名称/缩写模糊匹配。
 """
 
+import os
 import re
 
 # pissn / eissn 均为带连字符的标准 ISSN 格式；无纸质版时 pissn 为 None
@@ -283,11 +284,18 @@ def _match_journal_name(journal_name):
 
 def filter_by_journal(journal_name=None, issns=None, journal_names=None):
     """
-    期刊筛选：ISSN 优先，名称模糊匹配为辅。
+    可选期刊筛选：ISSN 优先，名称模糊匹配为辅。
 
+    默认关闭，以完整追踪心脑、EMA/ESM、EMI/JITAI 与心理健康四条主题线。
+    仅在环境变量 JOURNAL_FILTER_ENABLED=true 时启用下方白名单。
     - 若文献带有 ISSN：仅当命中 TARGET_ISSN_SET 时通过，否则丢弃（不再回退名称）。
     - 若文献缺失 ISSN：对 journal_name / journal_names 做名称匹配。
     """
+    if os.getenv("JOURNAL_FILTER_ENABLED", "false").strip().lower() not in {
+        "1", "true", "yes", "on",
+    }:
+        return True
+
     normalized_issns = _coerce_issn_list(issns)
     if normalized_issns:
         return bool(set(normalized_issns) & TARGET_ISSN_SET)
