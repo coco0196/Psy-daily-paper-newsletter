@@ -1,101 +1,62 @@
-# Psy 每日简报机器人
+# 心脑与数字心理健康文献周报
 
-该机器人能自动从 [Pubmed](https://pubmed.ncbi.nlm.nih.gov/) 和[Crossref](https://www.crossref.org/)收集paper信息，然后使用 DeepSeek 进行解读。
+本工具每周追踪四条相互独立的研究线，并优先呈现其交叉研究：
 
-## 🚀 主要功能
+1. 心脑轴、心脑耦合、神经内脏整合、HRV/RSA 与心搏诱发电位；
+2. 生态瞬时评估（EMA）、经验取样（ESM）与密集纵向测量；
+3. 生态瞬时干预（EMI）、即时自适应干预（JITAI）、微随机试验与数字表型；
+4. 心理健康、情绪调节及数字/移动心理干预。
 
-- ✅ 自动从[Pubmed](https://pubmed.ncbi.nlm.nih.gov/) 和[Crossref](https://www.crossref.org/)获取paper信息
-- ✅ 使用 DeepSeek 进行论文筛选，筛选标准如下：
-      1. 情绪/情感的心理学或神经科学研究（Emotion, Affect, 情绪感知/表达/体验等）
-      2. 面部表情或语音情绪表达（Facial/Vocal Expression）
-      3. 社会认知、人际关系、印象形成或人格
-      4. 人工智能（AI、机器学习、深度学习）在上述心理/情绪/认知领域的交叉应用。
-- ✅ 使用 DeepSeek 进行智能论文解读
-- ✅ 生成论文的中文解读信息，包括标题、摘要、关键词
-- ✅ 自动生成每日论文海报
-- ✅ 生成关键词云图和趋势分析
-- ✅ 支持语音播报功能
-- ✅ 自动生成日报（支持 Markdown 和 HTML 格式）
-- ✅ 错误通知和自动重试机制
+## 产物
 
-## 🛠️ 安装设置
+每次运行会把原始元数据、DeepSeek 中文解读、Markdown/HTML 周报、词云、趋势图、海报和中文 MP3 写入仓库。工具本身不发送电子邮件。
 
-1. 克隆本仓库
+## 工作流
 
-2. 配置 DeepSeek API Key：
-   - 访问您的 GitHub 仓库
-   - 点击 "Settings" > "Security" > "Secrets and variables" > "Actions"
-   - 点击 "New repository secret"
-   - Name: `DEEPSEEK_API_KEY`
-   - Value: 您的 DeepSeek API Key
-   - 点击 "Add secret" 保存
+`Download tracker metadata` 每周一北京时间 12:00 下载上周一至周日的 PubMed 与 Crossref 记录；成功后触发 `Generate heart-brain and digital mental-health report`。后者用 DeepSeek 判定相关性、主题标签和优先级，并生成完整报告。
 
-3. 配置 DeepSeek API Key：
-   - 访问您的 GitHub 仓库
-   - 点击 "Settings" > "Security" > "Secrets and variables" > "Actions"
-   - 点击 "New repository secret"
-   - Name: `NCBI_API_KEY`
-   - Value: 您的 NCBI API Key
-   - 点击 "Add secret" 保存
+## 配置
 
-4. 配置 NCBI EMAIL：
-   - 访问您的 GitHub 仓库
-   - 点击 "Settings" > "Security" > "Secrets and variables" > "Actions"
-   - 点击 "New repository secret"
-   - Name: `NCBI_EMAIL`
-   - Value: 注册NCBI时的邮箱
-   - 点击 "Add secret" 保存
+主题词集中在 `domain_config.py`：
 
-5. 启用 GitHub Actions：
-   - 访问仓库的 "Actions" 选项卡
-   - 点击 "I understand my workflows, go ahead and enable them"
+- `TOPIC_GROUPS`：四个独立的 PubMed 标题/摘要检索组；
+- `CROSSREF_QUERY_TERMS`：Crossref 的高特异性补充检索词；
+- `REPORT_TITLE`：报告、海报和语音的领域名称。
 
-## 🔄 运行方式
+默认不限制期刊，以保证四条研究线的覆盖范围。若希望启用 `journal_registry.py` 中的白名单，在 GitHub 仓库变量中设置：
 
-- **自动运行**：每天北京时间 23:00 自动运行
-- **手动运行**：在 Actions 页面选择工作流，点击 "Run workflow"
+```text
+JOURNAL_FILTER_ENABLED=true
+```
 
-## 📁 项目结构
+## GitHub 配置
 
-- `Paper_metadata_download.py`: 下载论文元数据
-- `Psy-day-paper-deepseek.py`: 主程序，处理论文解读
-- `newsletter.py`: 生成日报
-- `stats.py`: 统计分析和可视化
-- `tts.py`: 语音合成
-- `utils.py`: 工具函数
+在仓库的 `Settings → Secrets and variables → Actions` 添加：
 
-### 📂 文件夹结构
+```text
+DEEPSEEK_API_KEY=你的 DeepSeek API 密钥
+NCBI_API_KEY=你的 NCBI API 密钥（建议）
+NCBI_EMAIL=你的联系邮箱
+```
 
-- `Psy-day-paper-deepseek/`: 存放处理后的论文数据和每日总结
-- `Paper_metadata_download/`: 存放下载的论文元数据
-- `newsletters/`: 存放生成的日报文件（Markdown 和 HTML）
-- `images/`: 存放日报图片（关键词云图、趋势图等）
-- `audio/`: 存放语音播报文件
-- `stats/`: 存放统计分析数据（JSON 格式）
+建议在 Actions 变量中添加：
 
-## 📊 数据分析
+```text
+CROSSREF_MAILTO=你的联系邮箱
+JOURNAL_FILTER_ENABLED=false
+```
 
-- **关键词云图**：直观展示热门研究主题
-- **趋势分析**：显示每日论文数量变化
-- **热门领域**：自动识别热门研究领域
-- **统计报告**：生成详细的统计数据
+首次部署请通过 Actions 的手动触发指定一周日期，核对 `Paper_metadata_download/`、`Psy-day-paper-deepseek/` 与 `newsletters/` 产物后再依赖定时运行。
 
-## 📝 日报格式
+## 本地运行
 
-- **Markdown 格式**：适合在 GitHub 上阅读
-- **HTML 格式**：支持更丰富的展示效果
-- **包含内容**：
-  - 每日论文统计
-  - 热门研究领域
-  - 论文详细解读
-  - 关键词云图
-  - 趋势分析图
-  - 语音播报链接
+```powershell
+python -m pip install -r requirements.txt
+$env:DEEPSEEK_API_KEY = "你的密钥"
+$env:NCBI_API_KEY = "你的 NCBI 密钥"
+$env:NCBI_EMAIL = "you@example.org"
+python Paper_metadata_download.py --start-date 2026-08-17 --end-date 2026-08-23
+python Psy-day-paper-deepseek.py --start-date 2026-08-17 --end-date 2026-08-23
+```
 
-## 🎯 特色功能
-
-- **智能翻译**：使用 DeepSeek API 进行专业的学术翻译
-- **自动重试**：遇到错误时自动重试，提高可靠性
-- **错误通知**：通过 GitHub Issues 自动通知运行错误
-- **数据可视化**：自动生成图表和统计信息
-
+第二个命令会依次生成海报、统计、周报与语音。
