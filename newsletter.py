@@ -6,13 +6,15 @@ from jinja2 import Template
 from utils import get_logger, get_last_week_range, weekly_basename
 import re
 import argparse
+from collections import Counter
+from domain_config import REPORT_TITLE
 
 logger = get_logger()
 
 class NewsletterGenerator:
     def __init__(self):
         self.template = """
-# 心理学相关论文周报 ({{ date_range }})
+# {{ report_title }}（{{ date_range }}）
 
 ## 📊 本周论文统计
 - 总论文数：{{ total_papers }}
@@ -24,6 +26,9 @@ class NewsletterGenerator:
 ### {{ loop.index }}. {{ paper.title }}
 
 **原文标题：** {{ paper.original_title }}
+
+**主题标签：** {{ paper.topic_labels }}  
+**优先级：** {{ paper.priority }}
 
 **摘要：**
 {{ paper.summary }}
@@ -77,30 +82,31 @@ class NewsletterGenerator:
         keywords_match = re.search(r"关键词\s*[:：]\s*([^\n]+)", translation)
         raw_kw = keywords_match.group(1).strip() if keywords_match else ""
         keywords = raw_kw if raw_kw else "未提取"
+        topics_match = re.search(r"主题标签\s*[:：]\s*([^\n]+)", translation)
+        priority_match = re.search(r"优先级\s*[:：]\s*([^\n]+)", translation)
 
         return {
             "title": title,
             "original_title": paper_data.get("title", ""),
             "summary": summary,
             "keywords": keywords,
+            "topic_labels": topics_match.group(1).strip() if topics_match else "未标注",
+            "priority": priority_match.group(1).strip() if priority_match else "常规收录",
             "paper_url": paper_data.get("url", ""),
             "source": paper_data.get("source", "未知来源"),
             "code_url": paper_data.get("paper", {}).get("code", ""),
         }
 
     def get_hot_topics(self, papers):
-        """分析热门研究领域"""
-        topics = []
-        keywords = ['LLM', 'Vision', 'Audio', 'MultiModal', 'NLP', 'RL', 
-                   'Transformer', 'GPT', 'AIGC', 'Diffusion']
+        """按 DeepSeek 主题标签汇总本周覆盖方向。"""
+        topics = Counter()
         for paper in papers:
-            title = paper.get('title', '').lower()
-            summary = paper.get('summary', '').lower()
-            content = title + ' ' + summary
-            for keyword in keywords:
-                if keyword.lower() in content and keyword not in topics:
-                    topics.append(keyword)
-        return ', '.join(topics) if topics else '综合领域'
+            raw_labels = paper.get("topic_labels", "")
+            for label in re.split(r"[、,，;；/]", raw_labels):
+                label = label.strip(" []")
+                if label and label != "未标注":
+                    topics[label] += 1
+        return "、".join(label for label, _ in topics.most_common(4)) or "综合领域"
 
     def generate_newsletter(self, start_date=None, end_date=None, weekly_key=None):
         """生成每周论文简报"""
@@ -138,6 +144,7 @@ class NewsletterGenerator:
 
             audio_path = f'audio/{weekly_key}_weekly_papers.mp3'
             template_data = {
+                'report_title': REPORT_TITLE,
                 'date_range': date_range,
                 'total_papers': len(papers),
                 'hot_topics': self.get_hot_topics(papers),
