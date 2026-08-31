@@ -50,8 +50,6 @@ class NewsletterGenerator:
 ## 📈 近期论文趋势
 ![论文趋势](../images/daily_papers.png)
 
-## 🎙️ 语音播报
-- [收听本周论文解读](../{{ audio_path }})
 """
 
     def extract_paper_info(self, paper_data):
@@ -142,7 +140,6 @@ class NewsletterGenerator:
                 logger.warning("没有提取到有效的论文信息")
                 return False
 
-            audio_path = f'audio/{weekly_key}_weekly_papers.mp3'
             template_data = {
                 'report_title': REPORT_TITLE,
                 'date_range': date_range,
@@ -151,7 +148,6 @@ class NewsletterGenerator:
                 'papers': papers,
                 'wordcloud_path': f'images/keywords_wordcloud.png',
                 'trend_path': f'images/daily_papers.png',
-                'audio_path': audio_path,
             }
 
             template = Template(self.template)
