@@ -12,7 +12,11 @@ from urllib3.exceptions import ProtocolError
 from urllib3.util.retry import Retry
 from utils import setup_logger, get_last_week_range, weekly_basename, iter_date_range
 from journal_registry import filter_by_journal
-from domain_config import CROSSREF_QUERY_TERMS, iter_topic_terms
+from domain_config import (
+    CROSSREF_QUERY_TERMS,
+    iter_topic_terms,
+    local_prefilter_decision,
+)
 
 # 设置日志记录器
 logger = setup_logger()
@@ -548,6 +552,48 @@ def _validate_and_save_papers(papers, output_file, label):
     return valid_papers
 
 
+def _local_prefilter_enabled():
+    """允许在紧急回溯或 A/B 对比时以环境变量关闭预筛。"""
+    return os.getenv("LOCAL_KEYWORD_PREFILTER_ENABLED", "true").strip().lower() not in {
+        "0", "false", "no", "off"
+    }
+
+
+def _apply_local_keyword_prefilter(papers):
+    """在调用 DeepSeek 前，筛去未满足关键词组合的候选记录。"""
+    if not _local_prefilter_enabled():
+        logger.info("本地关键词预筛已通过 LOCAL_KEYWORD_PREFILTER_ENABLED 关闭")
+        return papers
+
+    accepted = []
+    rejected = 0
+    reasons = {}
+    for item in papers:
+        paper = item.get("paper", {})
+        decision = local_prefilter_decision(
+            paper.get("title", ""),
+            paper.get("summary", ""),
+        )
+        if decision["accepted"]:
+            # 保留可追溯信息；后续 DeepSeek 仍独立做语义相关性判断。
+            paper["local_prefilter_groups"] = decision["groups"]
+            paper["local_prefilter_reason"] = decision["reason"]
+            accepted.append(item)
+        else:
+            rejected += 1
+            reason = decision["reason"]
+            reasons[reason] = reasons.get(reason, 0) + 1
+
+    logger.info(
+        "本地关键词预筛：输入 %d 篇，保留 %d 篇，剔除 %d 篇（%s）",
+        len(papers),
+        len(accepted),
+        rejected,
+        ", ".join(f"{key}={value}" for key, value in sorted(reasons.items())) or "无",
+    )
+    return accepted
+
+
 def download_papers_for_date(date_str, retmax=10000):
     """
     从 PubMed 与 Crossref 下载指定日期的论文元数据（已按目标期刊过滤）。
@@ -615,7 +661,7 @@ def download_papers_for_date(date_str, retmax=10000):
     logger.info(
         f"{target_date} 合并后原始条目: PubMed {len(pubmed_papers)} 篇 + Crossref {len(crossref_papers)} 篇 = {len(papers)} 篇"
     )
-    return papers
+    return _apply_local_keyword_prefilter(papers)
 
 
 def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000):
