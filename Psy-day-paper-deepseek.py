@@ -15,7 +15,6 @@ from utils import (
     get_last_week_range, weekly_basename,
 )
 from stats import analyze_papers
-from tts import generate_weekly_paper_audio
 from newsletter import NewsletterGenerator
 from domain_config import REPORT_TITLE
 
@@ -387,7 +386,6 @@ def process_papers(start_date=None, end_date=None, weekly_key=None):
         os.makedirs('Psy-day-paper-deepseek', exist_ok=True)
         os.makedirs('posters', exist_ok=True)
         os.makedirs('newsletters', exist_ok=True)
-        os.makedirs('audio', exist_ok=True)
 
         temp_file = os.path.join('Psy-day-paper-deepseek', f"{weekly_key}_temp.json")
         filtered_file = os.path.join('Psy-day-paper-deepseek', f"{weekly_key}_filtered_titles.json")
@@ -569,12 +567,6 @@ def process_papers(start_date=None, end_date=None, weekly_key=None):
                 weekly_key=weekly_key,
             )
 
-            generate_weekly_paper_audio(
-                start_date=start_date,
-                end_date=end_date,
-                weekly_key=weekly_key,
-            )
-            
             return True
         else:
             logger.error("没有成功处理任何论文")
