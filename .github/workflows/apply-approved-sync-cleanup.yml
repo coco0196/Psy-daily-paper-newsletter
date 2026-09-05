@@ -72,7 +72,6 @@ jobs:
 
           shutil.rmtree(staging, ignore_errors=True)
           bundle.unlink(missing_ok=True)
-          (root / ".github/workflows/apply-approved-sync-cleanup.yml").unlink(missing_ok=True)
           PY
 
       - name: Commit the approved sync
