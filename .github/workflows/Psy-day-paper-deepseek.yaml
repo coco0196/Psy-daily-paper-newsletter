@@ -1,216 +1,70 @@
-name: Generate heart-brain and digital mental-health report
+name: Generate three-track Newsletter
 
 on:
   workflow_run:
     workflows: ["Download tracker metadata"]
-    types:
-      - completed
-  workflow_dispatch:
-    inputs:
-      start_date:
-        description: '周报起始日期 (YYYY-MM-DD)，留空则自动取上周一'
-        required: false
-        type: string
-      end_date:
-        description: '周报结束日期 (YYYY-MM-DD)，留空则自动取上周日'
-        required: false
-        type: string
+    types: [completed]
 
 permissions:
   contents: write
   actions: read
 
 jobs:
-  verify:
-    runs-on: ubuntu-latest
-    outputs:
-      is_authorized: ${{ steps.check_repo.outputs.is_authorized }}
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install cryptography
-    
-    - name: Verify repository
-      id: check_repo
-      run: |
-        REPO_URL=$(git config --get remote.origin.url)
-        echo "Repository URL: $REPO_URL"
-        echo "is_authorized=true" >> $GITHUB_OUTPUT
-        echo "Repository is authorized"
-  
   process:
-    needs: verify
-    if: >-
-      needs.verify.outputs.is_authorized == 'true' &&
-      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install cryptography
-        sudo apt-get update
-        sudo apt-get install -y fonts-wqy-zenhei fonts-noto-cjk
-    
-    - name: Download workflow artifact
-      if: github.event_name == 'workflow_run'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            run_id: context.payload.workflow_run.id,
-          });
-          const matchArtifact = artifacts.data.artifacts.find((artifact) => {
-            return artifact.name == "workflow-data"
-          });
-          if (matchArtifact) {
-            const download = await github.rest.actions.downloadArtifact({
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Download processing data
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              artifact_id: matchArtifact.id,
+              run_id: context.payload.workflow_run.id,
+            });
+            const artifact = artifacts.data.artifacts.find(item => item.name === 'workflow-data');
+            if (!artifact) core.setFailed('未找到候选文献 artifact');
+            const response = await github.rest.actions.downloadArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: artifact.id,
               archive_format: 'zip',
             });
-            const fs = require('fs');
-            fs.writeFileSync('${{github.workspace}}/workflow-data.zip', Buffer.from(download.data));
-          }
-    
-    - name: Set weekly date range
-      id: set-date
-      run: |
-        export TZ='Asia/Shanghai'
-
-        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-          if [ -n "${{ github.event.inputs.start_date }}" ] && [ -n "${{ github.event.inputs.end_date }}" ]; then
-            START_DATE="${{ github.event.inputs.start_date }}"
-            END_DATE="${{ github.event.inputs.end_date }}"
-          else
-            read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; s,e=get_last_week_range(); print(s, e)")
+            require('fs').writeFileSync('workflow-data.zip', Buffer.from(response.data));
+      - name: Generate Newsletter
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          unzip -o workflow-data.zip
+          START_DATE=$(sed -n '1p' weekly_range.txt)
+          END_DATE=$(sed -n '2p' weekly_range.txt)
+          WEEKLY_KEY=$(sed -n '3p' weekly_range.txt)
+          python Psy-day-paper-deepseek.py \
+            --start-date "$START_DATE" \
+            --end-date "$END_DATE" \
+            --weekly-key "$WEEKLY_KEY"
+      - name: Commit Newsletter only
+        run: |
+          WEEKLY_KEY=$(sed -n '3p' weekly_range.txt)
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add "newsletters/${WEEKLY_KEY}_weekly_paper.md" "newsletters/${WEEKLY_KEY}_weekly_paper.html"
+          if git diff --cached --quiet; then
+            echo "No Newsletter changes to commit"
+            exit 0
           fi
-        elif [ "${{ github.event_name }}" == "workflow_run" ]; then
-          if [ -f "workflow-data.zip" ]; then
-            unzip -o workflow-data.zip
-            if [ -f "weekly_range.txt" ] && [ -s "weekly_range.txt" ]; then
-              START_DATE=$(sed -n '1p' weekly_range.txt | tr -d '[:space:]')
-              END_DATE=$(sed -n '2p' weekly_range.txt | tr -d '[:space:]')
-            else
-              read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; s,e=get_last_week_range(); print(s, e)")
-            fi
-          else
-            read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; s,e=get_last_week_range(); print(s, e)")
-          fi
-        else
-          read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; s,e=get_last_week_range(); print(s, e)")
-        fi
-
-        if [[ ! $START_DATE =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || [[ ! $END_DATE =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-          read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; s,e=get_last_week_range(); print(s, e)")
-        fi
-
-        WEEKLY_KEY="${START_DATE}_to_${END_DATE}"
-        echo "start_date=$START_DATE" >> $GITHUB_OUTPUT
-        echo "end_date=$END_DATE" >> $GITHUB_OUTPUT
-        echo "weekly_key=$WEEKLY_KEY" >> $GITHUB_OUTPUT
-        echo "Final weekly range: $START_DATE to $END_DATE"
-    
-    - name: Check for paper data
-      id: check_data
-      run: |
-        START_DATE="${{ steps.set-date.outputs.start_date }}"
-        END_DATE="${{ steps.set-date.outputs.end_date }}"
-        WEEKLY_KEY="${{ steps.set-date.outputs.weekly_key }}"
-        FILE="Paper_metadata_download/${WEEKLY_KEY}_weekly.json"
-        echo "Processing weekly range: ${START_DATE} to ${END_DATE}"
-        if [ -f "$FILE" ]; then
-          if [ -s "$FILE" ]; then
-            if PAPER_COUNT=$(python -c "import json; f=open('$FILE'); data=json.load(f); print(len(data)); f.close()"); then
-              if [ "$PAPER_COUNT" -gt 0 ]; then
-                echo "Found $PAPER_COUNT papers in data file"
-                echo "has_data=true" >> $GITHUB_OUTPUT
-              else
-                echo "No valid papers found in data file"
-                echo "has_data=false" >> $GITHUB_OUTPUT
-              fi
-            else
-              echo "Invalid JSON format in data file"
-              echo "has_data=false" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "Empty paper data file"
-            echo "has_data=false" >> $GITHUB_OUTPUT
-          fi
-        else
-          echo "No paper data found: $FILE"
-          echo "has_data=false" >> $GITHUB_OUTPUT
-        fi
-    
-    - name: Process papers
-      if: steps.check_data.outputs.has_data == 'true'
-      env:
-        DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
-        START_DATE: ${{ steps.set-date.outputs.start_date }}
-        END_DATE: ${{ steps.set-date.outputs.end_date }}
-        WEEKLY_KEY: ${{ steps.set-date.outputs.weekly_key }}
-      run: |
-        python Psy-day-paper-deepseek.py \
-          --start-date "${START_DATE}" \
-          --end-date "${END_DATE}" \
-          --weekly-key "${WEEKLY_KEY}"
-    
-    - name: Commit and push if there are changes
-      if: steps.check_data.outputs.has_data == 'true'
-      env:
-        START_DATE: ${{ steps.set-date.outputs.start_date }}
-        END_DATE: ${{ steps.set-date.outputs.end_date }}
-        WEEKLY_KEY: ${{ steps.set-date.outputs.weekly_key }}
-      run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        
-        git add -A
-        
-        if ! git diff --cached --quiet; then
-          echo "Changes detected, committing..."
-          git commit -m "Update weekly paper report for ${START_DATE} to ${END_DATE}"
-          
-          n=0
-          until [ $n -ge 3 ]
-          do
-            git pull --rebase origin main
-            if git push origin main; then
-              echo "Successfully pushed changes"
-              break
-            fi
-            n=$((n+1))
-            if [ $n -lt 3 ]; then
-              echo "Push failed, retrying in 5 seconds..."
-              sleep 5
-            fi
-          done
-        else
-          echo "No changes to commit"
-        fi
+          git commit -m "Update Newsletter for ${WEEKLY_KEY}"
+          git pull --rebase origin main
+          git push origin main
