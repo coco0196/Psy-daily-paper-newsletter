@@ -1,12 +1,19 @@
-"""领域配置：心脑轴、日常密集测量与数字心理健康追踪。"""
+"""心脑、生态瞬时干预与数字心理健康文献追踪配置。"""
 
-REPORT_TITLE = "心脑与数字心理健康文献周报"
-REPORT_SHORT_TITLE = "心脑与数字心理健康"
+import re
 
-# 每个主题组都独立入选；同一篇论文命中多组时，在报告中标为重点推荐。
+REPORT_TITLE = "心脑、生态瞬时干预与数字心理健康文献周报"
+
+# 这三个值既是 DeepSeek 的唯一允许输出，也是 Newsletter 的固定分栏顺序。
+CANONICAL_TOPIC_LABELS = (
+    "心脑轴",
+    "生态瞬时干预",
+    "心理健康与数字心理干预",
+)
+
 TOPIC_GROUPS = {
     "heart_brain": {
-        "label": "心脑轴/心脑耦合",
+        "label": "心脑轴",
         "terms": [
             "heart-brain axis", "brain-heart axis",
             "brain-heart interaction", "brain-heart interactions",
@@ -17,20 +24,17 @@ TOPIC_GROUPS = {
             "vagally mediated heart rate variability",
             "respiratory heart rate variability", "respiratory sinus arrhythmia",
             "heartbeat evoked potential", "heartbeat evoked potentials",
+            "vagus nerve", "vagal tone", "cardiac vagal control",
+            "parasympathetic nervous system", "autonomic nervous system",
+            "autonomic regulation", "autonomic function",
         ],
     },
-    "ema": {
-        "label": "EMA/ESM 与密集纵向测量",
+    "emi": {
+        "label": "生态瞬时干预",
         "terms": [
             "ecological momentary assessment", "experience sampling",
             "experience sampling method", "ambulatory assessment",
-            "intensive longitudinal", "intensive longitudinal data",
-            "daily diary",
-        ],
-    },
-    "digital_intervention": {
-        "label": "EMI/JITAI 与微干预",
-        "terms": [
+            "intensive longitudinal", "intensive longitudinal data", "daily diary",
             "ecological momentary intervention", "just-in-time adaptive intervention",
             "just-in-time intervention", "micro-randomized trial",
             "micro-randomized trials", "digital micro-intervention",
@@ -55,115 +59,121 @@ TOPIC_GROUPS = {
     },
 }
 
-# Crossref 的查询质量通常低于 PubMed；限制为特异性最高的主题词，完整性由
-# PubMed 覆盖，Crossref 用来补充尚未进入 PubMed 的带摘要记录。
 CROSSREF_QUERY_TERMS = [
-    "heart-brain interaction", "heart rate variability",
-    "ecological momentary assessment", "experience sampling",
+    "heart-brain interaction", "vagus nerve mental health",
+    "heart rate variability psychological", "ecological momentary assessment",
     "just-in-time adaptive intervention", "ecological momentary intervention",
-    "micro-randomized trial", "digital phenotyping", "digital mental health",
+    "micro-randomized trial", "digital phenotyping mental health",
+    "digital mental health",
 ]
+
+# 以下心脑术语在纯心血管/解剖/生理文献中也常见，必须带心理学语境才放行。
+HEART_BRAIN_CONTEXT_REQUIRED_TERMS = {
+    "heart rate variability", "vagally mediated heart rate variability",
+    "respiratory heart rate variability", "respiratory sinus arrhythmia",
+    "vagus nerve", "vagal tone", "cardiac vagal control",
+    "parasympathetic nervous system", "autonomic nervous system",
+    "autonomic regulation", "autonomic function",
+}
+
+HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS = {
+    "mental", "psycholog", "psychiatr", "depress", "anxiety", "stress",
+    "emotion", "affect", "cognitive", "behavior", "behaviour", "wellbeing",
+    "well-being", "resilience", "mindfulness", "intervention", "therapy",
+    "treatment", "ecological", "experience sampling", "ambulatory", "daily diary",
+}
+
+LOCAL_PREFILTER_BROAD_TERMS = {
+    "emi": {
+        "adaptive intervention", "adaptive treatment", "personalized intervention",
+        "personalised intervention", "digital phenotyping", "passive sensing",
+        "mobile sensing", "mobile health",
+    },
+    "mental_health": {
+        "mental health", "mental well-being", "mental wellbeing",
+        "psychological well-being", "psychological wellbeing", "flourishing",
+        "resilience", "emotion regulation", "mindfulness", "digital intervention",
+        "digital interventions", "mobile intervention", "mobile interventions",
+    },
+}
+
+LOCAL_PREFILTER_CONTEXT_TERMS = {
+    "mental", "psycholog", "psychiatr", "depress", "anxiety", "stress",
+    "emotion", "affect", "behavior", "behaviour", "cognitive", "intervention",
+    "treatment", "therap", "mindfulness", "ecological", "experience sampling",
+    "ambulatory", "daily diary", "digital", "mobile", "smartphone", "wearable",
+}
+
+_TOPIC_ALIASES = {
+    "心脑轴": ("心脑轴", "心脑耦合", "心脑轴/心脑耦合", "heart-brain"),
+    "生态瞬时干预": (
+        "生态瞬时干预", "ema/esm", "密集纵向", "emi/jitai", "即时自适应",
+        "生态瞬时评估", "经验取样", "数字表型",
+    ),
+    "心理健康与数字心理干预": (
+        "心理健康与数字心理干预", "心理健康", "数字心理干预", "数字/移动心理干预",
+    ),
+}
 
 
 def iter_topic_terms():
-    """按主题组依次返回不重复的 PubMed 检索词。"""
+    """按主线返回不重复的 PubMed 标题/摘要检索词。"""
     seen = set()
     for group in TOPIC_GROUPS.values():
         for term in group["terms"]:
-            key = term.lower()
+            key = term.casefold()
             if key not in seen:
                 seen.add(key)
                 yield term
 
 
-# 本地预筛在调用 DeepSeek 前运行。它并不替代后续的语义筛选：目标是剔除仅因
-# "mental health"、"mobile health"、"heart rate variability" 等宽泛词而被检索到、
-# 但与本周报主题明显无关的记录，从而降低 API 调用量。
-#
-# 核心术语单独命中即可进入 AI 评审；宽泛术语必须同时命中一个心理/行为、数字
-# 干预或脑-心研究语境词。四条主题线仍独立处理，任一主题线满足条件就会保留。
-LOCAL_PREFILTER_BROAD_TERMS = {
-    "heart_brain": {
-        "heart rate variability",
-        "autonomic nervous system",
-    },
-    "ema": set(),
-    "digital_intervention": {
-        "adaptive intervention",
-        "adaptive treatment",
-        "personalized intervention",
-        "personalised intervention",
-        "digital phenotyping",
-        "passive sensing",
-        "mobile sensing",
-        "mobile health",
-    },
-    "mental_health": {
-        "mental health",
-        "mental well-being",
-        "mental wellbeing",
-        "psychological well-being",
-        "psychological wellbeing",
-        "flourishing",
-        "resilience",
-        "emotion regulation",
-        "mindfulness",
-        "digital intervention",
-        "digital interventions",
-        "mobile intervention",
-        "mobile interventions",
-    },
-}
-
-LOCAL_PREFILTER_CONTEXT_TERMS = {
-    "mental", "psycholog", "psychiatr", "well-being", "wellbeing",
-    "depress", "anxiety", "stress", "emotion", "behavior", "behaviour",
-    "cognitive", "intervention", "treatment", "therap", "mindfulness",
-    "ecological", "experience sampling", "ambulatory", "daily diary",
-    "digital", "mobile", "smartphone", "wearable", "passive sensing",
-    "brain", "neural", "neuro", "heart-brain", "brain-heart",
-}
-
-
 def _contains_term(text, term):
-    """不依赖第三方库的大小写不敏感短语匹配。"""
     return term.casefold() in text.casefold()
 
 
+def _has_any(text, terms):
+    return any(_contains_term(text, term) for term in terms)
+
+
 def local_prefilter_decision(title, abstract):
-    """返回本地预筛结论及命中的主题线，供下载脚本记录与测试。"""
+    """在 API 调用前执行可解释的本地候选预筛。"""
     text = " ".join(str(value or "") for value in (title, abstract))
-    core_groups = []
-    broad_groups = []
-    broad_hits = []
-
+    accepted_groups = []
+    reasons = []
     for group_id, group in TOPIC_GROUPS.items():
+        hits = [term for term in group["terms"] if _contains_term(text, term)]
+        if not hits:
+            continue
+        if group_id == "heart_brain":
+            only_context_required = all(term in HEART_BRAIN_CONTEXT_REQUIRED_TERMS for term in hits)
+            if only_context_required and not _has_any(text, HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS):
+                continue
+            accepted_groups.append(group["label"])
+            reasons.append("heart_brain_psych_context" if only_context_required else "heart_brain_specific")
+            continue
         broad_terms = LOCAL_PREFILTER_BROAD_TERMS.get(group_id, set())
-        terms = group["terms"]
-        if any(
-            _contains_term(text, term)
-            for term in terms
-            if term not in broad_terms
-        ):
-            core_groups.append(group_id)
-
-        matched_broad = [
-            term for term in broad_terms if _contains_term(text, term)
-        ]
-        if matched_broad:
-            broad_groups.append(group_id)
-            broad_hits.extend(matched_broad)
-
-    context_hits = [
-        term for term in LOCAL_PREFILTER_CONTEXT_TERMS
-        if _contains_term(text, term)
-    ]
-    accepted = bool(core_groups) or (bool(broad_groups) and bool(context_hits))
-    accepted_groups = list(dict.fromkeys(core_groups + (broad_groups if context_hits else [])))
+        only_broad = all(term in broad_terms for term in hits)
+        if only_broad and not _has_any(text, LOCAL_PREFILTER_CONTEXT_TERMS):
+            continue
+        accepted_groups.append(group["label"])
+        reasons.append("broad_term_with_context" if only_broad else "specific_term")
     return {
-        "accepted": accepted,
+        "accepted": bool(accepted_groups),
         "groups": accepted_groups,
-        "reason": "core_term" if core_groups else ("broad_term_with_context" if accepted else "no_qualifying_term"),
-        "broad_hits": sorted(set(broad_hits)),
-        "context_hits": sorted(set(context_hits)),
+        "reason": "；".join(reasons) if reasons else "no_qualifying_term",
     }
+
+
+def normalize_topic_labels(raw_labels):
+    """将 DeepSeek 的新旧标签、JSON 样式与引号统一为三个标准标签。"""
+    if isinstance(raw_labels, (list, tuple, set)):
+        text = "；".join(str(item) for item in raw_labels)
+    else:
+        text = str(raw_labels or "")
+    text = text.casefold()
+    text = re.sub(r"[\[\]\[\]\(\)（）{}\"'`]+", " ", text)
+    labels = []
+    for canonical in CANONICAL_TOPIC_LABELS:
+        if any(alias.casefold() in text for alias in _TOPIC_ALIASES[canonical]):
+            labels.append(canonical)
+    return labels

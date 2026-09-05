@@ -1,10 +1,7 @@
 import logging
 import os
 from datetime import datetime, timedelta
-import hashlib
-import hmac
 import time
-import base64
 from functools import wraps
 
 # 默认配置
@@ -14,21 +11,11 @@ SUPPORTED_MODELS = {
 }
 
 def setup_logger():
-    """设置日志记录器"""
-    # 创建logs目录
-    os.makedirs('logs', exist_ok=True)
-    
-    # 获取当前日期作为日志文件名
-    log_file = os.path.join('logs', f"{time.strftime('%Y-%m-%d')}.log")
-    
-    # 配置日志记录器
+    """仅向标准输出记录日志，避免将运行缓存写入仓库。"""
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.FileHandler(log_file, encoding='utf-8'),
-            logging.StreamHandler()
-        ]
+        handlers=[logging.StreamHandler()],
     )
     
     return logging.getLogger(__name__)

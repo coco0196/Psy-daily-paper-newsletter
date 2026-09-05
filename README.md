@@ -1,62 +1,42 @@
-# 心脑与数字心理健康文献周报
+# 心脑、生态瞬时干预与数字心理健康文献周报
 
-本工具每周追踪四条相互独立的研究线，并优先呈现其交叉研究：
+该工具每周追踪三条主线：
 
-1. 心脑轴、心脑耦合、神经内脏整合、HRV/RSA 与心搏诱发电位；
-2. 生态瞬时评估（EMA）、经验取样（ESM）与密集纵向测量；
-3. 生态瞬时干预（EMI）、即时自适应干预（JITAI）、微随机试验与数字表型；
-4. 心理健康、情绪调节及数字/移动心理干预。
+1. 心脑轴；
+2. 生态瞬时干预（覆盖 EMA/ESM、EMI、JITAI、MRT 与数字表型）；
+3. 心理健康与数字心理干预。
 
-## 产物
+每周一北京时间 12:00，GitHub Actions 下载上一个完整自然周的 PubMed 与 Crossref 候选文献。候选先经过本地关键词与心理学语境预筛，再由 DeepSeek 进行语义筛选。成功运行后只提交一份 Newsletter 的两种阅读格式：Markdown 与 HTML。
 
-每次运行会把原始元数据、DeepSeek 中文解读、Markdown/HTML 周报、词云、趋势图和海报写入仓库。工具本身不发送电子邮件或音频。
+## 输出
 
-## 工作流
+输出位于 `newsletters/`：
 
-`Download tracker metadata` 每周一北京时间 12:00 下载上周一至周日的 PubMed 与 Crossref 记录；成功后触发 `Generate heart-brain and digital mental-health report`。后者用 DeepSeek 判定相关性、主题标签和优先级，并生成完整报告。
+- `<日期范围>_weekly_paper.md`：GitHub 内直接阅读；
+- `<日期范围>_weekly_paper.html`：便于下载和分享。
+
+Newsletter 固定包含“重点推荐”、心脑轴、生态瞬时干预、心理健康与数字心理干预四个板块。主题标签仅允许使用这三个标准名称，多个标签以中文分号分隔。
 
 ## 配置
 
-主题词集中在 `domain_config.py`：
+主题词与本地预筛规则集中在 `domain_config.py`：
 
-- `TOPIC_GROUPS`：四个独立的 PubMed 标题/摘要检索组；
-- `CROSSREF_QUERY_TERMS`：Crossref 的高特异性补充检索词；
-- `REPORT_TITLE`：报告、海报和语音的领域名称。
+- `TOPIC_GROUPS`：三条主线的 PubMed 标题/摘要检索词；
+- `CROSSREF_QUERY_TERMS`：Crossref 补充检索词；
+- `HEART_BRAIN_CONTEXT_REQUIRED_TERMS`：HRV、迷走神经、自主神经系统等必须带心理学语境的词；
+- `HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS`：允许上述心脑词进入 DeepSeek 的心理/行为语境。
 
-默认不限制期刊，以保证四条研究线的覆盖范围。若希望启用 `journal_registry.py` 中的白名单，在 GitHub 仓库变量中设置：
+`journal_registry.py` 是默认启用的 ISSN 白名单。只有与三条主线直接相关、并经审计为 JCR Q1/Q2 的期刊会在抓取阶段保留；即使其他期刊同为 Q1/Q2，若不属于当前研究领域也会排除。论文带有 ISSN 时只做 ISSN 精确匹配；缺失 ISSN 时才以严格全名或唯一缩写兜底。
 
-```text
-JOURNAL_FILTER_ENABLED=true
-```
+名单中的 IF 与 JCR 分区来自 `impact_factor 1.1.3`（2025-11-25 发布）。该数据源没有提供每条记录的 JIF 统计年度和多学科分类明细，因此 Newsletter 会展示来源可追溯的 IF/JCR 值，但不会声称其为 Clarivate 官方导出。获得官方 JCR 导出后，可按 ISSN 覆盖这些字段。
 
-## GitHub 配置
+## GitHub Secrets 与变量
 
-在仓库的 `Settings → Secrets and variables → Actions` 添加：
+在仓库 Settings → Secrets and variables → Actions 中配置：
 
-```text
-DEEPSEEK_API_KEY=你的 DeepSeek API 密钥
-NCBI_API_KEY=你的 NCBI API 密钥（建议）
-NCBI_EMAIL=你的联系邮箱
-```
+- Secret `DEEPSEEK_API_KEY`
+- Secret `NCBI_API_KEY`
+- Secret `NCBI_EMAIL`
+- Variable `CROSSREF_MAILTO`
 
-建议在 Actions 变量中添加：
-
-```text
-CROSSREF_MAILTO=你的联系邮箱
-JOURNAL_FILTER_ENABLED=false
-```
-
-首次部署请通过 Actions 的手动触发指定一周日期，核对 `Paper_metadata_download/`、`Psy-day-paper-deepseek/` 与 `newsletters/` 产物后再依赖定时运行。
-
-## 本地运行
-
-```powershell
-python -m pip install -r requirements.txt
-$env:DEEPSEEK_API_KEY = "你的密钥"
-$env:NCBI_API_KEY = "你的 NCBI 密钥"
-$env:NCBI_EMAIL = "you@example.org"
-python Paper_metadata_download.py --start-date 2026-08-17 --end-date 2026-08-23
-python Psy-day-paper-deepseek.py --start-date 2026-08-17 --end-date 2026-08-23
-```
-
-第二个命令会依次生成海报、统计与周报。
+候选元数据在两个工作流之间以一天有效期的 Actions Artifact 传递，不会提交到仓库。

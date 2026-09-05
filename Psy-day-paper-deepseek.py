@@ -1,593 +1,217 @@
-import os
+"""对候选文献进行 DeepSeek 语义筛选，并只生成 Newsletter。"""
+
+import argparse
 import json
-import datetime
-from tqdm import tqdm
-from openai import OpenAI
-from PIL import Image, ImageDraw, ImageFont
+import os
 import re
 import time
-import argparse
-from tenacity import retry, stop_after_attempt, wait_exponential
-import asyncio
-from utils import (
-    setup_logger, require_auth, is_original_repo,
-    get_model_name, SUPPORTED_MODELS,
-    get_last_week_range, weekly_basename,
-)
-from stats import analyze_papers
-from newsletter import NewsletterGenerator
-from domain_config import REPORT_TITLE
 
-# 设置日志记录器
+from openai import OpenAI
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+from newsletter import NewsletterGenerator
+from utils import (
+    get_last_week_range,
+    get_model_name,
+    is_original_repo,
+    require_auth,
+    setup_logger,
+    weekly_basename,
+)
+
+
 logger = setup_logger()
 
 
-def _extract_zh_title_summary(translation):
-    """
-    从 DeepSeek 返回的结构化文本中提取中文标题与摘要；
-    摘要在遇到换行后的「关键词：」时截断，避免把关键词拼进摘要。
-    """
-    translation = translation or ""
-    title_match = re.search(r"标题[:：]\s*([^\n]+)(?=\s*\n\s*摘要[:：]|\Z)", translation, re.DOTALL)
-    summary_match = re.search(
-        r"摘要[:：]\s*(.+?)(?=\s*(?:\n\s*关键词[:：]|\Z))",
-        translation,
-        re.DOTALL,
-    )
-    if not title_match:
-        title_match = re.search(r"^([^\n]+)\n\s*摘要[:：]", translation, re.MULTILINE)
-
-    title = (title_match.group(1) if title_match else "").strip() or "无标题"
-    summary = (summary_match.group(1) if summary_match else "").strip()
-
-    if not summary:
-        for sep in ("摘要：", "摘要:"):
-            if sep in translation:
-                tail = translation.split(sep, 1)[1].strip()
-                parts = re.split(r"(?:^|\n)\s*关键词\s*[:：]", tail, maxsplit=1)
-                summary = parts[0].strip()
-                break
-
-    if not summary:
-        summary = "无摘要"
-    return title, summary
-
-
 def _translation_marked_relevant(text):
-    """模型明确判定为相关（支持中英文冒号及少量空格）。"""
-    if not text or not str(text).strip():
-        return False
-    return bool(re.search(r"相关性\s*[:：]\s*是", str(text)))
+    return bool(re.search(r"相关性\s*[:：]\s*是", str(text or "")))
 
 
 def _translation_marked_irrelevant(text):
-    """模型明确判定为不相关。"""
-    if not text or not str(text).strip():
-        return False
-    return bool(re.search(r"相关性\s*[:：]\s*否", str(text)))
+    return bool(re.search(r"相关性\s*[:：]\s*否", str(text or "")))
 
 
-def _should_filter_by_relevance(translation):
-    """
-    按需求：出现「相关性：否」或整段回复中未明确出现「相关性：是」时，视为不相关并丢弃。
-    空回复视为不相关。
-    """
-    t = (translation or "").strip()
-    if not t:
-        return True
-    if _translation_marked_irrelevant(t):
-        return True
-    if not _translation_marked_relevant(t):
-        return True
-    return False
+def _should_filter_by_relevance(text):
+    return not _translation_marked_relevant(text) or _translation_marked_irrelevant(text)
 
 
-@require_auth
-def init_api_client():
-    """初始化并返回API客户端"""
-    # 获取并验证 API Key
-    api_key = os.getenv('DEEPSEEK_API_KEY')
-    if not api_key:
-        if is_original_repo():
-            raise ValueError("原始仓库中未设置 DEEPSEEK_API_KEY 环境变量")
-        else:
-            raise ValueError("Fork仓库需要在 Settings -> Secrets -> Actions 中设置您自己的 DEEPSEEK_API_KEY")
-    
-    # 初始化客户端
-    return OpenAI(
-        api_key=api_key,
-        base_url="https://api.deepseek.com/v1"
-    )
+def _response_has_required_fields(text):
+    return all(marker in str(text or "") for marker in ("主题标签", "优先级", "标题", "摘要", "关键词"))
 
-# 获取验证后的客户端
-try:
-    client = init_api_client()
-except Exception as e:
-    logger.error(f"API客户端初始化失败: {str(e)}")
-    raise
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
-@require_auth
-def call_deepseek_api(prompt):
-    """调用 DeepSeek API 的函数,包含重试机制"""
-    try:
-        # 获取配置的模型名称
-        model_name = get_model_name()
-        logger.info(f"使用模型: {SUPPORTED_MODELS.get(model_name, model_name)}")
-        
-        result = client.chat.completions.create(
-            model=model_name,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "你是一个专业的学术翻译助手。请保持翻译的准确性和专业性，使用恰当的学术术语。"
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            stream=False
-        )
-        return result
-    except Exception as e:
-        if not is_original_repo():
-            logger.error("如果您使用的是fork仓库，请确保已设置正确的DEEPSEEK_API_KEY")
-        logger.error(f"API 调用出错: {str(e)}")
-        raise
+def _build_prompt(title, summary):
+    return f"""你是一名严格的心理学与数字健康领域学术编辑。请根据标题和摘要判断论文是否应纳入文献周报。
 
-def create_poster(results, weekly_key, output_folder):
-    if "_to_" in weekly_key:
-        start_date, end_date = weekly_key.split("_to_", 1)
-        date_range = f"{start_date} 至 {end_date}"
-    else:
-        date_range = weekly_key
-    # 创建海报
-    width = 3200  # 增加宽度到最大
-    min_height = 3200  # 相应增加最小高度
-    background_color = (247, 247, 248)  # 浅灰背景
-    primary_color = (255, 172, 51)  # HF 黄色
-    secondary_color = (48, 76, 125)  # HF 蓝色
-    text_color = (0, 0, 0)  # 黑色文字
-    
-    # 创建一个临时图像用于文本测量
-    temp_image = Image.new('RGB', (width, 100), background_color)
-    draw_test = ImageDraw.Draw(temp_image)
-    
-    # 加载字体
-    try:
-        if os.name == 'nt':  # Windows
-            title_font = ImageFont.truetype("C:\\Windows\\Fonts\\msyh.ttc", 96)  # 增加字体大小
-            content_font = ImageFont.truetype("C:\\Windows\\Fonts\\msyh.ttc", 56)  # 增加字体大小
-        else:  # Linux/Mac
-            # 尝试多个可能的字体路径
-            font_paths = [
-                "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
-                "/usr/share/fonts/truetype/wqy-microhei/wqy-microhei.ttc",
-                "/usr/share/fonts/wqy-microhei/wqy-microhei.ttc",
-                "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
-                "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc"
-            ]
-            
-            title_font = None
-            content_font = None
-            
-            for font_path in font_paths:
-                if os.path.exists(font_path):
-                    try:
-                        title_font = ImageFont.truetype(font_path, 96)  # 增加字体大小
-                        content_font = ImageFont.truetype(font_path, 56)  # 增加字体大小
-                        print(f"成功加载字体：{font_path}")
-                        break
-                    except Exception as e:
-                        print(f"尝试加载字体 {font_path} 失败：{e}")
-            
-            if title_font is None or content_font is None:
-                raise Exception("未能找到可用的中文字体")
-                
-    except Exception as e:
-        print(f"字体加载错误: {e}")
-        print("使用默认字体")
-        title_font = ImageFont.load_default()
-        content_font = ImageFont.load_default()
+【三条追踪主线】
+1. 心脑轴：心脑交互/耦合、神经内脏整合、中央自主神经网络，以及与心理健康相关的 HRV、迷走神经和自主神经系统研究。
+2. 生态瞬时干预：EMA/ESM、密集纵向测量、EMI、JITAI、微随机试验、数字表型、被动感知和实时个体化干预。
+3. 心理健康与数字心理干预：心理健康、情绪调节、幸福感/复原力，以及数字、移动、自助或心理治疗干预。
 
-    # 计算所需的总高度
-    y = 320  # 增加起始位置
-    required_height = y  # 初始高度（包含顶部空间）
-    
-    # 预计算每篇论文所需的高度
-    for result in results:
-        translation = result.get("translation", "")
-        title, summary = _extract_zh_title_summary(translation)
-            
-        # 计算标题行数
-        title_lines = []
-        current_line = ""
-        for word in title:
-            test_line = current_line + word
-            bbox = draw_test.textbbox((0, 0), test_line, font=content_font)
-            if bbox[2] - bbox[0] <= width - 400:  # 增加标题宽度边距
-                current_line = test_line
-            else:
-                if current_line:
-                    title_lines.append(current_line)
-                current_line = word
-        if current_line:
-            title_lines.append(current_line)
-            
-        # 计算摘要行数
-        summary_lines = []
-        current_line = ""
-        for char in summary:
-            current_line += char
-            if len(current_line) >= 120:  # 增加每行字符数
-                summary_lines.append(current_line)
-                current_line = ""
-        if current_line:
-            summary_lines.append(current_line)
-            
-        # 计算这篇论文需要的高度
-        paper_height = 120  # 增加基础高度（包含边距）
-        paper_height += len(title_lines) * 60  # 增加标题行高
-        paper_height += len(summary_lines) * 56  # 增加摘要行高
-        paper_height += 80  # 增加额外边距
-        
-        required_height += paper_height
-    
-    # 添加底部边距和页脚空间
-    required_height += 160
-    
-    # 确保最小高度
-    height = max(min_height, required_height)
-    
-    # 释放临时资源
-    del draw_test
-    del temp_image
-    
-    # 创建适应内容的新图像
-    image = Image.new('RGB', (width, height), background_color)
-    draw = ImageDraw.Draw(image)
-    
-    # 绘制顶部装饰条
-    draw.rectangle([0, 0, width, 240], fill=primary_color)  # 增加顶部装饰条高度
-    
-    # 绘制标题
-    title = f"{REPORT_TITLE}（{date_range}）"
-    title_bbox = draw.textbbox((0, 0), title, font=title_font)
-    title_width = title_bbox[2] - title_bbox[0]
-    
-    # 使用 Psy logo
-    try:
-        logo_size = (96, 96)  # 增加 logo 大小
-        logo_path = "psy_logo.jpg"
-        logo = Image.open(logo_path).convert('RGBA')
-        logo = logo.resize(logo_size, Image.Resampling.LANCZOS)
-        
-        total_width = logo_size[0] + 20 + title_width  # 增加 logo 和标题间距
-        start_x = (width - total_width) // 2
-        
-        image.paste(logo, (start_x, 72), logo)  # 调整 logo 位置
-        draw.text((start_x + logo_size[0] + 20, 80), title, font=title_font, fill=(255, 255, 255))  # 调整标题位置
-    except Exception as e:
-        print(f"Logo加载错误: {e}")
-        draw.text(((width - title_width) // 2, 80), title, font=title_font, fill=(255, 255, 255))
-    
-    # 绘制内容
-    y = 320  # 增加内容起始位置
-    for i, result in enumerate(results):
-        translation = result.get("translation", "")
-        title, summary = _extract_zh_title_summary(translation)
-        
-        # 创建论文卡片背景
-        card_start_y = y
-        
-        # 计算卡片实际需要的高度
-        title_lines = []
-        current_line = ""
-        for word in title:
-            test_line = current_line + word
-            bbox = draw.textbbox((0, 0), test_line, font=content_font)
-            if bbox[2] - bbox[0] <= width - 400:  # 增加标题宽度边距
-                current_line = test_line
-            else:
-                if current_line:
-                    title_lines.append(current_line)
-                current_line = word
-        if current_line:
-            title_lines.append(current_line)
-        
-        summary_lines = []
-        current_line = ""
-        for char in summary:
-            current_line += char
-            if len(current_line) >= 120:  # 增加每行字符数
-                summary_lines.append(current_line)
-                current_line = ""
-        if current_line:
-            summary_lines.append(current_line)
-        
-        # 计算这篇论文的实际高度
-        card_height = 120  # 增加基础高度
-        card_height += len(title_lines) * 60  # 增加标题行高
-        card_height += len(summary_lines) * 56  # 增加摘要行高
-        
-        # 绘制卡片背景
-        draw.rectangle([80, y, width-80, y+card_height], fill=(255, 255, 255))  # 调整卡片边距
-        
-        # 绘制序号
-        circle_x = 160  # 调整序号位置
-        circle_y = y + 60
-        circle_radius = 40  # 增加序号圆圈大小
-        draw.ellipse([circle_x-circle_radius, circle_y-circle_radius,
-                     circle_x+circle_radius, circle_y+circle_radius],
-                    fill=secondary_color)
-        draw.text((circle_x, circle_y), str(i+1), font=content_font, fill=(255, 255, 255), anchor="mm")
-        
-        # 绘制标题
-        title_x = 280  # 调整标题起始位置
-        title_y = y + 40
-        for i, line in enumerate(title_lines):
-            draw.text((title_x, title_y + i*60), line, font=content_font, fill=text_color)
-        
-        # 绘制摘要
-        summary_y = title_y + len(title_lines)*60 + 40
-        for line in summary_lines:
-            draw.text((160, summary_y), line, font=content_font, fill=text_color)  # 调整摘要起始位置
-            summary_y += 56
-        
-        y += card_height + 30  # 更新下一个卡片的起始位置
-    
-    # 添加底部信息
-    footer = "Generated by DeepSeek"
-    footer_bbox = draw.textbbox((0, 0), footer, font=content_font)
-    footer_width = footer_bbox[2] - footer_bbox[0]
-    draw.text(((width - footer_width) // 2, height - 80), footer, font=content_font, fill=text_color)
-    
-    # 保存图片
-    os.makedirs(output_folder, exist_ok=True)
-    output_path = os.path.join(output_folder, f"{weekly_key}_poster.png")
-    image.save(output_path)
-    print(f"海报保存到：{output_path}")
-
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
-def process_papers(start_date=None, end_date=None, weekly_key=None):
-    """
-    处理周报论文数据。
-    未指定日期时默认处理上周一至上周日的合并数据。
-    """
-    try:
-        if not weekly_key:
-            if not start_date or not end_date:
-                start_date, end_date = get_last_week_range()
-            weekly_key = weekly_basename(start_date, end_date)
-        elif not start_date or not end_date:
-            if "_to_" in weekly_key:
-                start_date, end_date = weekly_key.split("_to_", 1)
-            else:
-                start_date, end_date = get_last_week_range()
-
-        date_range = f"{start_date} 至 {end_date}"
-        logger.info(f"正在处理 {date_range} 的周报论文数据")
-
-        input_file = os.path.join('Paper_metadata_download', f"{weekly_key}_weekly.json")
-        if not os.path.exists(input_file):
-            logger.error(f"找不到 {date_range} 的论文数据文件: {input_file}")
-            return False
-
-        with open(input_file, 'r', encoding='utf-8') as f:
-            papers = json.load(f)
-
-        if not papers:
-            logger.warning(f"{date_range} 没有可用的论文数据")
-            return False
-
-        logger.info(f"读取到 {len(papers)} 篇论文数据")
-
-        os.makedirs('Psy-day-paper-deepseek', exist_ok=True)
-        os.makedirs('posters', exist_ok=True)
-        os.makedirs('newsletters', exist_ok=True)
-
-        temp_file = os.path.join('Psy-day-paper-deepseek', f"{weekly_key}_temp.json")
-        filtered_file = os.path.join('Psy-day-paper-deepseek', f"{weekly_key}_filtered_titles.json")
-        if os.path.exists(temp_file):
-            try:
-                with open(temp_file, 'r', encoding='utf-8') as f:
-                    results = json.load(f)
-                    logger.info(f"从中间文件恢复了 {len(results)} 篇已处理的论文")
-            except Exception as e:
-                logger.warning(f"读取中间文件失败: {str(e)}")
-                results = []
-        else:
-            results = []
-
-        filtered_titles = set()
-        if os.path.exists(filtered_file):
-            try:
-                with open(filtered_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    if isinstance(data, list):
-                        filtered_titles = set(data)
-            except Exception as e:
-                logger.warning(f"读取过滤记录失败: {str(e)}")
-                filtered_titles = set()
-
-        processed_titles = {r['title'] for r in results} | filtered_titles
-        
-        success_count = len(results)
-        error_count = 0
-        
-        # 处理每篇论文
-        for index, paper in enumerate(papers, 1):
-            try:
-                # 获取论文信息
-                paper_data = paper.get('paper', {})
-                if not paper_data:
-                    logger.warning(f"第 {index} 篇论文数据缺失")
-                    error_count += 1
-                    continue
-                    
-                title = paper_data.get('title', '')
-                summary = paper_data.get('summary', '')
-                paper_id = paper_data.get('id', '')
-                source = paper_data.get('source', 'PubMed')
-                if source == 'Crossref':
-                    url = f"https://doi.org/{paper_id}" if paper_id else ""
-                else:
-                    url = f"https://pubmed.ncbi.nlm.nih.gov/{paper_id}/" if paper_id else ""
-                
-                # 检查是否已处理过
-                if title in processed_titles:
-                    logger.info(f"第 {index} 篇论文已处理过，跳过")
-                    continue
-                
-                if not title or not summary:
-                    logger.warning(f"第 {index} 篇论文标题或摘要缺失")
-                    error_count += 1
-                    continue
-                
-                logger.info(f"正在处理第 {index}/{len(papers)} 篇论文")
-                
-                # 构建提示（四条主题线独立收录；交叉论文重点推荐）
-                prompt = f"""你是一个专业的学术评审专家。请阅读以下论文的标题和摘要。
-
-【核心筛选标准】
-本周报完整追踪下列四条主题线；论文只要对其中任意一条有实质贡献即可判定为相关：
-1. 心脑轴/心脑耦合：心脑相互作用、神经内脏整合、中央自主神经网络、HRV/RSA、心搏诱发电位等。
-2. EMA/ESM 与密集纵向测量：生态瞬时评估、经验取样、日常生活或动态测量。
-3. EMI/JITAI 与微干预：生态瞬时干预、即时自适应干预、微随机试验、数字表型、被动感知、个体化数字干预。
-4. 心理健康与数字心理干预：心理健康/幸福感、情绪调节、复原力，以及自助、移动或数字化心理干预。
-
-若论文同时实质涉及两条或以上主题线，或直接研究心脑指标在日常生活心理健康干预中的作用，应标为“重点推荐”。
-⚠️ 排除：仅泛泛提及上述概念、与心理/行为或方法学无关的纯躯体疾病研究、纯细胞机制研究，及与上述主题无关的普通医学影像 AI 研究。
+【心脑轴特别规则】
+HRV、迷走神经、自主神经系统或副交感神经相关研究，只有在明确涉及心理健康、精神障碍、情绪、压力、认知、行为、心理干预或日常生活动态测量时才相关。纯心血管疾病、手术、药物、解剖、生理机制、动物/细胞研究及无心理行为意义的研究一律排除。
 
 标题：{title}
 摘要：{summary}
 
-【输出要求】
-请先判断相关性。如果根据标准判定为不相关，请仅回复四个字：“相关性：否”。
-如果判定为高度相关，请严格按照以下格式返回（必须保留相关性标签）：
+【输出规则】
+若不相关，仅输出：相关性：否
+
+若相关，严格逐行输出。不要使用方括号、中括号、引号、Markdown 列表或 JSON。
+主题标签只能使用以下三个标准名称；多标签以中文分号分隔：心脑轴；生态瞬时干预；心理健康与数字心理干预。
+
 相关性：是
-主题标签：[从“心脑轴/心脑耦合”“EMA/ESM 与密集纵向测量”“EMI/JITAI 与微干预”“心理健康与数字心理干预”中选择一个或多个]
-优先级：[重点推荐 或 常规收录]
-标题：[中文标题]
-摘要：[中文摘要]
-关键词：[提取3-5个中文核心关键词]"""
+主题标签：心脑轴；生态瞬时干预
+优先级：重点推荐
+标题：中文标题
+摘要：中文摘要
+关键词：关键词一；关键词二；关键词三
 
-                max_retries = 3
-                retry_count = 0
-                translation = ""
-                while retry_count < max_retries:
-                    try:
-                        logger.info(f"正在评审/翻译第 {index} 篇论文 (尝试 {retry_count + 1}/{max_retries})")
-                        response = call_deepseek_api(prompt)
-                        translation = (response.choices[0].message.content or "").strip()
-                        if not translation:
-                            raise ValueError("模型返回空内容")
+“重点推荐”仅用于跨越两条及以上主线、或直接研究心脑指标与心理健康数字干预交叉的论文；否则标为“常规收录”。"""
 
-                        # AI 智能过滤：不相关或未明确标「相关性：是」时结束重试，不抛错
-                        if _should_filter_by_relevance(translation):
-                            logger.info(f"第 {index} 篇论文被 DeepSeek 判定为不相关，已自动过滤。")
-                            break
 
-                        if (
-                            _translation_marked_relevant(translation)
-                            and not _translation_marked_irrelevant(translation)
-                            and ("标题：" in translation or "标题:" in translation)
-                            and ("摘要：" in translation or "摘要:" in translation)
-                            and ("关键词：" in translation or "关键词:" in translation)
-                        ):
-                            break
-                        raise ValueError("翻译结果格式不正确")
+@require_auth
+def init_api_client():
+    api_key = os.getenv("DEEPSEEK_API_KEY")
+    if not api_key:
+        raise ValueError("未设置 DEEPSEEK_API_KEY 环境变量")
+    return OpenAI(api_key=api_key, base_url="https://api.deepseek.com/v1")
 
-                    except Exception as e:
-                        retry_count += 1
-                        if retry_count == max_retries:
-                            raise
-                        logger.warning(f"第 {index} 篇论文处理失败，将在 {2 ** retry_count} 秒后重试: {str(e)}")
-                        time.sleep(2 ** retry_count)
 
-                # 仅当明确「相关性：是」且非「否」时写入结果；过滤的不计成功/失败
-                if (
-                    _translation_marked_relevant(translation)
-                    and not _translation_marked_irrelevant(translation)
-                ):
-                    result = {
-                        "title": title,
-                        "summary": summary,
-                        "translation": translation,
-                        "url": url,
-                        "source": source,
-                    }
-                    results.append(result)
-                    processed_titles.add(title)
-                    success_count += 1
+client = init_api_client()
 
-                    with open(temp_file, 'w', encoding='utf-8') as f:
-                        json.dump(results, f, ensure_ascii=False, indent=2)
 
-                    logger.info(f"第 {index} 篇论文处理成功")
-                elif _should_filter_by_relevance(translation):
-                    filtered_titles.add(title)
-                    processed_titles.add(title)
-                    try:
-                        with open(filtered_file, 'w', encoding='utf-8') as ff:
-                            json.dump(sorted(filtered_titles), ff, ensure_ascii=False, indent=2)
-                    except Exception as exc:
-                        logger.warning(f"写入过滤记录失败: {exc}")
-                    logger.info(f"第 {index} 篇论文已过滤，未写入结果集")
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+@require_auth
+def call_deepseek_api(prompt):
+    try:
+        return client.chat.completions.create(
+            model=get_model_name(),
+            messages=[
+                {
+                    "role": "system",
+                    "content": "你是严谨的心理学文献筛选与学术翻译助手。",
+                },
+                {"role": "user", "content": prompt},
+            ],
+            stream=False,
+        )
+    except Exception:
+        if not is_original_repo():
+            logger.error("请确认 Fork 已配置有效的 DEEPSEEK_API_KEY")
+        raise
 
-                time.sleep(3)
-                
-            except Exception as e:
-                logger.error(f"处理第 {index} 篇论文时发生错误: {str(e)}")
-                error_count += 1
-                continue
-        
-        logger.info(f"论文处理统计：总数 {len(papers)}，成功 {success_count}，失败 {error_count}")
-        
-        # 处理完成后，保存最终结果
-        output_file = os.path.join('Psy-day-paper-deepseek', f"{weekly_key}_Psy_deepseek_clean.json")
-        with open(output_file, 'w', encoding='utf-8') as f:
-            json.dump(results, f, ensure_ascii=False, indent=2)
-        
-        # 删除中间文件
-        if os.path.exists(temp_file):
-            os.remove(temp_file)
-        
-        # 如果成功处理了论文，继续生成其他内容
-        if results:
-            create_poster(results, weekly_key, 'posters')
 
-            analyze_papers(start_date=start_date, end_date=end_date, weekly_key=weekly_key)
+def _paper_url(paper):
+    paper_id = paper.get("id", "")
+    if paper.get("source") == "Crossref":
+        return f"https://doi.org/{paper_id}" if paper_id else ""
+    return f"https://pubmed.ncbi.nlm.nih.gov/{paper_id}/" if paper_id else ""
 
-            newsletter_gen = NewsletterGenerator()
-            newsletter_gen.generate_newsletter(
-                start_date=start_date,
-                end_date=end_date,
-                weekly_key=weekly_key,
-            )
 
-            return True
-        else:
-            logger.error("没有成功处理任何论文")
-            return False
-            
-    except Exception as e:
-        logger.error(f"处理论文时发生错误: {str(e)}")
+def _read_json(path, default):
+    if not os.path.exists(path):
+        return default
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            return json.load(handle)
+    except (OSError, ValueError):
+        return default
+
+
+def _remove_if_exists(*paths):
+    for path in paths:
+        if os.path.exists(path):
+            os.remove(path)
+
+
+def process_papers(start_date=None, end_date=None, weekly_key=None):
+    if not weekly_key:
+        if not start_date or not end_date:
+            start_date, end_date = get_last_week_range()
+        weekly_key = weekly_basename(start_date, end_date)
+    elif not start_date or not end_date:
+        start_date, end_date = weekly_key.split("_to_", 1)
+
+    input_file = os.path.join("Paper_metadata_download", f"{weekly_key}_weekly.json")
+    if not os.path.exists(input_file):
+        logger.error("找不到候选文献数据：%s", input_file)
+        return False
+    papers = _read_json(input_file, [])
+    if not papers:
+        logger.error("候选文献数据为空：%s", input_file)
         return False
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='处理心理学论文周报数据（DeepSeek 翻译）')
-    parser.add_argument('--start-date', type=str, help='周报起始日期 (YYYY-MM-DD格式)')
-    parser.add_argument('--end-date', type=str, help='周报结束日期 (YYYY-MM-DD格式)')
-    parser.add_argument('--weekly-key', type=str, help='周报文件基名，如 2026-05-26_to_2026-06-01')
-    args = parser.parse_args()
+    work_dir = "Psy-day-paper-deepseek"
+    os.makedirs(work_dir, exist_ok=True)
+    temp_file = os.path.join(work_dir, f"{weekly_key}_temp.json")
+    filtered_file = os.path.join(work_dir, f"{weekly_key}_filtered_titles.json")
+    output_file = os.path.join(work_dir, f"{weekly_key}_Psy_deepseek_clean.json")
+    results = _read_json(temp_file, [])
+    filtered_titles = set(_read_json(filtered_file, []))
+    processed_titles = {item.get("title") for item in results if item.get("title")} | filtered_titles
 
-    success = process_papers(
-        start_date=args.start_date,
-        end_date=args.end_date,
-        weekly_key=args.weekly_key,
-    )
-    if not success:
-        exit(1)
-    exit(0) 
+    success_count = 0
+    error_count = 0
+    delay = float(os.getenv("DEEPSEEK_INTER_REQUEST_DELAY_SECONDS", "3"))
+    for index, entry in enumerate(papers, start=1):
+        paper = entry.get("paper", {})
+        title, summary = paper.get("title", ""), paper.get("summary", "")
+        if not title or not summary or title in processed_titles:
+            continue
+        try:
+            logger.info("正在处理第 %d/%d 篇候选文献", index, len(papers))
+            response = call_deepseek_api(_build_prompt(title, summary))
+            translation = (response.choices[0].message.content or "").strip()
+            if _should_filter_by_relevance(translation):
+                filtered_titles.add(title)
+                with open(filtered_file, "w", encoding="utf-8") as handle:
+                    json.dump(sorted(filtered_titles), handle, ensure_ascii=False, indent=2)
+                continue
+            if not _response_has_required_fields(translation):
+                raise ValueError("DeepSeek 返回格式不完整")
+
+            results.append(
+                {
+                    "title": title,
+                    "summary": summary,
+                    "translation": translation,
+                    "url": _paper_url(paper),
+                    "source": paper.get("source", "PubMed"),
+                    "authors": paper.get("authors", []),
+                    "journal": paper.get("journal", ""),
+                    "published_at": paper.get("publishedAt", ""),
+                    "issns": paper.get("issns", []),
+                    "journal_metrics": paper.get("journal_metrics", {}),
+                    "local_prefilter_groups": paper.get("local_prefilter_groups", []),
+                }
+            )
+            processed_titles.add(title)
+            success_count += 1
+            with open(temp_file, "w", encoding="utf-8") as handle:
+                json.dump(results, handle, ensure_ascii=False, indent=2)
+        except Exception as exc:
+            error_count += 1
+            logger.error("第 %d 篇处理失败：%s", index, exc)
+        if delay > 0:
+            time.sleep(delay)
+
+    logger.info("筛选完成：候选 %d，收录 %d，失败 %d", len(papers), success_count, error_count)
+    if not results:
+        return False
+    with open(output_file, "w", encoding="utf-8") as handle:
+        json.dump(results, handle, ensure_ascii=False, indent=2)
+
+    generated = NewsletterGenerator().generate_newsletter(start_date, end_date, weekly_key)
+    if generated:
+        # 成功后不保留中间筛选数据；工作流只提交 Newsletter。
+        _remove_if_exists(temp_file, filtered_file, output_file)
+    return generated
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="筛选文献并生成 Newsletter")
+    parser.add_argument("--start-date")
+    parser.add_argument("--end-date")
+    parser.add_argument("--weekly-key")
+    args = parser.parse_args()
+    raise SystemExit(0 if process_papers(args.start_date, args.end_date, args.weekly_key) else 1)

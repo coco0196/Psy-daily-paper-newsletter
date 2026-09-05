@@ -11,7 +11,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.exceptions import ProtocolError
 from urllib3.util.retry import Retry
 from utils import setup_logger, get_last_week_range, weekly_basename, iter_date_range
-from journal_registry import filter_by_journal
+from journal_registry import filter_by_journal, get_journal_profile
 from domain_config import (
     CROSSREF_QUERY_TERMS,
     iter_topic_terms,
@@ -473,7 +473,7 @@ def _fetch_crossref(session, date_str, retmax=80):
                 authors_out.append({"name": "Unknown"})
             out.append(
                 {
-                    "paper": {
+                    "paper": _attach_journal_profile({
                         "id": doi,
                         "title": title,
                         "summary": summary,
@@ -482,7 +482,7 @@ def _fetch_crossref(session, date_str, retmax=80):
                         "source": "Crossref",
                         "journal": journal_name,
                         "issns": item_issns,
-                    }
+                    })
                 }
             )
         return out
@@ -594,6 +594,15 @@ def _apply_local_keyword_prefilter(papers):
     return accepted
 
 
+def _attach_journal_profile(paper):
+    """把可展示的期刊优先级资料随候选记录传到 Newsletter 阶段。"""
+    paper["journal_metrics"] = get_journal_profile(
+        journal_name=paper.get("journal"),
+        issns=paper.get("issns"),
+    )
+    return paper
+
+
 def download_papers_for_date(date_str, retmax=10000):
     """
     从 PubMed 与 Crossref 下载指定日期的论文元数据（已按目标期刊过滤）。
@@ -631,7 +640,7 @@ def download_papers_for_date(date_str, retmax=10000):
                         continue
                     pubmed_papers.append(
                         {
-                            "paper": {
+                            "paper": _attach_journal_profile({
                                 "id": rec["pmid"],
                                 "title": rec["title"],
                                 "summary": rec["abstract"],
@@ -640,7 +649,7 @@ def download_papers_for_date(date_str, retmax=10000):
                                     "source": "PubMed",
                                     "journal": rec.get("journal", ""),
                                     "issns": rec.get("issns", []),
-                                }
+                                })
                         }
                     )
         except requests.RequestException as e:
