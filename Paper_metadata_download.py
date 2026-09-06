@@ -7,6 +7,7 @@ import datetime
 import unicodedata
 from difflib import SequenceMatcher
 from math import ceil
+from collections import Counter
 import requests
 import argparse
 import xml.etree.ElementTree as ET
@@ -615,15 +616,20 @@ def _local_prefilter_enabled():
     }
 
 
-def _apply_local_keyword_prefilter(papers):
+def _apply_local_keyword_prefilter(papers, return_stats=False):
     """在调用 DeepSeek 前，筛去未满足关键词组合的候选记录。"""
     if not _local_prefilter_enabled():
         logger.info("本地关键词预筛已通过 LOCAL_KEYWORD_PREFILTER_ENABLED 关闭")
-        return papers
+        stats = {
+            "input": len(papers), "accepted": len(papers), "rejected": 0,
+            "reasons": {}, "topic_assignments": {}, "enabled": False,
+        }
+        return (papers, stats) if return_stats else papers
 
     accepted = []
     rejected = 0
     reasons = {}
+    topic_assignments = Counter()
     for item in papers:
         paper = item.get("paper", {})
         decision = local_prefilter_decision(
@@ -635,6 +641,7 @@ def _apply_local_keyword_prefilter(papers):
             paper["local_prefilter_groups"] = decision["groups"]
             paper["local_prefilter_reason"] = decision["reason"]
             accepted.append(item)
+            topic_assignments.update(decision["groups"])
         else:
             rejected += 1
             reason = decision["reason"]
@@ -647,7 +654,11 @@ def _apply_local_keyword_prefilter(papers):
         rejected,
         ", ".join(f"{key}={value}" for key, value in sorted(reasons.items())) or "无",
     )
-    return accepted
+    stats = {
+        "input": len(papers), "accepted": len(accepted), "rejected": rejected,
+        "reasons": reasons, "topic_assignments": dict(topic_assignments), "enabled": True,
+    }
+    return (accepted, stats) if return_stats else accepted
 
 
 def _attach_journal_profile(paper):
@@ -843,6 +854,46 @@ def _deduplicate_papers(papers, stage):
     return retained
 
 
+def metadata_pilot(start_date=None, end_date=None, retmax=10000):
+    """只读运行元数据阶段，报告候选数量但不写文件、不调用 DeepSeek。"""
+    target_start = start_date
+    target_end = end_date
+    if target_start is None and target_end is None:
+        target_start, target_end = get_last_week_range()
+    elif target_start and not target_end:
+        target_end = target_start
+    elif target_end and not target_start:
+        target_start = target_end
+
+    daily_counts = {}
+    records = []
+    for day in iter_date_range(target_start, target_end):
+        day_records = download_papers_for_date(day, retmax=retmax)
+        daily_counts[day] = len(day_records)
+        records.extend(day_records)
+
+    merged = _deduplicate_papers(records, "metadata pilot 整周候选")
+    local, prefilter_stats = _apply_local_keyword_prefilter(merged, return_stats=True)
+    source_provenance = Counter()
+    for item in merged:
+        paper = item.get("paper", {})
+        source_provenance.update(paper.get("sources") or [paper.get("source", "未知")])
+
+    return {
+        "status": "success",
+        "mode": "dry-run",
+        "start_date": target_start,
+        "end_date": target_end,
+        "writes_files": False,
+        "calls_deepseek": False,
+        "daily_source_after_dedup": daily_counts,
+        "weekly_source_after_dedup": len(merged),
+        "source_provenance_after_dedup": dict(source_provenance),
+        "local_prefilter": prefilter_stats,
+        "deepseek_candidate_count": len(local),
+    }
+
+
 def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000):
     """
     下载论文元数据并保存为 JSON。
@@ -930,6 +981,10 @@ if __name__ == "__main__":
     parser.add_argument("--start-date", type=str, help="周报起始日期 (YYYY-MM-DD)")
     parser.add_argument("--end-date", type=str, help="周报结束日期 (YYYY-MM-DD)")
     parser.add_argument(
+        "--dry-run", action="store_true",
+        help="只统计元数据与本地预筛，不写文件、不调用 DeepSeek",
+    )
+    parser.add_argument(
         "--retmax",
         type=int,
         default=10000,
@@ -937,13 +992,24 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    result = download_papers(
-        start_date=args.start_date,
-        end_date=args.end_date,
-        date_str=args.date,
-        retmax=args.retmax,
-    )
-    logger.info(f"下载结果: {result}")
+    if args.dry_run:
+        if args.date:
+            args.start_date = args.date
+            args.end_date = args.date
+        result = metadata_pilot(
+            start_date=args.start_date,
+            end_date=args.end_date,
+            retmax=args.retmax,
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+    else:
+        result = download_papers(
+            start_date=args.start_date,
+            end_date=args.end_date,
+            date_str=args.date,
+            retmax=args.retmax,
+        )
+        logger.info(f"下载结果: {result}")
     if result["status"] == "error":
         exit(1)
     exit(0)

@@ -20,7 +20,8 @@ TOPIC_GROUPS = {
             "heart-brain interaction", "heart-brain interactions",
             "brain-heart coupling", "heart-brain coupling",
             "brain-heart dynamics", "neurovisceral integration",
-            "central autonomic network", "heart rate variability",
+            "central autonomic network", "cardiac interoception", "interoception",
+            "heart rate variability",
             "vagally mediated heart rate variability",
             "respiratory heart rate variability", "respiratory sinus arrhythmia",
             "heartbeat evoked potential", "heartbeat evoked potentials",
@@ -98,7 +99,9 @@ EEG_ECG_PUBMED_QUERY = (
     'AND (psychological[Title/Abstract] OR mental[Title/Abstract] OR '
     'emotion[Title/Abstract] OR stress[Title/Abstract] OR cognitive[Title/Abstract] '
     'OR behavior[Title/Abstract] OR behaviour[Title/Abstract] OR '
-    'intervention[Title/Abstract]))'
+    'intervention[Title/Abstract] OR neuroscience[Title/Abstract] OR '
+    'neural[Title/Abstract] OR brain[Title/Abstract] OR '
+    'psychophysiology[Title/Abstract]))'
 )
 
 # 以下心脑术语在纯心血管/解剖/生理文献中也常见，必须带心理学语境才放行。
@@ -174,6 +177,11 @@ MENTAL_HEALTH_HIGH_SPECIFIC_INTERVENTION_TERMS = (
     "somatic intervention", "body-oriented psychotherapy", "micro-intervention",
     "behavioral activation",
 )
+MENTAL_HEALTH_DIGITAL_RETRIEVAL_TERMS = (
+    "digital mental health", "digital psychological intervention", "digital intervention",
+    "mobile intervention", "smartphone intervention", "app-based intervention",
+    "web-based intervention", "internet-based intervention", "mhealth intervention",
+)
 
 
 def _pubmed_title_abstract_any(terms):
@@ -183,7 +191,8 @@ def _pubmed_title_abstract_any(terms):
 PUBMED_MENTAL_HEALTH_QUERY = (
     f"(({_pubmed_title_abstract_any(MENTAL_HEALTH_RETRIEVAL_OUTCOME_TERMS)}) "
     f"AND ({_pubmed_title_abstract_any(MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS)})) "
-    f"OR ({_pubmed_title_abstract_any(MENTAL_HEALTH_HIGH_SPECIFIC_INTERVENTION_TERMS)}))"
+    f"OR ({_pubmed_title_abstract_any(MENTAL_HEALTH_HIGH_SPECIFIC_INTERVENTION_TERMS)}) "
+    f"OR ({_pubmed_title_abstract_any(MENTAL_HEALTH_DIGITAL_RETRIEVAL_TERMS)}))"
 )
 
 # EMA/ESM 的一般自评问卷研究数量很大，且未必符合本项目的重点。EMA/EMI
@@ -240,6 +249,14 @@ MENTAL_HEALTH_CONTEXT_TERMS = {
     "psychophysiolog", "heart rate variability", "hrv", "biofeedback",
     "mindfulness", "meditation", "relaxation", "breathing", "mind-body",
     "somatic", "body-oriented",
+}
+MENTAL_HEALTH_SUPPORTING_OUTCOME_TERMS = {
+    "sleep", "insomnia", "pain", "physical activity", "adherence",
+    "medication adherence", "treatment adherence",
+}
+MENTAL_HEALTH_MINDBODY_INTERVENTION_TERMS = {
+    "mindfulness", "meditation", "relaxation", "breathing", "mind-body",
+    "biofeedback", "hrv biofeedback", "somatic", "body-oriented",
 }
 
 LOCAL_PREFILTER_BROAD_TERMS = {
@@ -349,16 +366,22 @@ def local_prefilter_decision(title, abstract):
             )
             continue
         if group_id == "mental_health":
-            has_outcome = _has_any(text, MENTAL_HEALTH_OUTCOME_TERMS)
             has_intervention = _has_any(text, MENTAL_HEALTH_INTERVENTION_TERMS)
             has_delivery = _has_any(text, MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS)
-            # 第三主线要求心理、行为、主观体验或心理生理指标等研究结局，且
-            # 必须实际评估干预、治疗、试验或方案。数字/移动递送仅作为相关性
-            # 增强信号，不再误排除非数字的心理与身心干预。
+            has_context = _has_any(text, MENTAL_HEALTH_CONTEXT_TERMS)
+            has_supporting_outcome = _has_any(text, MENTAL_HEALTH_SUPPORTING_OUTCOME_TERMS)
+            has_mindbody_intervention = _has_any(
+                text, MENTAL_HEALTH_MINDBODY_INTERVENTION_TERMS
+            )
+            has_eligible_context = has_context or (
+                has_supporting_outcome and has_mindbody_intervention
+            )
+            # 第三主线只排除明显无关的记录：不再强制要求命中特定结局词。只要
+            # 具备心理/身心/心理生理语境和干预信号即可送入 DeepSeek；直接相关
+            # 综述也保留，由模型判断是否足够直接。
             if not (
-                has_outcome
-                and has_intervention
-                and _has_any(text, MENTAL_HEALTH_CONTEXT_TERMS)
+                (has_eligible_context and has_intervention)
+                or (is_review and has_eligible_context)
             ):
                 continue
             accepted_groups.append(group["label"])
@@ -383,16 +406,14 @@ def local_prefilter_decision(title, abstract):
             ):
                 continue
             accepted_groups.append(group["label"])
-            reasons.append(
-                "emi_with_intervention_and_physiology"
-                "ema_emi_review"
-                if is_review and not (has_intervention or has_physiology)
-                else "emi_with_intervention_and_physiology"
-                if has_intervention and has_physiology
-                else "emi_with_intervention"
-                if has_intervention
-                else "ema_with_physiology"
-            )
+            if is_review and not (has_intervention or has_physiology):
+                reasons.append("ema_emi_review")
+            elif has_intervention and has_physiology:
+                reasons.append("emi_with_intervention_and_physiology")
+            elif has_intervention:
+                reasons.append("emi_with_intervention")
+            else:
+                reasons.append("ema_with_physiology")
             continue
         broad_terms = LOCAL_PREFILTER_BROAD_TERMS.get(group_id, set())
         only_broad = all(term in broad_terms for term in hits)
