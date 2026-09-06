@@ -9,7 +9,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from Paper_metadata_download import _crossref_query_params
+from Paper_metadata_download import _crossref_query_params, _normalised_title_key
 
 
 class CrossrefQueryParamsTests(unittest.TestCase):
@@ -22,6 +22,14 @@ class CrossrefQueryParamsTests(unittest.TestCase):
             params["query.bibliographic"],
             "ecological momentary assessment intervention",
         )
+
+    def test_title_key_deduplicates_terminal_punctuation_across_sources(self):
+        pubmed_title = (
+            "Immediate and Sustained Improvements in Mood and Stress Associated With Yuna, "
+            "an AI-Powered Digital Mental Health Intervention: Real-World Retrospective Study."
+        )
+        crossref_title = pubmed_title.rstrip(".")
+        self.assertEqual(_normalised_title_key(pubmed_title), _normalised_title_key(crossref_title))
 
 
 if __name__ == "__main__":
