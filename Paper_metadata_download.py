@@ -665,6 +665,42 @@ def _candidate_quality_score(item):
     )
 
 
+def _limit_weekly_source_candidates(papers):
+    """把异常高产周的“来源候选”限制在 150 篇，而非按返回顺序截断。
+
+    100–150 是本项目的预算目标而不是每周硬凑的数量。正常周完整保留；只有
+    超出 150 时，才优先保留本地规则已识别为直接相关、跨主线或期刊质量更高
+    的来源候选，再进入正式的 60–90 篇本地预筛阶段。
+    """
+    limit = int(os.getenv("WEEKLY_SOURCE_CANDIDATE_LIMIT", "150"))
+    if limit <= 0 or len(papers) <= limit:
+        logger.info("整周来源候选 %d 篇，未触发来源上限 %d", len(papers), limit)
+        return papers
+
+    ranked = []
+    for item in papers:
+        paper = item.get("paper", {})
+        decision = local_prefilter_decision(
+            paper.get("title", ""), paper.get("summary", "")
+        )
+        metrics = paper.get("journal_metrics") or {}
+        impact_factor = metrics.get("impact_factor") or 0
+        score = (
+            (8 if decision["accepted"] else 0)
+            + min(len(decision["groups"]), 3) * 2
+            + (3 if metrics.get("is_flagship") else 0)
+            + min(float(impact_factor), 15) / 10
+        )
+        ranked.append((score, item))
+    ranked.sort(key=lambda pair: pair[0], reverse=True)
+    selected = [item for _, item in ranked[:limit]]
+    logger.info(
+        "整周来源候选 %d 篇超过上限 %d，按直接相关性与期刊资料保留 %d 篇",
+        len(papers), limit, len(selected),
+    )
+    return selected
+
+
 def _limit_weekly_local_candidates(papers):
     """仅在异常高产周将 DeepSeek 输入控制在可负担的 90 篇以内。
 
@@ -939,6 +975,7 @@ def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000)
                 merged.append(paper)
 
         merged = _deduplicate_papers(merged, "周报候选")
+        merged = _limit_weekly_source_candidates(merged)
         source_count = len(merged)
         merged = _apply_local_keyword_prefilter(merged)
         merged = _limit_weekly_local_candidates(merged)
