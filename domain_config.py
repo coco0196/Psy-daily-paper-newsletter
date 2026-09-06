@@ -54,7 +54,12 @@ TOPIC_GROUPS = {
             "self-guided interventions", "self-help intervention",
             "self-help interventions", "digital intervention", "digital interventions",
             "mobile intervention", "mobile interventions", "behavioral activation",
-            "acceptance and commitment therapy", "mindfulness",
+            "acceptance and commitment therapy", "mindfulness", "intervention",
+            "therapy", "treatment", "psychotherapy", "trial", "randomized",
+            "randomised", "protocol", "micro-intervention", "microintervention",
+            "biofeedback", "heart rate variability biofeedback", "hrv biofeedback",
+            "mind-body", "mindfulness-based", "meditation", "relaxation",
+            "breathing intervention",
         ],
     },
 }
@@ -64,7 +69,10 @@ TOPIC_GROUPS = {
 CROSSREF_TRACK_QUERIES = {
     "heart_brain": "heart brain interaction neurovisceral HRV EEG ECG psychological",
     "emi": "ecological momentary assessment experience sampling intervention just in time adaptive ECG PPG physiological wearable",
-    "mental_health": "digital mobile mental health psychological intervention",
+    "mental_health": (
+        "mental health emotional behavioural subjective intervention therapy treatment "
+        "psychotherapy trial mind body mindfulness meditation relaxation breathing biofeedback"
+    ),
 }
 
 # EEG 与 ECG 同步测量是心脑耦合的重要证据，但任一信号单独出现都不足以
@@ -116,7 +124,12 @@ MENTAL_HEALTH_OUTCOME_TERMS = {
     "mental health", "mental well-being", "mental wellbeing",
     "psychological well-being", "psychological wellbeing", "emotion regulation",
     "depress", "anxiety", "psychiatr", "psychological distress", "stress",
-    "suicid", "self-harm", "wellbeing", "well-being",
+    "suicid", "self-harm", "wellbeing", "well-being", "mood", "affect",
+    "emotion", "loneliness", "quality of life", "coping", "self-efficacy",
+    "health behavior", "health behaviour", "behavior change", "behaviour change",
+    "self-regulation", "sleep", "insomnia", "pain", "medication adherence",
+    "treatment adherence", "heart rate variability", "hrv", "heart rate",
+    "psychophysiological", "psychophysiology",
 }
 
 MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS = {
@@ -126,7 +139,10 @@ MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS = {
 
 MENTAL_HEALTH_INTERVENTION_TERMS = {
     "intervention", "therapy", "treatment", "psychotherap", "trial", "randomized",
-    "randomised", "protocol", "programme", "program",
+    "randomised", "protocol", "programme", "program", "self-guided", "self-help",
+    "micro-intervention", "microintervention", "biofeedback", "hrv biofeedback",
+    "mind-body", "mindfulness-based", "meditation", "relaxation",
+    "breathing intervention",
 }
 
 # EMA/ESM 的一般自评问卷研究数量很大，且未必符合本项目的重点。EMA/EMI
@@ -246,14 +262,19 @@ def local_prefilter_decision(title, abstract):
             continue
         if group_id == "mental_health":
             has_outcome = _has_any(text, MENTAL_HEALTH_OUTCOME_TERMS)
-            has_delivery = _has_any(text, MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS)
             has_intervention = _has_any(text, MENTAL_HEALTH_INTERVENTION_TERMS)
-            # 心理健康/情绪问题必须是研究对象，并同时具备数字递送方式与
-            # 干预/治疗/试验/方案信号；一般正念或泛幸福感研究不再自动放行。
-            if not (has_outcome and has_delivery and has_intervention):
+            has_delivery = _has_any(text, MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS)
+            # 第三主线要求心理、行为、主观体验或心理生理指标等研究结局，且
+            # 必须实际评估干预、治疗、试验或方案。数字/移动递送仅作为相关性
+            # 增强信号，不再误排除非数字的心理与身心干预。
+            if not (has_outcome and has_intervention):
                 continue
             accepted_groups.append(group["label"])
-            reasons.append("mental_health_high_precision")
+            reasons.append(
+                "mental_health_intervention_with_digital_delivery"
+                if has_delivery
+                else "mental_health_intervention"
+            )
             continue
         if group_id == "emi":
             has_core_method = _has_any(text, EMA_EMI_CORE_METHOD_TERMS)
@@ -299,3 +320,11 @@ def normalize_topic_labels(raw_labels):
             labels.append(canonical)
     return labels
 
+
+def topic_label_eligibility(title, abstract):
+    """返回可由本地可解释规则支持的主题标签。
+
+    DeepSeek 负责语义判断，程序只用此函数阻止明显不成立的标签。例如，单纯
+    EEG/HRV/EDA 实验不会因含生理指标而获得“生态瞬时干预”标签。
+    """
+    return local_prefilter_decision(title, abstract)["groups"]

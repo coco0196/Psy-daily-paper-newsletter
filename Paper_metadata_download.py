@@ -5,6 +5,7 @@ import html
 import time
 import datetime
 import unicodedata
+from difflib import SequenceMatcher
 from math import ceil
 import requests
 import argparse
@@ -146,6 +147,14 @@ def _text_join(parts):
     return " ".join(p for p in parts if p and p.strip()).strip()
 
 
+def _normalise_doi(value):
+    """将 URL、doi: 前缀等归一为用于匹配的 DOI。"""
+    doi = str(value or "").strip().casefold()
+    doi = re.sub(r"^https?://(?:dx\.)?doi\.org/", "", doi)
+    doi = re.sub(r"^doi:\s*", "", doi)
+    return doi.strip()
+
+
 def _parse_pubmed_xml_batch(xml_bytes):
     """
     解析 efetch 返回的 PubMed XML（可能含多篇 PubmedArticle），
@@ -163,6 +172,8 @@ def _parse_pubmed_xml_batch(xml_bytes):
         abstract_parts = []
         authors_out = []
         published_at = ""
+        publication_date_source = ""
+        doi = ""
         journal_title = ""
         journal_abbrev = ""
         journal_issns = []
@@ -176,6 +187,8 @@ def _parse_pubmed_xml_batch(xml_bytes):
             elif ln == "PubmedData":
                 pubmed_data = child
 
+        article_date = ""
+        issue_date = ""
         if medline is not None:
             for mc in medline:
                 ln = _local_name(mc)
@@ -219,7 +232,8 @@ def _parse_pubmed_xml_batch(xml_bytes):
                                 if name:
                                     authors_out.append({"name": name})
 
-        # 优先从 PubmedData / History 取电子化发表日期，其次 MedlineCitation 内日期
+        # 论文发表日期与 PubMed 收录/索引日期是不同概念。前者应优先展示；后者
+        # 仅在 XML 未提供论文实际日期时作为明确标记的回退值。
         def parse_pub_date_elem(elem):
             if elem is None:
                 return ""
@@ -247,29 +261,35 @@ def _parse_pubmed_xml_batch(xml_bytes):
             elif month.isdigit():
                 month_norm = month.zfill(2)
             else:
-                month_norm = "01"
-            day_norm = day.zfill(2) if day.isdigit() else "01"
+                month_norm = ""
+            day_norm = day.zfill(2) if day.isdigit() else ""
             try:
-                datetime.date(int(year), int(month_norm), int(day_norm))
-                return f"{year}-{month_norm}-{day_norm}"
+                if month_norm and day_norm:
+                    datetime.date(int(year), int(month_norm), int(day_norm))
+                    return f"{year}-{month_norm}-{day_norm}"
+                if month_norm:
+                    datetime.date(int(year), int(month_norm), 1)
+                    return f"{year}-{month_norm}"
+                return year
             except ValueError:
                 return year
 
+        indexed_at = ""
         if pubmed_data is not None:
             for pd in pubmed_data:
-                if _local_name(pd) != "History":
-                    continue
-                for hp in pd:
-                    if _local_name(hp) != "PubMedPubDate":
-                        continue
-                    status = hp.attrib.get("PubStatus", "")
-                    if status in ("pubmed", "medline", "entrez"):
-                        d = parse_pub_date_elem(hp)
-                        if d:
-                            published_at = d
-                            break
-                if published_at:
-                    break
+                if _local_name(pd) == "ArticleIdList":
+                    for article_id in pd:
+                        if article_id.attrib.get("IdType", "").casefold() == "doi":
+                            doi = _normalise_doi(article_id.text)
+                elif _local_name(pd) == "History":
+                    for hp in pd:
+                        if _local_name(hp) != "PubMedPubDate":
+                            continue
+                        status = hp.attrib.get("PubStatus", "")
+                        if status in ("pubmed", "medline", "entrez"):
+                            indexed_at = parse_pub_date_elem(hp)
+                            if indexed_at:
+                                break
 
         if medline is not None:
             for mc in medline:
@@ -289,20 +309,33 @@ def _parse_pubmed_xml_batch(xml_bytes):
                         elif jln == "ISOAbbreviation":
                             journal_abbrev = (jc.text or "").strip() or journal_abbrev
 
-        if medline is not None and not published_at:
+        if medline is not None:
             for mc in medline:
                 if _local_name(mc) != "Article":
                     continue
                 for ac in mc:
                     aln = _local_name(ac)
                     if aln == "ArticleDate":
-                        published_at = parse_pub_date_elem(ac) or published_at
+                        article_date = parse_pub_date_elem(ac) or article_date
                     elif aln == "Journal":
                         for jc in ac:
                             if _local_name(jc) == "JournalIssue":
                                 for ji in jc:
                                     if _local_name(ji) == "PubDate":
-                                        published_at = parse_pub_date_elem(ji) or published_at
+                                        issue_date = parse_pub_date_elem(ji)
+                                        if issue_date:
+                                            break
+
+        if article_date:
+            published_at = article_date
+            publication_date_source = "article"
+        elif issue_date:
+            published_at = issue_date
+            publication_date_source = "journal_issue"
+
+        if not published_at and indexed_at:
+            published_at = indexed_at
+            publication_date_source = "pubmed_indexed_fallback"
 
         abstract = "\n".join(abstract_parts).strip()
 
@@ -326,10 +359,12 @@ def _parse_pubmed_xml_batch(xml_bytes):
         results.append(
             {
                 "pmid": pmid,
+                "doi": doi,
                 "title": title,
                 "abstract": abstract,
                 "authors": authors_out,
                 "published_at": published_at,
+                "publication_date_source": publication_date_source,
                 "journal": journal_name,
                 "issns": journal_issns,
             }
@@ -481,11 +516,14 @@ def _fetch_crossref(session, date_str, retmax=80):
                     continue
                 out.append({"paper": _attach_journal_profile({
                     "id": doi,
+                    "doi": _normalise_doi(doi),
                     "title": title,
                     "summary": summary,
                     "authors": authors_out or [{"name": "Unknown"}],
                     "publishedAt": _crossref_published_date(item, date_str),
+                    "publicationDateSource": "crossref_published",
                     "source": "Crossref",
+                    "sources": ["Crossref"],
                     "journal": journal_name,
                     "issns": item_issns,
                 })})
@@ -648,13 +686,17 @@ def download_papers_for_date(date_str, retmax=10000):
                         {
                             "paper": _attach_journal_profile({
                                 "id": rec["pmid"],
+                                "pmid": rec["pmid"],
+                                "doi": rec.get("doi", ""),
                                 "title": rec["title"],
                                 "summary": rec["abstract"],
                                 "authors": rec["authors"],
                                 "publishedAt": rec["published_at"] or target_date,
-                                    "source": "PubMed",
-                                    "journal": rec.get("journal", ""),
-                                    "issns": rec.get("issns", []),
+                                "publicationDateSource": rec.get("publication_date_source", ""),
+                                "source": "PubMed",
+                                "sources": ["PubMed"],
+                                "journal": rec.get("journal", ""),
+                                "issns": rec.get("issns", []),
                                 })
                         }
                     )
@@ -676,7 +718,7 @@ def download_papers_for_date(date_str, retmax=10000):
     logger.info(
         f"{target_date} 合并后原始条目: PubMed {len(pubmed_papers)} 篇 + Crossref {len(crossref_papers)} 篇 = {len(papers)} 篇"
     )
-    return _apply_local_keyword_prefilter(papers)
+    return _apply_local_keyword_prefilter(_deduplicate_papers(papers, f"{target_date} 跨来源"))
 
 
 def _normalised_title_key(title):
@@ -688,6 +730,103 @@ def _normalised_title_key(title):
     """
     text = unicodedata.normalize("NFKC", str(title or "")).casefold()
     return re.sub(r"[^\w]+", "", text, flags=re.UNICODE)
+
+
+def _normalised_issn(value):
+    return re.sub(r"[^0-9x]", "", str(value or "").casefold())
+
+
+def _first_author_key(authors):
+    if not authors:
+        return ""
+    value = authors[0]
+    name = value.get("name", "") if isinstance(value, dict) else str(value)
+    return _normalised_title_key(name.split()[-1] if name else "")
+
+
+def _bibliographic_key(metadata):
+    """无 DOI 时的保守书目信息键，防止仅因标题相同误合并。"""
+    title = _normalised_title_key(metadata.get("title"))
+    author = _first_author_key(metadata.get("authors", []))
+    journal = _normalised_title_key(metadata.get("journal"))
+    year = str(metadata.get("publishedAt", ""))[:4]
+    issns = sorted(_normalised_issn(value) for value in metadata.get("issns", []) if value)
+    if not title or not year or not (author or journal or issns):
+        return ""
+    return "|".join((title, author, journal, year, ",".join(issns)))
+
+
+def _merge_record_provenance(existing, duplicate):
+    """将同一论文的 DOI、PMID 和来源合并到一条可追溯记录。"""
+    target = existing.get("paper", {})
+    incoming = duplicate.get("paper", {})
+    target_sources = target.setdefault("sources", [target.get("source", "")])
+    for source in incoming.get("sources", [incoming.get("source", "")]):
+        if source and source not in target_sources:
+            target_sources.append(source)
+    for field in ("doi", "pmid"):
+        if not target.get(field) and incoming.get(field):
+            target[field] = incoming[field]
+    if target.get("doi"):
+        target["id"] = target["doi"]
+
+
+def _deduplicate_papers(papers, stage):
+    """按 DOI、保守书目信息和高阈值标题相似度合并候选论文。"""
+    retained = []
+    by_doi = {}
+    by_bibliographic = {}
+    duplicate_counts = {"doi": 0, "bibliographic": 0, "title_similarity": 0}
+
+    for candidate in papers:
+        metadata = candidate.get("paper", {})
+        doi = _normalise_doi(metadata.get("doi"))
+        biblio = _bibliographic_key(metadata)
+        existing = by_doi.get(doi) if doi else None
+        reason = "doi" if existing else ""
+        if existing is None and biblio:
+            existing = by_bibliographic.get(biblio)
+            reason = "bibliographic" if existing else ""
+
+        if existing is None:
+            title = _normalised_title_key(metadata.get("title"))
+            author = _first_author_key(metadata.get("authors", []))
+            journal = _normalised_title_key(metadata.get("journal"))
+            year = str(metadata.get("publishedAt", ""))[:4]
+            for prior in retained:
+                old = prior.get("paper", {})
+                if (
+                    author
+                    and author == _first_author_key(old.get("authors", []))
+                    and journal
+                    and journal == _normalised_title_key(old.get("journal"))
+                    and year
+                    and year == str(old.get("publishedAt", ""))[:4]
+                    and SequenceMatcher(None, title, _normalised_title_key(old.get("title"))).ratio() >= 0.985
+                ):
+                    existing = prior
+                    reason = "title_similarity"
+                    break
+
+        if existing is not None:
+            duplicate_counts[reason] += 1
+            _merge_record_provenance(existing, candidate)
+            continue
+
+        retained.append(candidate)
+        if doi:
+            by_doi[doi] = candidate
+        if biblio:
+            by_bibliographic[biblio] = candidate
+
+    duplicates = sum(duplicate_counts.values())
+    if duplicates:
+        logger.info(
+            "%s 去重：输入 %d 篇，合并 %d 篇，保留 %d 篇（DOI=%d，书目信息=%d，标题相似=%d）",
+            stage, len(papers), duplicates, len(retained), duplicate_counts["doi"],
+            duplicate_counts["bibliographic"], duplicate_counts["title_similarity"],
+        )
+    return retained
 
 
 def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000):
@@ -721,24 +860,12 @@ def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000)
 
         logger.info(f"周报模式：下载 {target_start} 至 {target_end} 的论文数据")
         merged = []
-        seen_ids = set()
-        seen_titles = set()
         for day in iter_date_range(target_start, target_end):
             day_papers = download_papers_for_date(day, retmax=retmax)
             for paper in day_papers:
-                metadata = paper.get("paper", {})
-                paper_id = metadata.get("id")
-                title_key = _normalised_title_key(metadata.get("title"))
-                if paper_id and paper_id in seen_ids:
-                    continue
-                if title_key and title_key in seen_titles:
-                    logger.info("跨来源重复标题已跳过：%s", metadata.get("title", ""))
-                    continue
-                if paper_id:
-                    seen_ids.add(paper_id)
-                if title_key:
-                    seen_titles.add(title_key)
                 merged.append(paper)
+
+        merged = _deduplicate_papers(merged, "周报候选")
 
         basename = weekly_basename(target_start, target_end)
         output_file = os.path.join("Paper_metadata_download", f"{basename}_weekly.json")
@@ -801,4 +928,3 @@ if __name__ == "__main__":
     if result["status"] == "error":
         exit(1)
     exit(0)
-
