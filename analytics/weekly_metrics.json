@@ -3,63 +3,63 @@
   "weeks": {
     "2026-08-24_to_2026-08-30": {
       "date_range": "2026-08-24 至 2026-08-30",
-      "total_papers": 91,
+      "total_papers": 5,
       "track_counts": {
-        "心脑轴": 12,
-        "生态瞬时干预": 30,
-        "心理健康与数字心理干预": 85
+        "心脑轴": 2,
+        "生态瞬时干预": 2,
+        "心理健康与数字心理干预": 4
       },
       "hot_topics": [
         {
-          "topic": "随机对照试验",
-          "count": 16
+          "topic": "情绪改善",
+          "count": 2
         },
         {
-          "topic": "生态瞬时评估",
-          "count": 14
+          "topic": "压力改善",
+          "count": 2
         },
         {
-          "topic": "数字心理健康干预",
-          "count": 14
+          "topic": "AI心理健康干预",
+          "count": 1
         },
         {
-          "topic": "数字心理健康",
-          "count": 9
+          "topic": "现实世界研究",
+          "count": 1
         },
         {
-          "topic": "移动健康",
-          "count": 7
+          "topic": "AI驱动数字心理干预",
+          "count": 1
         },
         {
-          "topic": "生态瞬时干预",
-          "count": 6
+          "topic": "真实世界研究",
+          "count": 1
         },
         {
-          "topic": "情绪调节",
-          "count": 5
+          "topic": "视觉模拟量表",
+          "count": 1
         },
         {
-          "topic": "系统综述",
-          "count": 5
+          "topic": "抑郁症状",
+          "count": 1
         },
         {
           "topic": "数字心理干预",
-          "count": 5
+          "count": 1
         },
         {
-          "topic": "数字干预",
-          "count": 4
+          "topic": "生态瞬时评估与干预",
+          "count": 1
         },
         {
-          "topic": "机器学习",
-          "count": 4
+          "topic": "治疗性伴侣代理",
+          "count": 1
         },
         {
-          "topic": "数字表型",
-          "count": 4
+          "topic": "治疗联盟",
+          "count": 1
         }
       ],
-      "updated_at": "2026-09-06T06:07:15.211550+00:00"
+      "updated_at": "2026-09-06T07:46:13.357143+00:00"
     }
   }
 }
