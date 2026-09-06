@@ -14,12 +14,16 @@ from Paper_metadata_download import _crossref_query_params
 
 class CrossrefQueryParamsTests(unittest.TestCase):
     def test_uses_supported_bibliographic_field_query(self):
-        params = _crossref_query_params()
+        params = _crossref_query_params("ecological momentary assessment intervention")
 
         self.assertIn("query.bibliographic", params)
         self.assertNotIn("query.abstract", params)
-        self.assertTrue(params["query.bibliographic"].strip())
+        self.assertEqual(
+            params["query.bibliographic"],
+            "ecological momentary assessment intervention",
+        )
 
 
 if __name__ == "__main__":
     unittest.main()
+
