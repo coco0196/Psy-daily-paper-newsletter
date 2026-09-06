@@ -58,6 +58,7 @@ TOPIC_GROUPS = {
             "mindfulness intervention", "mind-body intervention", "meditation intervention",
             "relaxation intervention", "breathing intervention", "biofeedback",
             "heart rate variability biofeedback", "hrv biofeedback",
+            "somatic intervention", "body-oriented psychotherapy",
             "micro-intervention", "microintervention",
         ],
     },
@@ -75,8 +76,8 @@ CROSSREF_TRACK_QUERIES = {
         "digital phenotyping passive sensing intensive longitudinal mental health psychology",
     ),
     "mental_health": (
-        "mental health emotion regulation stress anxiety psychological intervention psychotherapy trial behavior",
-        "mind body mindfulness meditation breathing relaxation biofeedback HRV sleep pain intervention",
+        "mental health emotion regulation stress anxiety psychological intervention psychotherapy",
+        "mind body mindfulness meditation breathing relaxation biofeedback somatic body oriented",
     ),
 }
 
@@ -150,25 +151,28 @@ MENTAL_HEALTH_INTERVENTION_TERMS = {
     "micro-intervention", "microintervention", "biofeedback", "hrv biofeedback",
     "mind-body intervention", "mindfulness-based", "mindfulness intervention",
     "meditation intervention", "relaxation intervention", "breathing intervention",
+    "somatic intervention", "body-oriented psychotherapy",
 }
 
-# PubMed 是严格布尔检索。第三主线仍使用“结局 AND 干预”的组合，而不是把
-# 两类词拆成总 OR；但干预词覆盖常见的心理、行为和身心干预，以保证召回率。
+# PubMed 是严格布尔检索。第三主线使用“核心心理/行为主题 AND 一般干预”
+# 作为宽召回入口；高特异身心干预另设入口。协议、trial、programme 等泛词
+# 不单独用于检索，避免把大量一般医学研究引入候选池。
 MENTAL_HEALTH_RETRIEVAL_OUTCOME_TERMS = (
     "mental health", "emotion regulation", "psychological distress", "stress",
-    "anxiety", "well-being", "sleep", "pain", "health behavior",
-    "medication adherence", "depression", "mood", "affect", "quality of life",
-    "heart rate variability", "heart rate", "psychophysiology",
+    "anxiety", "depression", "mood", "affect", "well-being",
 )
 MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS = (
-    "intervention", "therapy", "treatment", "psychotherapy", "trial", "randomized",
-    "randomised", "protocol", "programme", "program", "psychological intervention",
-    "cognitive behavioral therapy", "acceptance and commitment therapy", "mind-body intervention",
+    "intervention", "therapy", "treatment", "psychotherapy", "randomized",
+    "randomised", "psychological intervention", "self-guided intervention",
+    "self-help intervention", "digital intervention", "mobile intervention",
+)
+MENTAL_HEALTH_HIGH_SPECIFIC_INTERVENTION_TERMS = (
+    "mind-body intervention",
     "mindfulness-based intervention", "mindfulness intervention",
     "meditation intervention", "relaxation intervention", "breathing intervention",
     "biofeedback", "heart rate variability biofeedback", "hrv biofeedback",
-    "self-guided intervention", "self-help intervention", "micro-intervention",
-    "behavioral activation", "digital intervention", "mobile intervention",
+    "somatic intervention", "body-oriented psychotherapy", "micro-intervention",
+    "behavioral activation",
 )
 
 
@@ -178,7 +182,8 @@ def _pubmed_title_abstract_any(terms):
 
 PUBMED_MENTAL_HEALTH_QUERY = (
     f"(({_pubmed_title_abstract_any(MENTAL_HEALTH_RETRIEVAL_OUTCOME_TERMS)}) "
-    f"AND ({_pubmed_title_abstract_any(MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS)}))"
+    f"AND ({_pubmed_title_abstract_any(MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS)})) "
+    f"OR ({_pubmed_title_abstract_any(MENTAL_HEALTH_HIGH_SPECIFIC_INTERVENTION_TERMS)}))"
 )
 
 # EMA/ESM 的一般自评问卷研究数量很大，且未必符合本项目的重点。EMA/EMI
@@ -234,6 +239,7 @@ MENTAL_HEALTH_CONTEXT_TERMS = {
     "wellbeing", "well-being", "quality of life", "subjective", "experience",
     "psychophysiolog", "heart rate variability", "hrv", "biofeedback",
     "mindfulness", "meditation", "relaxation", "breathing", "mind-body",
+    "somatic", "body-oriented",
 }
 
 LOCAL_PREFILTER_BROAD_TERMS = {
