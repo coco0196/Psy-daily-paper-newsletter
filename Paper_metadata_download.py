@@ -18,6 +18,7 @@ from journal_registry import filter_by_journal, get_journal_profile
 from domain_config import (
     CROSSREF_TRACK_QUERIES,
     EEG_ECG_PUBMED_QUERY,
+    PUBMED_MENTAL_HEALTH_QUERY,
     iter_topic_terms,
     local_prefilter_decision,
 )
@@ -377,7 +378,7 @@ def _esearch_pubmed(session, date_str, retmax=10000):
     """按日期 + 标题/摘要关键词检索 PubMed；retmax 默认 10000。"""
     keyword_query = " OR ".join(
         [f'"{term}"[Title/Abstract]' for term in iter_topic_terms()]
-        + [EEG_ECG_PUBMED_QUERY]
+        + [EEG_ECG_PUBMED_QUERY, PUBMED_MENTAL_HEALTH_QUERY]
     )
     term = f'"{date_str}"[dp] AND ({keyword_query})'
     url = f"{EUTILS_BASE}/esearch.fcgi"

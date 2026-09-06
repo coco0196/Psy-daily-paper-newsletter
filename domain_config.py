@@ -54,12 +54,11 @@ TOPIC_GROUPS = {
             "self-guided interventions", "self-help intervention",
             "self-help interventions", "digital intervention", "digital interventions",
             "mobile intervention", "mobile interventions", "behavioral activation",
-            "acceptance and commitment therapy", "mindfulness", "intervention",
-            "therapy", "treatment", "psychotherapy", "trial", "randomized",
-            "randomised", "protocol", "micro-intervention", "microintervention",
-            "biofeedback", "heart rate variability biofeedback", "hrv biofeedback",
-            "mind-body", "mindfulness-based", "meditation", "relaxation",
-            "breathing intervention",
+            "acceptance and commitment therapy", "mindfulness-based intervention",
+            "mindfulness intervention", "mind-body intervention", "meditation intervention",
+            "relaxation intervention", "breathing intervention", "biofeedback",
+            "heart rate variability biofeedback", "hrv biofeedback",
+            "micro-intervention", "microintervention",
         ],
     },
 }
@@ -70,8 +69,9 @@ CROSSREF_TRACK_QUERIES = {
     "heart_brain": "heart brain interaction neurovisceral HRV EEG ECG psychological",
     "emi": "ecological momentary assessment experience sampling intervention just in time adaptive ECG PPG physiological wearable",
     "mental_health": (
-        "mental health emotional behavioural subjective intervention therapy treatment "
-        "psychotherapy trial mind body mindfulness meditation relaxation breathing biofeedback"
+        "mental health emotion regulation psychological distress stress anxiety well being "
+        "psychological intervention mind body mindfulness based breathing biofeedback "
+        "self guided micro intervention"
     ),
 }
 
@@ -141,9 +141,35 @@ MENTAL_HEALTH_INTERVENTION_TERMS = {
     "intervention", "therapy", "treatment", "psychotherap", "trial", "randomized",
     "randomised", "protocol", "programme", "program", "self-guided", "self-help",
     "micro-intervention", "microintervention", "biofeedback", "hrv biofeedback",
-    "mind-body", "mindfulness-based", "meditation", "relaxation",
-    "breathing intervention",
+    "mind-body intervention", "mindfulness-based", "mindfulness intervention",
+    "meditation intervention", "relaxation intervention", "breathing intervention",
 }
+
+# PubMed 是严格布尔检索。第三主线只使用“结局 AND 高特异干预方法”的
+# 组合，不将 intervention、therapy、trial 等泛词单独加入总 OR 候选池。
+MENTAL_HEALTH_RETRIEVAL_OUTCOME_TERMS = (
+    "mental health", "emotion regulation", "psychological distress", "stress",
+    "anxiety", "well-being", "sleep", "pain", "health behavior",
+    "medication adherence",
+)
+MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS = (
+    "psychological intervention", "psychotherapy", "mind-body intervention",
+    "mindfulness-based intervention", "mindfulness intervention",
+    "meditation intervention", "relaxation intervention", "breathing intervention",
+    "biofeedback", "heart rate variability biofeedback", "hrv biofeedback",
+    "self-guided intervention", "self-help intervention", "micro-intervention",
+    "behavioral activation",
+)
+
+
+def _pubmed_title_abstract_any(terms):
+    return " OR ".join(f'"{term}"[Title/Abstract]' for term in terms)
+
+
+PUBMED_MENTAL_HEALTH_QUERY = (
+    f"(({_pubmed_title_abstract_any(MENTAL_HEALTH_RETRIEVAL_OUTCOME_TERMS)}) "
+    f"AND ({_pubmed_title_abstract_any(MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS)}))"
+)
 
 # EMA/ESM 的一般自评问卷研究数量很大，且未必符合本项目的重点。EMA/EMI
 # 主线要求明确的瞬时/密集纵向方法，并进一步要求：要么是主动干预，要么结合
@@ -207,9 +233,15 @@ _TOPIC_ALIASES = {
 
 
 def iter_topic_terms():
-    """按主线返回不重复的 PubMed 标题/摘要检索词。"""
+    """返回心脑轴与 EMA/EMI 的 PubMed 标题/摘要检索词。
+
+    第三主线使用 PUBMED_MENTAL_HEALTH_QUERY 的结局—干预组合，而不是把其
+    局部词逐个放入同一 OR 查询。
+    """
     seen = set()
-    for group in TOPIC_GROUPS.values():
+    for group_id, group in TOPIC_GROUPS.items():
+        if group_id == "mental_health":
+            continue
         for term in group["terms"]:
             key = term.casefold()
             if key not in seen:
@@ -246,7 +278,11 @@ def local_prefilter_decision(title, abstract):
             _has_any_whole_phrase(text, EEG_TERMS)
             and _has_any_whole_phrase(text, ECG_TERMS)
         )
-        if not hits and not (group_id == "heart_brain" and has_eeg_ecg_pair):
+        if (
+            group_id != "mental_health"
+            and not hits
+            and not (group_id == "heart_brain" and has_eeg_ecg_pair)
+        ):
             continue
         if group_id == "heart_brain":
             if _has_any_whole_phrase(text, HEART_BRAIN_EXCLUSION_TERMS):
