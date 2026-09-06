@@ -24,11 +24,11 @@ logger = setup_logger()
 
 
 def _translation_marked_relevant(text):
-    return bool(re.search(r"相关性\s*[:：]\s*是", str(text or "")))
+    return bool(re.search(r"收录决定\s*[:：]\s*核心收录", str(text or "")))
 
 
 def _translation_marked_irrelevant(text):
-    return bool(re.search(r"相关性\s*[:：]\s*否", str(text or "")))
+    return bool(re.search(r"收录决定\s*[:：]\s*排除", str(text or "")))
 
 
 def _should_filter_by_relevance(text):
@@ -36,11 +36,11 @@ def _should_filter_by_relevance(text):
 
 
 def _response_has_required_fields(text):
-    return all(marker in str(text or "") for marker in ("主题标签", "优先级", "标题", "摘要", "关键词"))
+    return all(marker in str(text or "") for marker in ("收录决定", "主题标签", "优先级", "标题", "摘要", "关键词"))
 
 
 def _build_prompt(title, summary):
-    return f"""你是一名严格的心理学与数字健康领域学术编辑。请根据标题和摘要判断论文是否应纳入文献周报。
+    return f"""你是一名采用高精度标准的心理学与数字健康领域学术编辑。请根据标题和摘要判断论文是否足够核心、值得进入篇幅有限的高质量文献周报。
 
 【三条追踪主线】
 1. 心脑轴：心脑交互/耦合、神经内脏整合、中央自主神经网络，以及与心理健康相关的 HRV、迷走神经和自主神经系统研究。
@@ -50,16 +50,22 @@ def _build_prompt(title, summary):
 【心脑轴特别规则】
 HRV、迷走神经、自主神经系统或副交感神经相关研究，只有在明确涉及心理健康、精神障碍、情绪、压力、认知、行为、心理干预或日常生活动态测量时才相关。纯心血管疾病、手术、药物、解剖、生理机制、动物/细胞研究及无心理行为意义的研究一律排除。
 
+【心理健康与数字心理干预特别规则】
+必须以心理健康、精神障碍、情绪问题或情绪调节为直接研究对象，并同时明确包含数字/移动递送方式，或干预、治疗、试验、方案等信号。泛心理健康、一般正念、泛幸福感，或只在背景中提及数字技术的研究一律排除。
+
+【核心收录阈值】
+仅在论文的主要研究问题、方法或主要结局直接对应至少一条追踪主线，且不是边缘提及、背景引用或宽泛相邻主题时，才能收录。任何不确定或仅部分相关的论文均排除；不要为了提高数量而收录。
+
 标题：{title}
 摘要：{summary}
 
 【输出规则】
-若不相关，仅输出：相关性：否
+若应排除，仅输出：收录决定：排除
 
 若相关，严格逐行输出。不要使用方括号、中括号、引号、Markdown 列表或 JSON。
 主题标签只能使用以下三个标准名称；多标签以中文分号分隔：心脑轴；生态瞬时干预；心理健康与数字心理干预。
 
-相关性：是
+收录决定：核心收录
 主题标签：心脑轴；生态瞬时干预
 优先级：重点推荐
 标题：中文标题
@@ -215,3 +221,4 @@ if __name__ == "__main__":
     parser.add_argument("--weekly-key")
     args = parser.parse_args()
     raise SystemExit(0 if process_papers(args.start_date, args.end_date, args.weekly_key) else 1)
+
