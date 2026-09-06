@@ -7,7 +7,7 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
     def test_each_topic_line_can_pass_independently(self):
         examples = [
             ("Brain-heart coupling during affective stress", "A neurovisceral integration study."),
-            ("Ecological momentary assessment of mood", "Participants completed smartphone prompts."),
+            ("Ecological momentary assessment of mood with PPG", "Participants completed smartphone prompts and wearable physiological monitoring."),
             ("A just-in-time adaptive intervention for anxiety", "The mobile intervention adapts support."),
             ("A mobile behavioral activation programme for depression", "A self-guided digital psychological intervention trial."),
         ]
@@ -67,6 +67,23 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         )
         self.assertTrue(accepted["accepted"])
         self.assertFalse(rejected["accepted"])
+
+    def test_questionnaire_only_ema_is_rejected_but_physiology_or_emi_is_accepted(self):
+        questionnaire_only = local_prefilter_decision(
+            "Ecological momentary assessment of mood",
+            "Participants completed repeated self-report questionnaires.",
+        )
+        physiology_ema = local_prefilter_decision(
+            "Experience sampling with ECG and PPG",
+            "Ambulatory physiological monitoring assessed affect in daily life.",
+        )
+        emi = local_prefilter_decision(
+            "A just-in-time adaptive intervention for anxiety",
+            "A smartphone intervention delivered support in daily life.",
+        )
+        self.assertFalse(questionnaire_only["accepted"])
+        self.assertTrue(physiology_ema["accepted"])
+        self.assertTrue(emi["accepted"])
 
     def test_unrelated_record_is_rejected(self):
         result = local_prefilter_decision(
