@@ -84,6 +84,14 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         self.assertTrue(result["accepted"])
         self.assertIn("心理健康与数字心理干预", result["groups"])
 
+    def test_direct_psychological_intervention_review_does_not_need_a_fixed_outcome_word(self):
+        result = local_prefilter_decision(
+            "A systematic review of psychological interventions",
+            "This review synthesizes psychotherapy and self-guided intervention methods.",
+        )
+        self.assertTrue(result["accepted"])
+        self.assertIn("心理健康与数字心理干预", result["groups"])
+
     def test_physiology_alone_does_not_create_emi_label(self):
         labels = topic_label_eligibility(
             "Concurrent EEG and ECG during emotion regulation",

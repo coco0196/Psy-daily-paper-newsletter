@@ -1,6 +1,7 @@
 import unittest
+from unittest.mock import patch
 
-from Paper_metadata_download import _deduplicate_papers, _parse_pubmed_xml_batch
+from Paper_metadata_download import _deduplicate_papers, _parse_pubmed_xml_batch, metadata_pilot
 
 
 class PubMedMetadataTests(unittest.TestCase):
@@ -37,6 +38,29 @@ class PubMedMetadataTests(unittest.TestCase):
             {"paper": {"id": "2", "title": "Editorial", "summary": "x", "authors": [{"name": "Grace Hopper"}], "journal": "Journal B", "issns": ["2222-2222"], "publishedAt": "2026-08-24", "source": "Crossref"}},
         ]
         self.assertEqual(len(_deduplicate_papers(papers, "test")), 2)
+
+    def test_metadata_pilot_does_not_write_or_call_deepseek(self):
+        sample = {
+            "paper": {
+                "id": "1", "pmid": "1", "doi": "10.1000/pilot",
+                "title": "A digital mental health intervention for anxiety",
+                "summary": "A randomized psychological intervention assessed anxiety and wellbeing.",
+                "authors": [{"name": "Ada Lovelace"}],
+                "journal": "Journal of Medical Internet Research",
+                "issns": ["1438-8871"], "publishedAt": "2026-08-24",
+                "source": "PubMed", "sources": ["PubMed"],
+            }
+        }
+        with patch(
+            "Paper_metadata_download.download_papers_for_date",
+            side_effect=[[sample], []],
+        ):
+            result = metadata_pilot("2026-08-24", "2026-08-25")
+        self.assertEqual(result["mode"], "dry-run")
+        self.assertFalse(result["writes_files"])
+        self.assertFalse(result["calls_deepseek"])
+        self.assertEqual(result["weekly_source_after_dedup"], 1)
+        self.assertEqual(result["deepseek_candidate_count"], 1)
 
 
 if __name__ == "__main__":

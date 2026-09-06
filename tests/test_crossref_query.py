@@ -39,6 +39,8 @@ class CrossrefQueryParamsTests(unittest.TestCase):
         self.assertIn('"therapy"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
         self.assertIn('"somatic intervention"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
         self.assertIn('"body-oriented psychotherapy"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
+        self.assertIn('"digital mental health"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
+        self.assertIn('"app-based intervention"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
         self.assertNotIn('"trial"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
         self.assertNotIn('"protocol"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
         self.assertNotIn('"programme"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
