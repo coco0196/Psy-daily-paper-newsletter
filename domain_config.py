@@ -59,13 +59,13 @@ TOPIC_GROUPS = {
     },
 }
 
-CROSSREF_QUERY_TERMS = [
-    "heart-brain interaction", "vagus nerve mental health",
-    "heart rate variability psychological", "ecological momentary assessment",
-    "just-in-time adaptive intervention", "ecological momentary intervention",
-    "micro-randomized trial", "digital phenotyping mental health",
-    "digital mental health",
-]
+# Crossref 的 bibliographic 查询不是严格的布尔检索。按主线拆分可避免宽词
+# 在同一查询中相互放大，并让每条主线都有稳定的召回入口。
+CROSSREF_TRACK_QUERIES = {
+    "heart_brain": "heart brain interaction neurovisceral HRV psychological",
+    "emi": "ecological momentary assessment intervention just in time adaptive",
+    "mental_health": "digital mobile mental health psychological intervention",
+}
 
 # 以下心脑术语在纯心血管/解剖/生理文献中也常见，必须带心理学语境才放行。
 HEART_BRAIN_CONTEXT_REQUIRED_TERMS = {
@@ -81,6 +81,32 @@ HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS = {
     "emotion", "affect", "cognitive", "behavior", "behaviour", "wellbeing",
     "well-being", "resilience", "mindfulness", "intervention", "therapy",
     "treatment", "ecological", "experience sampling", "ambulatory", "daily diary",
+}
+
+# 高精度心脑轴模式：这些医学/基础研究信号一旦出现，即不作为心理学周报候选。
+HEART_BRAIN_EXCLUSION_TERMS = {
+    "animal", "mice", "mouse", "rat", "rats", "rodent", "canine", "porcine",
+    "cell culture", "in vitro", "anatomical", "anatomy", "histology",
+    "cardiac surgery", "postoperative", "post-operative", "catheter", "stent",
+    "myocardial infarction", "heart failure", "arrhythmia", "pharmacological",
+    "drug administration", "dose response",
+}
+
+MENTAL_HEALTH_OUTCOME_TERMS = {
+    "mental health", "mental well-being", "mental wellbeing",
+    "psychological well-being", "psychological wellbeing", "emotion regulation",
+    "depress", "anxiety", "psychiatr", "psychological distress", "stress",
+    "suicid", "self-harm", "wellbeing", "well-being",
+}
+
+MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS = {
+    "digital", "mobile", "smartphone", "app", "web-based", "online", "mhealth",
+    "telehealth", "internet-based",
+}
+
+MENTAL_HEALTH_INTERVENTION_TERMS = {
+    "intervention", "therapy", "treatment", "psychotherap", "trial", "randomized",
+    "randomised", "protocol", "programme", "program",
 }
 
 LOCAL_PREFILTER_BROAD_TERMS = {
@@ -135,6 +161,16 @@ def _has_any(text, terms):
     return any(_contains_term(text, term) for term in terms)
 
 
+def _has_any_whole_phrase(text, terms):
+    """用于排除词，避免 ``rat`` 误匹配 ``heart rate`` 之类的子串。"""
+    normalized = str(text or "").casefold()
+    for term in terms:
+        phrase = re.escape(term.casefold()).replace(r"\ ", r"\s+")
+        if re.search(rf"(?<!\w){phrase}(?!\w)", normalized):
+            return True
+    return False
+
+
 def local_prefilter_decision(title, abstract):
     """在 API 调用前执行可解释的本地候选预筛。"""
     text = " ".join(str(value or "") for value in (title, abstract))
@@ -145,11 +181,25 @@ def local_prefilter_decision(title, abstract):
         if not hits:
             continue
         if group_id == "heart_brain":
-            only_context_required = all(term in HEART_BRAIN_CONTEXT_REQUIRED_TERMS for term in hits)
-            if only_context_required and not _has_any(text, HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS):
+            if _has_any_whole_phrase(text, HEART_BRAIN_EXCLUSION_TERMS):
+                continue
+            # 高精度模式下，直接心脑术语也必须具备心理/行为语境；不能仅因
+            # 心血管或神经生理术语而放行。
+            if not _has_any(text, HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS):
                 continue
             accepted_groups.append(group["label"])
-            reasons.append("heart_brain_psych_context" if only_context_required else "heart_brain_specific")
+            reasons.append("heart_brain_psych_context")
+            continue
+        if group_id == "mental_health":
+            has_outcome = _has_any(text, MENTAL_HEALTH_OUTCOME_TERMS)
+            has_delivery = _has_any(text, MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS)
+            has_intervention = _has_any(text, MENTAL_HEALTH_INTERVENTION_TERMS)
+            # 心理健康/情绪问题必须是研究对象，且至少同时出现数字递送方式或
+            # 干预/治疗/试验/方案信号；一般正念或泛幸福感研究不再自动放行。
+            if not has_outcome or not (has_delivery or has_intervention):
+                continue
+            accepted_groups.append(group["label"])
+            reasons.append("mental_health_high_precision")
             continue
         broad_terms = LOCAL_PREFILTER_BROAD_TERMS.get(group_id, set())
         only_broad = all(term in broad_terms for term in hits)
