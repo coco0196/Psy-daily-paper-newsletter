@@ -1,7 +1,9 @@
 """三主线文献追踪的 ISSN 白名单。
 
-筛选规则：期刊必须同时满足“JCR Q1/Q2”与“三条主线中的核心直接相关”。
-不因 Q1、Nature、Science、Lancet 等刊名自动放行。ISSN 精确匹配优先；
+筛选规则：期刊必须同时满足“JCR Q1/Q2”与“三条主线直接相关”。
+不因分区、Nature、Science、Lancet 等刊名自动放行；但已登记、与三条主线
+有直接发表交集的综合旗舰刊会保留在白名单中，由后续主题筛选决定是否收录。
+ISSN 精确匹配优先；
 只有原始记录没有 ISSN 时才使用严格的期刊全名/唯一缩写匹配。
 
 指标来自 impact_factor 1.1.3（PyPI 于 2025-11-25 发布，自述为 2025 数据）。
@@ -103,7 +105,7 @@ _JOURNAL_ROWS = (
     ("Journal of Child Psychology and Psychiatry", "0021-9630", "1469-7610", 7.0, "Q1", (MENTAL_HEALTH,), ()),
     ("European Child & Adolescent Psychiatry", "1018-8827", "1435-165X", 4.9, "Q1", (MENTAL_HEALTH,), ()),
 
-    # 仅保留与三主线有直接发表交集的跨学科旗舰刊
+    # 仅保留与三主线有���接发表交集的跨学科旗舰刊
     ("Nature", "0028-0836", "1476-4687", 48.5, "Q1", (HEART_BRAIN, EMA_EMI, MENTAL_HEALTH), ()),
     ("Science", "0036-8075", "1095-9203", 45.8, "Q1", (HEART_BRAIN, EMA_EMI, MENTAL_HEALTH), ()),
     ("Nature Communications", "-", "2041-1723", 15.7, "Q1", (HEART_BRAIN, EMA_EMI, MENTAL_HEALTH), ()),
@@ -116,8 +118,9 @@ _JOURNAL_ROWS = (
     ("BMJ", "0959-535X", "1756-1833", 42.7, "Q1", (HEART_BRAIN, EMA_EMI, MENTAL_HEALTH), ("BMJ-British Medical Journal",)),
 )
 
-# 只保留与三条主线直接对应的核心期刊。这里的集合比原始宽白名单更窄：
-# Q1 与 Q2 都必须在此列中，Q2 仅保留用户确认的核心刊物。
+# 期刊白名单以领域相关性而非 Q1/Q2 差别为核心：登记表中的每本期刊都已经
+# 过人工领域核对，Q1 与 Q2 同等处理。后续的本地规则和 DeepSeek 负责把
+# 宽白名单带来的相邻主题文献筛掉，而不是以期刊名过早丢弃。
 CORE_JOURNAL_NAMES = {
     # 心脑轴与心理生理
     "Psychophysiology", "International Journal of Psychophysiology",
@@ -146,6 +149,16 @@ CORE_JOURNAL_NAMES = {
     "European Journal of Psychotraumatology", "Journal of Psychiatric Research",
     "Translational Psychiatry", "Journal of Child Psychology and Psychiatry",
     "European Child & Adolescent Psychiatry",
+    # 综合与相邻学科期刊：只因三主线确有直接发表交集而保留，绝不自动收录。
+    "Autonomic Neuroscience: Basic and Clinical", "Neuroscience & Biobehavioral Reviews",
+    "Network Neuroscience", "NeuroImage", "Cerebral Cortex", "Nature Neuroscience",
+    "Nature Reviews Neuroscience", "Journal of the American Medical Informatics Association",
+    "Journal of Biomedical Informatics", "Pervasive and Mobile Computing",
+    "Computers in Human Behavior", "Psychiatry Research",
+    "Social Psychiatry and Psychiatric Epidemiology", "Frontiers in Psychiatry", "BMC Psychiatry",
+    "Nature", "Science", "Nature Communications", "Science Advances",
+    "Proceedings of the National Academy of Sciences of the United States of America",
+    "Nature Human Behaviour", "Nature Medicine", "The Lancet", "JAMA", "BMJ",
 }
 
 
