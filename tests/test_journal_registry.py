@@ -21,6 +21,9 @@ class JournalRegistryTests(unittest.TestCase):
     def test_q3_journal_is_not_in_whitelist(self):
         self.assertFalse(filter_by_journal(issns=["1070-5503"]))
 
+    def test_non_core_q1_flagship_is_not_in_whitelist(self):
+        self.assertFalse(filter_by_journal(issns=["0028-0836"]))
+
     def test_download_record_receives_journal_metadata(self):
         paper = _attach_journal_profile(
             {"journal": "Journal of Medical Internet Research", "issns": ["1438-8871"]}
@@ -31,3 +34,4 @@ class JournalRegistryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
