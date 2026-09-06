@@ -8,6 +8,7 @@ from collections import defaultdict
 
 import markdown
 
+from analytics import AnalyticsGenerator
 from domain_config import CANONICAL_TOPIC_LABELS, REPORT_TITLE, normalize_topic_labels
 from utils import get_last_week_range, get_logger, weekly_basename
 
@@ -92,7 +93,7 @@ class NewsletterGenerator:
 **原文链接**：[{paper['source']}]({paper['paper_url']})
 """
 
-    def render_markdown(self, papers, date_range):
+    def render_markdown(self, papers, date_range, analytics_markdown=""):
         featured = [paper for paper in papers if self.is_featured(paper)]
         grouped = defaultdict(list)
         for paper in papers:
@@ -113,6 +114,8 @@ class NewsletterGenerator:
                 lines.append("本期无符合条件的文献。")
             else:
                 lines.extend(self._render_paper(paper, index + 1) for index, paper in enumerate(section))
+        if analytics_markdown:
+            lines.extend(["", analytics_markdown])
         return "\n".join(lines).strip() + "\n"
 
     def generate_newsletter(self, start_date=None, end_date=None, weekly_key=None):
@@ -133,7 +136,9 @@ class NewsletterGenerator:
             return False
         output_dir = "newsletters"
         os.makedirs(output_dir, exist_ok=True)
-        markdown_text = self.render_markdown(papers, f"{start_date} 至 {end_date}")
+        date_range = f"{start_date} 至 {end_date}"
+        analytics = AnalyticsGenerator().generate(papers, weekly_key, date_range)
+        markdown_text = self.render_markdown(papers, date_range, analytics["markdown"])
         md_path = os.path.join(output_dir, f"{weekly_key}_weekly_paper.md")
         html_path = os.path.join(output_dir, f"{weekly_key}_weekly_paper.html")
         with open(md_path, "w", encoding="utf-8") as handle:
