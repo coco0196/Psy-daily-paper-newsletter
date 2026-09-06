@@ -27,6 +27,20 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         self.assertFalse(rejected["accepted"])
         self.assertTrue(accepted["accepted"])
 
+    def test_heart_brain_medical_or_animal_record_is_rejected(self):
+        result = local_prefilter_decision(
+            "Heart-brain axis after myocardial infarction in mice",
+            "We examined autonomic function following cardiac surgery in an animal model.",
+        )
+        self.assertFalse(result["accepted"])
+
+    def test_general_wellbeing_without_digital_or_intervention_signal_is_rejected(self):
+        result = local_prefilter_decision(
+            "Mindfulness and psychological wellbeing in university students",
+            "A cross-sectional study of flourishing and resilience.",
+        )
+        self.assertFalse(result["accepted"])
+
     def test_unrelated_record_is_rejected(self):
         result = local_prefilter_decision(
             "Novel surgical repair for hip fracture",
@@ -37,3 +51,4 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
