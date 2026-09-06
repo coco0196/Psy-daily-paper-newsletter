@@ -32,12 +32,16 @@ class CrossrefQueryParamsTests(unittest.TestCase):
         crossref_title = pubmed_title.rstrip(".")
         self.assertEqual(_normalised_title_key(pubmed_title), _normalised_title_key(crossref_title))
 
-    def test_mental_health_pubmed_retrieval_keeps_boolean_outcome_intervention_gate(self):
+    def test_mental_health_pubmed_retrieval_uses_focused_general_and_somatic_paths(self):
         self.assertIn(") AND (", PUBMED_MENTAL_HEALTH_QUERY)
         self.assertIn('"stress"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
         self.assertIn('"breathing intervention"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
-        self.assertIn('"trial"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
         self.assertIn('"therapy"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
+        self.assertIn('"somatic intervention"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
+        self.assertIn('"body-oriented psychotherapy"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
+        self.assertNotIn('"trial"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
+        self.assertNotIn('"protocol"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
+        self.assertNotIn('"programme"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
 
     def test_crossref_uses_two_targeted_queries_per_track(self):
         self.assertEqual(set(CROSSREF_TRACK_QUERIES), {"heart_brain", "emi", "mental_health"})
