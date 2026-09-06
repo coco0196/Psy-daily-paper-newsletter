@@ -44,6 +44,8 @@ class NewsletterFormattingTests(unittest.TestCase):
         self.assertIn("## 心理健康与数字心理干预", rendered)
         self.assertIn("主题标签：心理健康与数字心理干预", rendered)
         self.assertNotIn('["心理健康与数字心理干预"]', rendered)
+        self.assertIn("收录 1 篇文献。", rendered)
+        self.assertNotIn("优先级：", rendered)
 
     def test_end_to_end_newsletter_keeps_verified_journal_metadata(self):
         payload = [{
@@ -84,8 +86,8 @@ class NewsletterFormattingTests(unittest.TestCase):
                     encoding="utf-8",
                 ) as handle:
                     rendered = handle.read()
-                self.assertIn("IF：6.0", rendered)
-                self.assertIn("JCR 分区：Q1", rendered)
+                self.assertIn("期刊：Journal of Medical Internet Research，JCR Q1，IF 6.0", rendered)
+                self.assertNotIn("优先级：", rendered)
                 self.assertIn("主题标签：生态瞬时干预；心理健康与数字心理干预", rendered)
                 self.assertIn("## 数据分析", rendered)
                 self.assertIn("关键词云图", rendered)
@@ -102,3 +104,4 @@ class NewsletterFormattingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
