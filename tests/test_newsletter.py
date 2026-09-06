@@ -50,7 +50,7 @@ class NewsletterFormattingTests(unittest.TestCase):
     def test_end_to_end_newsletter_keeps_verified_journal_metadata(self):
         payload = [{
             "title": "A just-in-time intervention for anxiety",
-            "translation": """相关性：是
+            "translation": """收录决定：核心收录
 主题标签：生态瞬时干预；心理健康与数字心理干预
 优先级：重点推荐
 标题：焦虑的即时干预
@@ -88,6 +88,7 @@ class NewsletterFormattingTests(unittest.TestCase):
                     rendered = handle.read()
                 self.assertIn("期刊：Journal of Medical Internet Research，JCR Q1，IF 6.0", rendered)
                 self.assertNotIn("优先级：", rendered)
+                self.assertNotIn("收录决定：", rendered)
                 self.assertIn("主题标签：生态瞬时干预；心理健康与数字心理干预", rendered)
                 self.assertIn("## 数据分析", rendered)
                 self.assertIn("关键词云图", rendered)
