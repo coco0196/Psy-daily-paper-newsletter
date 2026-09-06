@@ -1,7 +1,8 @@
 """三主线文献追踪的 ISSN 白名单。
 
-筛选规则：期刊必须同时满足“与三条主线直接相关”与“JCR Q1/Q2”。ISSN
-精确匹配优先；只有原始记录没有 ISSN 时才使用严格的期刊全名/唯一缩写匹配。
+筛选规则：期刊必须同时满足“JCR Q1/Q2”与“三条主线中的核心直接相关”。
+不因 Q1、Nature、Science、Lancet 等刊名自动放行。ISSN 精确匹配优先；
+只有原始记录没有 ISSN 时才使用严格的期刊全名/唯一缩写匹配。
 
 指标来自 impact_factor 1.1.3（PyPI 于 2025-11-25 发布，自述为 2025 数据）。
 该第三方库没有为每条记录提供 JIF 统计年度或 JCR 学科分类明细，故本文件不将其
@@ -115,6 +116,38 @@ _JOURNAL_ROWS = (
     ("BMJ", "0959-535X", "1756-1833", 42.7, "Q1", (HEART_BRAIN, EMA_EMI, MENTAL_HEALTH), ("BMJ-British Medical Journal",)),
 )
 
+# 只保留与三条主线直接对应的核心期刊。这里的集合比原始宽白名单更窄：
+# Q1 与 Q2 都必须在此列中，Q2 仅保留用户确认的核心刊物。
+CORE_JOURNAL_NAMES = {
+    # 心脑轴与心理生理
+    "Psychophysiology", "International Journal of Psychophysiology",
+    "Biological Psychology", "Psychosomatic Medicine", "Psychoneuroendocrinology",
+    "Journal of Psychosomatic Research", "Applied Psychophysiology and Biofeedback",
+    "Social Cognitive and Affective Neuroscience", "Biological Psychiatry",
+    "Biological Psychiatry: Cognitive Neuroscience and Neuroimaging",
+    "Brain, Behavior, and Immunity", "Stress",
+    # EMA / EMI / JITAI 与数字心理健康
+    "Psychological Methods", "Behavior Research Methods", "Multivariate Behavioral Research",
+    "Assessment", "Advances in Methods and Practices in Psychological Science",
+    "Psychological Assessment", "npj Digital Medicine", "The Lancet Digital Health",
+    "Journal of Medical Internet Research", "JMIR Mental Health", "JMIR mHealth and uHealth",
+    "Internet Interventions", "DIGITAL HEALTH", "Frontiers in Digital Health",
+    "Cyberpsychology, Behavior, and Social Networking", "Journal of Contextual Behavioral Science",
+    # 临床心理、情绪调节与数字/移动心理干预
+    "Journal of Consulting and Clinical Psychology", "Behaviour Research and Therapy",
+    "Clinical Psychology Review", "Clinical Psychological Science", "Health Psychology",
+    "Health Psychology Review", "Behavior Therapy", "Annual Review of Clinical Psychology",
+    "The Lancet Psychiatry", "JAMA Psychiatry", "Molecular Psychiatry", "Psychological Medicine",
+    "Nature Mental Health", "World Psychiatry", "American Journal of Psychiatry",
+    "British Journal of Psychiatry", "Journal of Affective Disorders", "Depression and Anxiety",
+    "Journal of Anxiety Disorders", "Clinical Psychology: Science and Practice",
+    "Journal of Clinical Psychology", "Cognitive Behaviour Therapy", "Cognitive Therapy and Research",
+    "Mindfulness", "Psychological Trauma: Theory, Research, Practice, and Policy",
+    "European Journal of Psychotraumatology", "Journal of Psychiatric Research",
+    "Translational Psychiatry", "Journal of Child Psychology and Psychiatry",
+    "European Child & Adolescent Psychiatry",
+}
+
 
 def normalize_issn(value):
     """将 ISSN 规范化为无连字符的大写形式。"""
@@ -129,6 +162,8 @@ JOURNAL_WHITELIST = []
 _BY_ISSN = {}
 _BY_NAME = {}
 for _name, _pissn, _eissn, _factor, _quartile, _tracks, _aliases in _JOURNAL_ROWS:
+    if _name not in CORE_JOURNAL_NAMES:
+        continue
     _profile = {
         "name": _name,
         "pissn": None if _pissn == "-" else _pissn,
@@ -170,3 +205,4 @@ def filter_by_journal(journal_name=None, issns=None, journal_names=None):
     if journal_names:
         names.extend([journal_names] if isinstance(journal_names, str) else journal_names)
     return any(_normalise_name(name) in _BY_NAME for name in names if name)
+
