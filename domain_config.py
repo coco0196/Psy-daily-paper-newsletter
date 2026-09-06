@@ -62,10 +62,30 @@ TOPIC_GROUPS = {
 # Crossref 的 bibliographic 查询不是严格的布尔检索。按主线拆分可避免宽词
 # 在同一查询中相互放大，并让每条主线都有稳定的召回入口。
 CROSSREF_TRACK_QUERIES = {
-    "heart_brain": "heart brain interaction neurovisceral HRV psychological",
+    "heart_brain": "heart brain interaction neurovisceral HRV EEG ECG psychological",
     "emi": "ecological momentary assessment intervention just in time adaptive",
     "mental_health": "digital mobile mental health psychological intervention",
 }
+
+# EEG 与 ECG 同步测量是心脑耦合的重要证据，但任一信号单独出现都不足以
+# 说明论文属于心脑轴。检索与本地筛选均要求两类信号同时出现，且带有心理学
+# 语境，避免把一般神经电生理或心电临床监测纳入。
+EEG_TERMS = {
+    "eeg", "electroencephalography", "electroencephalogram",
+}
+ECG_TERMS = {
+    "ecg", "electrocardiography", "electrocardiogram",
+}
+EEG_ECG_PUBMED_QUERY = (
+    '(("electroencephalography"[Title/Abstract] OR '
+    '"electroencephalogram"[Title/Abstract] OR EEG[Title/Abstract]) '
+    'AND ("electrocardiography"[Title/Abstract] OR '
+    '"electrocardiogram"[Title/Abstract] OR ECG[Title/Abstract]) '
+    'AND (psychological[Title/Abstract] OR mental[Title/Abstract] OR '
+    'emotion[Title/Abstract] OR stress[Title/Abstract] OR cognitive[Title/Abstract] '
+    'OR behavior[Title/Abstract] OR behaviour[Title/Abstract] OR '
+    'intervention[Title/Abstract]))'
+)
 
 # 以下心脑术语在纯心血管/解剖/生理文献中也常见，必须带心理学语境才放行。
 HEART_BRAIN_CONTEXT_REQUIRED_TERMS = {
@@ -100,8 +120,8 @@ MENTAL_HEALTH_OUTCOME_TERMS = {
 }
 
 MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS = {
-    "digital", "mobile", "smartphone", "app", "web-based", "online", "mhealth",
-    "telehealth", "internet-based",
+    "digital", "mobile", "smartphone", "smartphone app", "mobile app", "app-based",
+    "web-based", "online", "mhealth", "telehealth", "internet-based",
 }
 
 MENTAL_HEALTH_INTERVENTION_TERMS = {
@@ -178,7 +198,11 @@ def local_prefilter_decision(title, abstract):
     reasons = []
     for group_id, group in TOPIC_GROUPS.items():
         hits = [term for term in group["terms"] if _contains_term(text, term)]
-        if not hits:
+        has_eeg_ecg_pair = (
+            _has_any_whole_phrase(text, EEG_TERMS)
+            and _has_any_whole_phrase(text, ECG_TERMS)
+        )
+        if not hits and not (group_id == "heart_brain" and has_eeg_ecg_pair):
             continue
         if group_id == "heart_brain":
             if _has_any_whole_phrase(text, HEART_BRAIN_EXCLUSION_TERMS):
@@ -188,15 +212,17 @@ def local_prefilter_decision(title, abstract):
             if not _has_any(text, HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS):
                 continue
             accepted_groups.append(group["label"])
-            reasons.append("heart_brain_psych_context")
+            reasons.append(
+                "eeg_ecg_psych_context" if has_eeg_ecg_pair else "heart_brain_psych_context"
+            )
             continue
         if group_id == "mental_health":
             has_outcome = _has_any(text, MENTAL_HEALTH_OUTCOME_TERMS)
             has_delivery = _has_any(text, MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS)
             has_intervention = _has_any(text, MENTAL_HEALTH_INTERVENTION_TERMS)
-            # 心理健康/情绪问题必须是研究对象，且至少同时出现数字递送方式或
+            # 心理健康/情绪问题必须是研究对象，并同时具备数字递送方式与
             # 干预/治疗/试验/方案信号；一般正念或泛幸福感研究不再自动放行。
-            if not has_outcome or not (has_delivery or has_intervention):
+            if not (has_outcome and has_delivery and has_intervention):
                 continue
             accepted_groups.append(group["label"])
             reasons.append("mental_health_high_precision")
@@ -227,3 +253,4 @@ def normalize_topic_labels(raw_labels):
         if any(alias.casefold() in text for alias in _TOPIC_ALIASES[canonical]):
             labels.append(canonical)
     return labels
+
