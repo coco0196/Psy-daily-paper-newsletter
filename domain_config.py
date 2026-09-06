@@ -63,7 +63,7 @@ TOPIC_GROUPS = {
 # 在同一查询中相互放大，并让每条主线都有稳定的召回入口。
 CROSSREF_TRACK_QUERIES = {
     "heart_brain": "heart brain interaction neurovisceral HRV EEG ECG psychological",
-    "emi": "ecological momentary assessment intervention just in time adaptive",
+    "emi": "ecological momentary assessment experience sampling intervention just in time adaptive ECG PPG physiological wearable",
     "mental_health": "digital mobile mental health psychological intervention",
 }
 
@@ -127,6 +127,33 @@ MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS = {
 MENTAL_HEALTH_INTERVENTION_TERMS = {
     "intervention", "therapy", "treatment", "psychotherap", "trial", "randomized",
     "randomised", "protocol", "programme", "program",
+}
+
+# EMA/ESM 的一般自评问卷研究数量很大，且未必符合本项目的重点。EMA/EMI
+# 主线要求明确的瞬时/密集纵向方法，并进一步要求：要么是主动干预，要么结合
+# 客观生理数据（含心血管与可穿戴感测）。数字表型和被动感测被视为传感路径，
+# 但仍需明确属于 EMA/ESM 或密集纵向设计。
+EMA_EMI_CORE_METHOD_TERMS = {
+    "ecological momentary assessment", "experience sampling",
+    "experience sampling method", "ambulatory assessment", "intensive longitudinal",
+    "intensive longitudinal data", "daily diary", "ecological momentary intervention",
+    "just-in-time adaptive intervention", "just-in-time intervention",
+    "micro-randomized trial", "micro-randomized trials", "digital phenotyping",
+    "passive sensing", "mobile sensing",
+}
+EMA_EMI_INTERVENTION_TERMS = {
+    "ecological momentary intervention", "just-in-time adaptive intervention",
+    "just-in-time intervention", "micro-randomized trial", "micro-randomized trials",
+    "digital micro-intervention", "digital micro-interventions", "microintervention",
+    "microinterventions", "context-aware intervention", "adaptive intervention",
+    "adaptive treatment", "personalized intervention", "personalised intervention",
+}
+EMA_EMI_PHYSIOLOGICAL_TERMS = {
+    "ecg", "electrocardiography", "electrocardiogram", "ppg", "photoplethysmography",
+    "heart rate", "heart rate variability", "hrv", "electrodermal activity",
+    "skin conductance", "galvanic skin response", "physiological", "physiologic",
+    "biosensor", "biosensors", "wearable", "wearables", "actigraphy",
+    "respiration", "respiratory", "accelerometry",
 }
 
 LOCAL_PREFILTER_BROAD_TERMS = {
@@ -226,6 +253,23 @@ def local_prefilter_decision(title, abstract):
                 continue
             accepted_groups.append(group["label"])
             reasons.append("mental_health_high_precision")
+            continue
+        if group_id == "emi":
+            has_core_method = _has_any(text, EMA_EMI_CORE_METHOD_TERMS)
+            has_intervention = _has_any(text, EMA_EMI_INTERVENTION_TERMS)
+            has_physiology = _has_any_whole_phrase(text, EMA_EMI_PHYSIOLOGICAL_TERMS)
+            # 排除只做自评问卷的 EMA/ESM；需为直接干预，或结合客观生理/传感
+            # 指标。两者兼具的论文会在 DeepSeek 阶段获得重点推荐资格。
+            if not has_core_method or not (has_intervention or has_physiology):
+                continue
+            accepted_groups.append(group["label"])
+            reasons.append(
+                "emi_with_intervention_and_physiology"
+                if has_intervention and has_physiology
+                else "emi_with_intervention"
+                if has_intervention
+                else "ema_with_physiology"
+            )
             continue
         broad_terms = LOCAL_PREFILTER_BROAD_TERMS.get(group_id, set())
         only_broad = all(term in broad_terms for term in hits)
