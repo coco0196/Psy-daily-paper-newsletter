@@ -153,7 +153,8 @@ EMA_EMI_PHYSIOLOGICAL_TERMS = {
     "heart rate", "heart rate variability", "hrv", "electrodermal activity",
     "skin conductance", "galvanic skin response", "physiological", "physiologic",
     "biosensor", "biosensors", "wearable", "wearables", "actigraphy",
-    "respiration", "respiratory", "accelerometry",
+    "respiration", "respiratory", "accelerometry", "digital phenotyping",
+    "passive sensing", "mobile sensing",
 }
 
 LOCAL_PREFILTER_BROAD_TERMS = {
