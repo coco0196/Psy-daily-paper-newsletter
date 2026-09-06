@@ -87,6 +87,14 @@ class NewsletterFormattingTests(unittest.TestCase):
                 self.assertIn("IF：6.0", rendered)
                 self.assertIn("JCR 分区：Q1", rendered)
                 self.assertIn("主题标签：生态瞬时干预；心理健康与数字心理干预", rendered)
+                self.assertIn("## 数据分析", rendered)
+                self.assertIn("关键词云图", rendered)
+                self.assertTrue(
+                    os.path.exists("newsletters/assets/2026-09-01_to_2026-09-07_wordcloud.png")
+                )
+                self.assertTrue(
+                    os.path.exists("analytics/weekly_metrics.json")
+                )
                 self.assertTrue(os.path.exists("newsletters/2026-09-01_to_2026-09-07_weekly_paper.html"))
             finally:
                 os.chdir(original)
