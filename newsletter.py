@@ -68,7 +68,6 @@ class NewsletterGenerator:
         return (
             paper["priority"] == "重点推荐"
             or len([label for label in paper["topic_labels"] if label != "未标注"]) >= 2
-            or paper["is_flagship"]
         )
 
     def _render_paper(self, paper, index):
@@ -80,12 +79,9 @@ class NewsletterGenerator:
 
 - 原文标题：{paper['original_title']}
 - 作者：{paper['authors']}
-- 期刊：{paper['journal']}
-- IF：{impact_factor}
-- JCR 分区：{paper['jcr_quartile']}
+- 期刊：{paper['journal']}，JCR {paper['jcr_quartile']}，IF {impact_factor}
 - 发表时间：{paper['published_at']}
 - 主题标签：{labels}
-- 优先级：{paper['priority']}
 - 关键词：{paper['keywords']}
 
 **摘要**：{paper['summary']}
@@ -105,11 +101,11 @@ class NewsletterGenerator:
 
         lines = [f"# {REPORT_TITLE}（{date_range}）", "", f"本期收录 {len(papers)} 篇文献。"]
         if featured:
-            lines.extend(["", "## 重点推荐", ""])
+            lines.extend(["", "## 重点推荐", f"收录 {len(featured)} 篇文献。", ""])
             lines.extend(self._render_paper(paper, index + 1) for index, paper in enumerate(featured))
         for label in CANONICAL_TOPIC_LABELS:
-            lines.extend(["", f"## {label}", ""])
             section = grouped.get(label, [])
+            lines.extend(["", f"## {label}", f"收录 {len(section)} 篇文献。", ""])
             if not section:
                 lines.append("本期无符合条件的文献。")
             else:
@@ -157,3 +153,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if not NewsletterGenerator().generate_newsletter(args.start_date, args.end_date, args.weekly_key):
         raise SystemExit(1)
+
