@@ -9,7 +9,7 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             ("Brain-heart coupling during affective stress", "A neurovisceral integration study."),
             ("Ecological momentary assessment of mood", "Participants completed smartphone prompts."),
             ("A just-in-time adaptive intervention for anxiety", "The mobile intervention adapts support."),
-            ("Behavioral activation for depression", "A self-guided psychological intervention trial."),
+            ("A mobile behavioral activation programme for depression", "A self-guided digital psychological intervention trial."),
         ]
         for title, abstract in examples:
             with self.subTest(title=title):
@@ -34,12 +34,39 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         )
         self.assertFalse(result["accepted"])
 
+    def test_synchronous_eeg_ecg_with_psychological_context_is_heart_brain(self):
+        result = local_prefilter_decision(
+            "Concurrent EEG and ECG during emotion regulation",
+            "We examined brain-heart coupling during psychological stress.",
+        )
+        self.assertTrue(result["accepted"])
+        self.assertIn("心脑轴", result["groups"])
+
+    def test_eeg_or_ecg_alone_is_not_a_heart_brain_signal(self):
+        result = local_prefilter_decision(
+            "EEG markers of attention",
+            "We examined cognitive processing in healthy adults.",
+        )
+        self.assertFalse(result["accepted"])
+
     def test_general_wellbeing_without_digital_or_intervention_signal_is_rejected(self):
         result = local_prefilter_decision(
             "Mindfulness and psychological wellbeing in university students",
             "A cross-sectional study of flourishing and resilience.",
         )
         self.assertFalse(result["accepted"])
+
+    def test_mental_digital_track_requires_outcome_delivery_and_intervention(self):
+        accepted = local_prefilter_decision(
+            "A smartphone cognitive behavioral intervention for depression",
+            "A randomized trial of a mobile mental health treatment.",
+        )
+        rejected = local_prefilter_decision(
+            "Digital monitoring of depression symptoms",
+            "A smartphone observational study of symptom trajectories.",
+        )
+        self.assertTrue(accepted["accepted"])
+        self.assertFalse(rejected["accepted"])
 
     def test_unrelated_record_is_rejected(self):
         result = local_prefilter_decision(
