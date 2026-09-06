@@ -15,6 +15,7 @@ from utils import setup_logger, get_last_week_range, weekly_basename, iter_date_
 from journal_registry import filter_by_journal, get_journal_profile
 from domain_config import (
     CROSSREF_TRACK_QUERIES,
+    EEG_ECG_PUBMED_QUERY,
     iter_topic_terms,
     local_prefilter_decision,
 )
@@ -339,7 +340,8 @@ def _parse_pubmed_xml_batch(xml_bytes):
 def _esearch_pubmed(session, date_str, retmax=10000):
     """按日期 + 标题/摘要关键词检索 PubMed；retmax 默认 10000。"""
     keyword_query = " OR ".join(
-        f'"{term}"[Title/Abstract]' for term in iter_topic_terms()
+        [f'"{term}"[Title/Abstract]' for term in iter_topic_terms()]
+        + [EEG_ECG_PUBMED_QUERY]
     )
     term = f'"{date_str}"[dp] AND ({keyword_query})'
     url = f"{EUTILS_BASE}/esearch.fcgi"
@@ -375,7 +377,7 @@ def _efetch_pubmed_xml_single(session, pmids_chunk):
 
 
 def _efetch_pubmed_parsed(session, pmids):
-    """对��量 PMID 分批 efetch 并解析合并（与 retmax 增大配套）。"""
+    """对大量 PMID 分批 efetch 并解析合并（与 retmax 增大配套）。"""
     if not pmids:
         return []
     chunk_size = int(os.getenv("NCBI_EFETCH_BATCH_SIZE", "250"))
