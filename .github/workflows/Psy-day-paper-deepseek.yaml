@@ -41,7 +41,7 @@ jobs:
             if (!artifact) core.setFailed('未找到候选文献 artifact');
             const response = await github.rest.actions.downloadArtifact({
               owner: context.repo.owner,
-              repo: context.repo.repo,
+              repo: context.repo,
               artifact_id: artifact.id,
               archive_format: 'zip',
             });
@@ -64,6 +64,11 @@ jobs:
           WEEKLY_KEY=$(sed -n '3p' weekly_range.txt)
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          # workflow-data.zip 覆盖的是仓库中保留的旧版中间 JSON；还原寣们，
+          # y/只界发布 Newsletter 与分析产物，并让 rebase 时工作区保持干净。
+          git restore --source=HEAD --worktree -- \
+            "Paper_metadata_download/${WEEKLY_KEY}_weekly.json" \
+            "Psy-day-paper-deepseek/${WEEKLY_KEY}_Psy_deepseek_clean.json"
           git add \
             "newsletters/${WEEKLY_KEY}_weekly_paper.md" \
             "newsletters/${WEEKLY_KEY}_weekly_paper.html" \
