@@ -47,6 +47,13 @@ class NewsletterFormattingTests(unittest.TestCase):
         self.assertIn("收录 1 篇文献。", rendered)
         self.assertNotIn("优先级：", rendered)
 
+    def test_multiple_labels_do_not_automatically_become_featured(self):
+        paper = {
+            "priority": "常规收录",
+            "topic_labels": ["心脑轴", "生态瞬时干预"],
+        }
+        self.assertFalse(NewsletterGenerator.is_featured(paper))
+
     def test_end_to_end_newsletter_keeps_verified_journal_metadata(self):
         payload = [{
             "title": "A just-in-time intervention for anxiety",
@@ -105,4 +112,3 @@ class NewsletterFormattingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

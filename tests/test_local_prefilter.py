@@ -105,6 +105,25 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         self.assertTrue(emi["accepted"])
         self.assertTrue(digital_phenotyping["accepted"])
 
+    def test_direct_topic_reviews_are_kept(self):
+        heart_review = local_prefilter_decision(
+            "A systematic review of neurovisceral integration and emotion",
+            "This review synthesizes heart rate variability research in affective neuroscience.",
+        )
+        ema_review = local_prefilter_decision(
+            "A systematic review of ecological momentary assessment in depression",
+            "We review intensive longitudinal psychological assessment methods.",
+        )
+        self.assertIn("心脑轴", heart_review["groups"])
+        self.assertIn("生态瞬时干预", ema_review["groups"])
+
+    def test_generic_clinical_intervention_without_psychology_or_neuroscience_is_rejected(self):
+        result = local_prefilter_decision(
+            "Pain treatment after orthopedic surgery",
+            "A randomized trial of postoperative analgesic treatment.",
+        )
+        self.assertFalse(result["accepted"])
+
     def test_unrelated_record_is_rejected(self):
         result = local_prefilter_decision(
             "Novel surgical repair for hip fracture",
