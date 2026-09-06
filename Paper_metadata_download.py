@@ -4,6 +4,7 @@ import json
 import html
 import time
 import datetime
+from math import ceil
 import requests
 import argparse
 import xml.etree.ElementTree as ET
@@ -13,7 +14,7 @@ from urllib3.util.retry import Retry
 from utils import setup_logger, get_last_week_range, weekly_basename, iter_date_range
 from journal_registry import filter_by_journal, get_journal_profile
 from domain_config import (
-    CROSSREF_QUERY_TERMS,
+    CROSSREF_TRACK_QUERIES,
     iter_topic_terms,
     local_prefilter_decision,
 )
@@ -374,7 +375,7 @@ def _efetch_pubmed_xml_single(session, pmids_chunk):
 
 
 def _efetch_pubmed_parsed(session, pmids):
-    """对大量 PMID 分批 efetch 并解析合并（与 retmax 增大配套）。"""
+    """对��量 PMID 分批 efetch 并解析合并（与 retmax 增大配套）。"""
     if not pmids:
         return []
     chunk_size = int(os.getenv("NCBI_EFETCH_BATCH_SIZE", "250"))
@@ -397,7 +398,7 @@ def _strip_crossref_abstract(raw):
     return html.unescape(text).strip()
 
 
-def _crossref_query_params():
+def _crossref_query_params(query_text):
     """
     构建 Crossref 检索参数。
 
@@ -405,89 +406,88 @@ def _crossref_query_params():
     ``400 field-query-not-available``。这里使用官方支持的
     ``query.bibliographic``，再由期刊白名单和本地关键词预筛保证领域相关性。
     """
-    max_kw = int(os.getenv("CROSSREF_QUERY_KEYWORDS_MAX", "10"))
-    max_kw = max(1, min(max_kw, len(CROSSREF_QUERY_TERMS)))
-    kw_subset = CROSSREF_QUERY_TERMS[:max_kw]
-    bibliographic_query = " OR ".join(kw_subset)
-    return {"query.bibliographic": bibliographic_query}
+    return {"query.bibliographic": query_text}
+
+
+def _crossref_published_date(item, fallback):
+    """优先保留 Crossref 提供的实际发表日期。"""
+    for key in ("published-online", "published-print", "published", "issued"):
+        date_parts = ((item.get(key) or {}).get("date-parts") or [[]])[0]
+        if date_parts:
+            year, *rest = date_parts
+            month = rest[0] if rest else 1
+            day = rest[1] if len(rest) > 1 else 1
+            try:
+                return f"{int(year):04d}-{int(month):02d}-{int(day):02d}"
+            except (TypeError, ValueError):
+                continue
+    return fallback
 
 
 def _fetch_crossref(session, date_str, retmax=80):
     """
-    从 Crossref REST API 拉取指定 index-date 起入库、含摘要的文献，映射为与 PubMed 一致的结构，并标记 source=Crossref。
+    从 Crossref REST API 拉取指定发表日、含摘要的文献，映射为与 PubMed 一致的结构，并标记 source=Crossref。
     retmax 在此作为 rows 上限，最大 100，避免单次请求过大。
     失败时记录 warning 并返回空列表，不向上抛出以免中断主流程。
     """
     try:
-        filter_str = f"from-index-date:{date_str},has-abstract:true"
-        params = {
-            **_crossref_query_params(),
-            "filter": filter_str,
-            "rows": min(int(retmax), 100),
-            "mailto": os.getenv("CROSSREF_MAILTO", "zhugamen@gmail.com"),
-        }
-        r = _api_get(
-            session,
-            CROSSREF_WORKS_URL,
-            params=params,
-            timeout=90,
-            label="Crossref",
-        )
-        r.raise_for_status()
-        payload = r.json()
-        items = (payload.get("message") or {}).get("items") or []
         out = []
-        for item in items:
-            doi = (item.get("DOI") or "").strip()
-            titles = item.get("title") or []
-            title = (titles[0] if titles else "").strip()
-            container_titles = item.get("container-title") or []
-            journal_name = (container_titles[0] if container_titles else "").strip()
-            if not journal_name:
-                short_titles = item.get("short-container-title") or []
-                journal_name = (short_titles[0] if short_titles else "").strip()
-            item_issns = item.get("ISSN") or []
-            if isinstance(item_issns, str):
-                item_issns = [item_issns]
-            if not filter_by_journal(journal_name=journal_name, issns=item_issns):
-                logger.debug(
-                    "Crossref 期刊过滤丢弃 DOI=%s, journal=%r, issns=%r",
-                    doi,
-                    journal_name,
-                    item_issns,
-                )
-                continue
-            raw_abs = item.get("abstract")
-            if raw_abs is None:
-                continue
-            if isinstance(raw_abs, list):
-                raw_abs = " ".join(str(x) for x in raw_abs)
-            summary = _strip_crossref_abstract(raw_abs)
-            authors_out = []
-            for a in item.get("author") or []:
-                if not isinstance(a, dict):
+        seen_dois = set()
+        filter_str = f"from-pub-date:{date_str},until-pub-date:{date_str},has-abstract:true"
+        per_track_rows = max(1, min(100, ceil(int(retmax) / len(CROSSREF_TRACK_QUERIES))))
+        track_queries = list(CROSSREF_TRACK_QUERIES.items())
+        crossref_delay = float(os.getenv("CROSSREF_INTER_REQUEST_DELAY_SEC", "1.0"))
+        for index, (track, query_text) in enumerate(track_queries):
+            params = {
+                **_crossref_query_params(query_text),
+                "filter": filter_str,
+                "rows": per_track_rows,
+                "mailto": os.getenv("CROSSREF_MAILTO", "zhugamen@gmail.com"),
+            }
+            r = _api_get(session, CROSSREF_WORKS_URL, params=params, timeout=90, label=f"Crossref:{track}")
+            r.raise_for_status()
+            items = ((r.json().get("message") or {}).get("items") or [])
+            logger.info("Crossref %s 查询返回 %d 条", track, len(items))
+            for item in items:
+                doi = (item.get("DOI") or "").strip()
+                if not doi or doi.casefold() in seen_dois:
                     continue
-                name = f"{a.get('given', '') or ''} {a.get('family', '') or ''}".strip()
-                if name:
-                    authors_out.append({"name": name})
-            if not doi or not title or not summary:
-                continue
-            if not authors_out:
-                authors_out.append({"name": "Unknown"})
-            out.append(
-                {
-                    "paper": _attach_journal_profile({
-                        "id": doi,
-                        "title": title,
-                        "summary": summary,
-                        "authors": authors_out,
-                        "publishedAt": date_str,
-                        "source": "Crossref",
-                        "journal": journal_name,
-                        "issns": item_issns,
-                    })
-                }
-            )
+                seen_dois.add(doi.casefold())
+                titles = item.get("title") or []
+                title = (titles[0] if titles else "").strip()
+                container_titles = item.get("container-title") or []
+                journal_name = (container_titles[0] if container_titles else "").strip()
+                if not journal_name:
+                    journal_name = ((item.get("short-container-title") or [""])[0] or "").strip()
+                item_issns = item.get("ISSN") or []
+                if isinstance(item_issns, str):
+                    item_issns = [item_issns]
+                if not filter_by_journal(journal_name=journal_name, issns=item_issns):
+                    continue
+                raw_abs = item.get("abstract")
+                if isinstance(raw_abs, list):
+                    raw_abs = " ".join(str(x) for x in raw_abs)
+                summary = _strip_crossref_abstract(raw_abs)
+                authors_out = [
+                    {"name": f"{author.get('given', '') or ''} {author.get('family', '') or ''}".strip()}
+                    for author in item.get("author") or []
+                    if isinstance(author, dict)
+                    and f"{author.get('given', '') or ''} {author.get('family', '') or ''}".strip()
+                ]
+                if not title or not summary:
+                    continue
+                out.append({"paper": _attach_journal_profile({
+                    "id": doi,
+                    "title": title,
+                    "summary": summary,
+                    "authors": authors_out or [{"name": "Unknown"}],
+                    "publishedAt": _crossref_published_date(item, date_str),
+                    "source": "Crossref",
+                    "journal": journal_name,
+                    "issns": item_issns,
+                })})
+            if index + 1 < len(track_queries) and crossref_delay > 0:
+                time.sleep(crossref_delay)
         return out
     except (
         requests.exceptions.RequestException,
@@ -779,3 +779,4 @@ if __name__ == "__main__":
     if result["status"] == "error":
         exit(1)
     exit(0)
+
