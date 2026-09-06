@@ -4,6 +4,7 @@ import json
 import html
 import time
 import datetime
+import unicodedata
 from math import ceil
 import requests
 import argparse
@@ -678,6 +679,17 @@ def download_papers_for_date(date_str, retmax=10000):
     return _apply_local_keyword_prefilter(papers)
 
 
+def _normalised_title_key(title):
+    """为跨 PubMed/Crossref 去重生成稳健的标题键。
+
+    同一 DOI 在两个来源的标题经常只相差句末标点、连字符或大小写；两边的
+    记录 ID 又分别是 PMID 和 DOI。因此在保留原始标题用于展示的同时，以
+    Unicode 规范化后的字母数字标题作为第二重去重键。
+    """
+    text = unicodedata.normalize("NFKC", str(title or "")).casefold()
+    return re.sub(r"[^\w]+", "", text, flags=re.UNICODE)
+
+
 def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000):
     """
     下载论文元数据并保存为 JSON。
@@ -710,14 +722,22 @@ def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000)
         logger.info(f"周报模式：下载 {target_start} 至 {target_end} 的论文数据")
         merged = []
         seen_ids = set()
+        seen_titles = set()
         for day in iter_date_range(target_start, target_end):
             day_papers = download_papers_for_date(day, retmax=retmax)
             for paper in day_papers:
-                paper_id = paper.get("paper", {}).get("id")
+                metadata = paper.get("paper", {})
+                paper_id = metadata.get("id")
+                title_key = _normalised_title_key(metadata.get("title"))
                 if paper_id and paper_id in seen_ids:
+                    continue
+                if title_key and title_key in seen_titles:
+                    logger.info("跨来源重复标题已跳过：%s", metadata.get("title", ""))
                     continue
                 if paper_id:
                     seen_ids.add(paper_id)
+                if title_key:
+                    seen_titles.add(title_key)
                 merged.append(paper)
 
         basename = weekly_basename(target_start, target_end)
