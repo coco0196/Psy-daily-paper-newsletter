@@ -65,10 +65,9 @@ class NewsletterGenerator:
 
     @staticmethod
     def is_featured(paper):
-        return (
-            paper["priority"] == "重点推荐"
-            or len([label for label in paper["topic_labels"] if label != "未标注"]) >= 2
-        )
+        # “重点推荐”是独立展示决定。多标签论文若不满足重点条件，仍在各自
+        # 主线下呈现，不能因自动升级而挤占重点推荐版面。
+        return paper["priority"] == "重点推荐"
 
     def _render_paper(self, paper, index):
         labels = "；".join(paper["topic_labels"])
@@ -153,4 +152,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if not NewsletterGenerator().generate_newsletter(args.start_date, args.end_date, args.weekly_key):
         raise SystemExit(1)
-

@@ -463,18 +463,23 @@ def _crossref_published_date(item, fallback):
     return fallback
 
 
-def _fetch_crossref(session, date_str, retmax=80):
+def _fetch_crossref(session, date_str, retmax=120):
     """
     从 Crossref REST API 拉取指定发表日、含摘要的文献，映射为与 PubMed 一致的结构，并标记 source=Crossref。
-    retmax 在此作为 rows 上限，最大 100，避免单次请求过大。
+    retmax 是全部子查询合计的近似 rows 上限。每条主线使用两条短的定向查询，
+    以兼顾召回率与 Crossref 的相关性排序特性。
     失败时记录 warning 并返回空列表，不向上抛出以免中断主流程。
     """
     try:
         out = []
         seen_dois = set()
         filter_str = f"from-pub-date:{date_str},until-pub-date:{date_str},has-abstract:true"
-        per_track_rows = max(1, min(100, ceil(int(retmax) / len(CROSSREF_TRACK_QUERIES))))
-        track_queries = list(CROSSREF_TRACK_QUERIES.items())
+        track_queries = [
+            (track, query_text)
+            for track, queries in CROSSREF_TRACK_QUERIES.items()
+            for query_text in (queries if isinstance(queries, (tuple, list)) else (queries,))
+        ]
+        per_track_rows = max(1, min(100, ceil(int(retmax) / len(track_queries))))
         crossref_delay = float(os.getenv("CROSSREF_INTER_REQUEST_DELAY_SEC", "1.0"))
         for index, (track, query_text) in enumerate(track_queries):
             params = {
@@ -483,10 +488,16 @@ def _fetch_crossref(session, date_str, retmax=80):
                 "rows": per_track_rows,
                 "mailto": os.getenv("CROSSREF_MAILTO", "zhugamen@gmail.com"),
             }
-            r = _api_get(session, CROSSREF_WORKS_URL, params=params, timeout=90, label=f"Crossref:{track}")
+            r = _api_get(
+                session,
+                CROSSREF_WORKS_URL,
+                params=params,
+                timeout=90,
+                label=f"Crossref:{track}:{index + 1}",
+            )
             r.raise_for_status()
             items = ((r.json().get("message") or {}).get("items") or [])
-            logger.info("Crossref %s 查询返回 %d 条", track, len(items))
+            logger.info("Crossref %s 子查询 %d 返回 %d 条", track, index + 1, len(items))
             for item in items:
                 doi = (item.get("DOI") or "").strip()
                 if not doi or doi.casefold() in seen_dois:
@@ -639,6 +650,64 @@ def _apply_local_keyword_prefilter(papers):
     return accepted
 
 
+def _candidate_quality_score(item):
+    """为异常高产周的本地候选上限提供可解释的排序，不参与最终收录决定。"""
+    paper = item.get("paper", {})
+    metrics = paper.get("journal_metrics") or {}
+    impact_factor = metrics.get("impact_factor") or 0
+    groups = paper.get("local_prefilter_groups") or []
+    reason = paper.get("local_prefilter_reason") or ""
+    return (
+        (4 if metrics.get("is_flagship") else 0)
+        + min(float(impact_factor), 15) / 5
+        + min(len(groups), 3)
+        + (1 if "and_physiology" in reason or "eeg_ecg" in reason else 0)
+    )
+
+
+def _limit_weekly_local_candidates(papers):
+    """仅在异常高产周将 DeepSeek 输入控制在可负担的 90 篇以内。
+
+    先按三条主线轮流取最高质量候选，避免某一条主线因当周发文量高而挤占
+    全部 API 配额。正常周（不超过上限）保持原样，不会丢弃任何直接相关候选。
+    """
+    limit = int(os.getenv("WEEKLY_LOCAL_CANDIDATE_LIMIT", "90"))
+    if limit <= 0 or len(papers) <= limit:
+        logger.info("本地候选数量 %d，未触发周度上限 %d", len(papers), limit)
+        return papers
+
+    buckets = {"心脑轴": [], "生态瞬时干预": [], "心理健康与数字心理干预": []}
+    leftovers = []
+    for item in papers:
+        groups = item.get("paper", {}).get("local_prefilter_groups") or []
+        matching = [group for group in buckets if group in groups]
+        if matching:
+            # 多主线论文只进入一个首要桶；轮转时仍能避免重复并保证均衡。
+            buckets[matching[0]].append(item)
+        else:
+            leftovers.append(item)
+    for bucket in buckets.values():
+        bucket.sort(key=_candidate_quality_score, reverse=True)
+    leftovers.sort(key=_candidate_quality_score, reverse=True)
+
+    selected = []
+    while len(selected) < limit and any(buckets.values()):
+        progressed = False
+        for label in buckets:
+            if buckets[label] and len(selected) < limit:
+                selected.append(buckets[label].pop(0))
+                progressed = True
+        if not progressed:
+            break
+    if len(selected) < limit:
+        selected.extend(leftovers[: limit - len(selected)])
+    logger.info(
+        "本地候选 %d 篇超过周度上限 %d，按主线均衡与期刊/方法信号保留 %d 篇",
+        len(papers), limit, len(selected),
+    )
+    return selected
+
+
 def _attach_journal_profile(paper):
     """把可展示的期刊优先级资料随候选记录传到 Newsletter 阶段。"""
     paper["journal_metrics"] = get_journal_profile(
@@ -668,7 +737,7 @@ def download_papers_for_date(date_str, retmax=10000):
     pubmed_papers = []
     crossref_papers = []
     inter_delay = float(os.getenv("NCBI_INTER_REQUEST_DELAY_SEC", "0.35"))
-    crossref_rows = int(os.getenv("CROSSREF_ROWS", "80"))
+    crossref_rows = int(os.getenv("CROSSREF_ROWS", "120"))
     session = _make_api_session()
     try:
         try:
@@ -719,7 +788,9 @@ def download_papers_for_date(date_str, retmax=10000):
     logger.info(
         f"{target_date} 合并后原始条目: PubMed {len(pubmed_papers)} 篇 + Crossref {len(crossref_papers)} 篇 = {len(papers)} 篇"
     )
-    return _apply_local_keyword_prefilter(_deduplicate_papers(papers, f"{target_date} 跨来源"))
+    # 日粒度只负责抓取、期刊白名单和跨来源 DOI 去重。周度合并后再预筛，
+    # 这样日志与配额反映的是完整周，而不会出现按天筛选造成的计数失真。
+    return _deduplicate_papers(papers, f"{target_date} 跨来源")
 
 
 def _normalised_title_key(title):
@@ -844,6 +915,7 @@ def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000)
     try:
         if date_str:
             papers = download_papers_for_date(date_str, retmax=retmax)
+            papers = _apply_local_keyword_prefilter(papers)
             if not papers:
                 return {"status": "no_data", "date": date_str}
             output_file = os.path.join("Paper_metadata_download", f"{date_str}.json")
@@ -867,6 +939,9 @@ def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000)
                 merged.append(paper)
 
         merged = _deduplicate_papers(merged, "周报候选")
+        source_count = len(merged)
+        merged = _apply_local_keyword_prefilter(merged)
+        merged = _limit_weekly_local_candidates(merged)
 
         basename = weekly_basename(target_start, target_end)
         output_file = os.path.join("Paper_metadata_download", f"{basename}_weekly.json")
@@ -892,6 +967,8 @@ def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000)
             "start_date": target_start,
             "end_date": target_end,
             "count": len(valid),
+            "source_count": source_count,
+            "local_prefilter_count": len(valid),
             "file": output_file,
         }
 

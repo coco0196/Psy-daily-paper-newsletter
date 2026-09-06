@@ -66,12 +66,17 @@ TOPIC_GROUPS = {
 # Crossref 的 bibliographic 查询不是严格的布尔检索。按主线拆分可避免宽词
 # 在同一查询中相互放大，并让每条主线都有稳定的召回入口。
 CROSSREF_TRACK_QUERIES = {
-    "heart_brain": "heart brain interaction neurovisceral HRV EEG ECG psychological",
-    "emi": "ecological momentary assessment experience sampling intervention just in time adaptive ECG PPG physiological wearable",
+    "heart_brain": (
+        "heart brain interaction coupling neurovisceral autonomic vagal HRV psychological neuroscience",
+        "EEG ECG heart rate variability psychophysiology emotion cognition stress intervention",
+    ),
+    "emi": (
+        "ecological momentary assessment experience sampling intervention just in time adaptive physiological wearable",
+        "digital phenotyping passive sensing intensive longitudinal mental health psychology",
+    ),
     "mental_health": (
-        "mental health emotion regulation psychological distress stress anxiety well being "
-        "psychological intervention mind body mindfulness based breathing biofeedback "
-        "self guided micro intervention"
+        "mental health emotion regulation stress anxiety psychological intervention psychotherapy trial behavior",
+        "mind body mindfulness meditation breathing relaxation biofeedback HRV sleep pain intervention",
     ),
 }
 
@@ -109,14 +114,16 @@ HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS = {
     "emotion", "affect", "cognitive", "behavior", "behaviour", "wellbeing",
     "well-being", "resilience", "mindfulness", "intervention", "therapy",
     "treatment", "ecological", "experience sampling", "ambulatory", "daily diary",
+    "neuroscience", "neuroscientific", "neural", "brain", "eeg",
 }
 
-# 高精度心脑轴模式：这些医学/基础研究信号一旦出现，即不作为心理学周报候选。
+# 这些信号几乎总是基础/医学研究而非本项目所需的心理学或神经科学语境。
+# 疾病名称本身不再一刀切排除：若其确实研究心理行为或身心干预，交由
+# DeepSeek 根据摘要作最终判断。
 HEART_BRAIN_EXCLUSION_TERMS = {
     "animal", "mice", "mouse", "rat", "rats", "rodent", "canine", "porcine",
     "cell culture", "in vitro", "anatomical", "anatomy", "histology",
     "cardiac surgery", "postoperative", "post-operative", "catheter", "stent",
-    "myocardial infarction", "heart failure", "arrhythmia", "pharmacological",
     "drug administration", "dose response",
 }
 
@@ -145,20 +152,23 @@ MENTAL_HEALTH_INTERVENTION_TERMS = {
     "meditation intervention", "relaxation intervention", "breathing intervention",
 }
 
-# PubMed 是严格布尔检索。第三主线只使用“结局 AND 高特异干预方法”的
-# 组合，不将 intervention、therapy、trial 等泛词单独加入总 OR 候选池。
+# PubMed 是严格布尔检索。第三主线仍使用“结局 AND 干预”的组合，而不是把
+# 两类词拆成总 OR；但干预词覆盖常见的心理、行为和身心干预，以保证召回率。
 MENTAL_HEALTH_RETRIEVAL_OUTCOME_TERMS = (
     "mental health", "emotion regulation", "psychological distress", "stress",
     "anxiety", "well-being", "sleep", "pain", "health behavior",
-    "medication adherence",
+    "medication adherence", "depression", "mood", "affect", "quality of life",
+    "heart rate variability", "heart rate", "psychophysiology",
 )
 MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS = (
-    "psychological intervention", "psychotherapy", "mind-body intervention",
+    "intervention", "therapy", "treatment", "psychotherapy", "trial", "randomized",
+    "randomised", "protocol", "programme", "program", "psychological intervention",
+    "cognitive behavioral therapy", "acceptance and commitment therapy", "mind-body intervention",
     "mindfulness-based intervention", "mindfulness intervention",
     "meditation intervention", "relaxation intervention", "breathing intervention",
     "biofeedback", "heart rate variability biofeedback", "hrv biofeedback",
     "self-guided intervention", "self-help intervention", "micro-intervention",
-    "behavioral activation",
+    "behavioral activation", "digital intervention", "mobile intervention",
 )
 
 
@@ -197,6 +207,33 @@ EMA_EMI_PHYSIOLOGICAL_TERMS = {
     "biosensor", "biosensors", "wearable", "wearables", "actigraphy",
     "respiration", "respiratory", "accelerometry", "digital phenotyping",
     "passive sensing", "mobile sensing",
+}
+
+REVIEW_TERMS = {
+    "systematic review", "scoping review", "narrative review", "literature review",
+    "meta-analysis", "meta analysis", "umbrella review", "review article",
+}
+
+# 除直接的心脑术语外，三条主线都应落在心理学、精神健康、行为科学、
+# 心理生理或神经科学的语境中。该集合用于本地阶段拦截泛临床/工程噪声；
+# 不是最终的学术相关性判断。
+PSYCHOLOGY_NEUROSCIENCE_CONTEXT_TERMS = {
+    "mental", "psycholog", "psychiatr", "depress", "anxiety", "stress",
+    "emotion", "affect", "mood", "cognitive", "behavior", "behaviour",
+    "wellbeing", "well-being", "quality of life", "subjective", "experience",
+    "neuroscience", "neural", "brain", "eeg", "psychophysiolog", "hrv",
+    "mindfulness", "meditation", "relaxation", "breathing", "biofeedback",
+    "sleep", "insomnia", "pain", "adherence",
+}
+
+# 第三主线允许睡眠、疼痛、身体活动或依从性作为身心干预结局，但这些健康词
+# 本身不能把一般临床试验带入周报；还须有心理/行为、心理生理或身心方法语境。
+MENTAL_HEALTH_CONTEXT_TERMS = {
+    "mental", "psycholog", "psychiatr", "depress", "anxiety", "stress",
+    "emotion", "affect", "mood", "cognitive", "behavior", "behaviour",
+    "wellbeing", "well-being", "quality of life", "subjective", "experience",
+    "psychophysiolog", "heart rate variability", "hrv", "biofeedback",
+    "mindfulness", "meditation", "relaxation", "breathing", "mind-body",
 }
 
 LOCAL_PREFILTER_BROAD_TERMS = {
@@ -268,8 +305,14 @@ def _has_any_whole_phrase(text, terms):
 
 
 def local_prefilter_decision(title, abstract):
-    """在 API 调用前执行可解释的本地候选预筛。"""
+    """在 API 调用前执行“宽召回、可解释”的候选预筛。
+
+    本层只移除明显不属于心理学/神经科学三条主线的记录；最终的直接相关性
+    由 DeepSeek 判定。因此它不把“不是重点推荐”误当作“不能收录”。
+    """
     text = " ".join(str(value or "") for value in (title, abstract))
+    has_psych_neuro_context = _has_any(text, PSYCHOLOGY_NEUROSCIENCE_CONTEXT_TERMS)
+    is_review = _has_any(text, REVIEW_TERMS)
     accepted_groups = []
     reasons = []
     for group_id, group in TOPIC_GROUPS.items():
@@ -287,9 +330,12 @@ def local_prefilter_decision(title, abstract):
         if group_id == "heart_brain":
             if _has_any_whole_phrase(text, HEART_BRAIN_EXCLUSION_TERMS):
                 continue
-            # 高精度模式下，直接心脑术语也必须具备心理/行为语境；不能仅因
-            # 心血管或神经生理术语而放行。
-            if not _has_any(text, HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS):
+            # HRV/迷走/自主神经等词非常宽泛，仍需心理或神经科学语境；直接
+            # 心脑研究和综述同样须落在这一语境，而不是纯心血管生理。
+            if not (
+                _has_any(text, HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS)
+                or (is_review and has_psych_neuro_context)
+            ):
                 continue
             accepted_groups.append(group["label"])
             reasons.append(
@@ -303,7 +349,11 @@ def local_prefilter_decision(title, abstract):
             # 第三主线要求心理、行为、主观体验或心理生理指标等研究结局，且
             # 必须实际评估干预、治疗、试验或方案。数字/移动递送仅作为相关性
             # 增强信号，不再误排除非数字的心理与身心干预。
-            if not (has_outcome and has_intervention):
+            if not (
+                has_outcome
+                and has_intervention
+                and _has_any(text, MENTAL_HEALTH_CONTEXT_TERMS)
+            ):
                 continue
             accepted_groups.append(group["label"])
             reasons.append(
@@ -318,11 +368,20 @@ def local_prefilter_decision(title, abstract):
             has_physiology = _has_any_whole_phrase(text, EMA_EMI_PHYSIOLOGICAL_TERMS)
             # 排除只做自评问卷的 EMA/ESM；需为直接干预，或结合客观生理/传感
             # 指标。两者兼具的论文会在 DeepSeek 阶段获得重点推荐资格。
-            if not has_core_method or not (has_intervention or has_physiology):
+            # EMA/ESM 的方法学门槛保持不变；但直接讨论该方法学的综述也有
+            # 长期追踪价值，不按“简单问卷研究”处理。
+            if not (
+                has_core_method
+                and (has_intervention or has_physiology or is_review)
+                and has_psych_neuro_context
+            ):
                 continue
             accepted_groups.append(group["label"])
             reasons.append(
                 "emi_with_intervention_and_physiology"
+                "ema_emi_review"
+                if is_review and not (has_intervention or has_physiology)
+                else "emi_with_intervention_and_physiology"
                 if has_intervention and has_physiology
                 else "emi_with_intervention"
                 if has_intervention

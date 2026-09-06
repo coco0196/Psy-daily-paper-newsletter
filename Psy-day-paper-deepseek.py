@@ -11,7 +11,7 @@ from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from newsletter import NewsletterGenerator
-from domain_config import normalize_topic_labels, topic_label_eligibility
+from domain_config import CANONICAL_TOPIC_LABELS, normalize_topic_labels, topic_label_eligibility
 from utils import (
     get_last_week_range,
     get_model_name,
@@ -24,9 +24,12 @@ from utils import (
 
 logger = setup_logger()
 
+# 改动筛选准则时必须使旧缓存失效；否则同一篇论文会沿用旧提示词下的决定。
+SCREENING_POLICY_VERSION = "2026-09-06-broad-recall-direct-relevance-v1"
+
 
 def _translation_marked_relevant(text):
-    return bool(re.search(r"收录决定\s*[:：]\s*核心收录", str(text or "")))
+    return bool(re.search(r"收录决定\s*[:：]\s*收录", str(text or "")))
 
 
 def _translation_marked_irrelevant(text):
@@ -41,16 +44,29 @@ def _response_has_required_fields(text):
     return all(marker in str(text or "") for marker in ("收录决定", "主题标签", "优先级", "标题", "摘要", "关键词"))
 
 
-def _build_prompt(title, summary):
-    return f"""你是一名采用高精度标准的心理学与数字健康领域学术编辑。请根据标题和摘要判断论文是否足够核心、值得进入篇幅有限的高质量文献周报。
+def _build_prompt(title, summary, journal="", journal_metrics=None):
+    journal_metrics = journal_metrics or {}
+    journal_context = "；".join(
+        value
+        for value in (
+            f"期刊：{journal}" if journal else "",
+            f"JCR：{journal_metrics.get('jcr_quartile')}" if journal_metrics.get("jcr_quartile") else "",
+            f"IF：{journal_metrics.get('impact_factor')}" if journal_metrics.get("impact_factor") is not None else "",
+            "旗舰期刊：是" if journal_metrics.get("is_flagship") else "",
+        )
+        if value
+    ) or "期刊信息未提供"
+    return f"""你是一名严谨的心理学与神经科学领域学术编辑。请根据标题和摘要，判断论文是否与三条追踪主线具有直接关系，值得进入高质量文献周报。
 
 【三条追踪主线】
 1. 心脑轴：心脑交互/耦合、神经内脏整合、中央自主神经网络，以及与心理健康相关的 HRV、迷走神经和自主神经系统研究。
 2. 生态瞬时干预：EMA/ESM、密集纵向测量、EMI、JITAI、微随机试验、数字表型、被动感知和实时个体化干预。
 3. 心理健康与数字心理干预：以心理、情绪、行为、主观体验或心理生理指标为结局的干预研究，包括数字、移动、自助、心理治疗和身心干预。
 
+所有领域必须处于心理学、精神健康、行为科学、心理生理或神经科学语境。直接对应主线的综述、系统综述、meta 分析和方法学综述可以收录。
+
 【心脑轴特别规则】
-HRV、迷走神经、自主神经系统或副交感神经相关研究，只有在明确涉及心理健康、精神障碍、情绪、压力、认知、行为、心理干预或日常生活动态测量时才相关。同步 EEG 与 ECG 测量也只有在用于检验脑—心关系且具有上述心理学语境时才相关；单独 EEG 或单独 ECG 研究不纳入。纯心血管疾病、手术、药物、解剖、生理机制、动物/细胞研究及无心理行为意义的研究一律排除。
+HRV、迷走神经、自主神经系统或副交感神经相关研究，只有在明确涉及心理健康、精神障碍、情绪、压力、认知、行为、心理干预、日常生活动态测量或神经科学问题时才相关。同步 EEG 与 ECG 测量也只有在用于检验脑—心关系且具有上述语境时才相关；单独 EEG 或单独 ECG 研究不纳入。纯心血管疾病、手术、药物、解剖、生理机制、动物/细胞研究及无心理行为意义的研究一律排除。
 
 【生态瞬时干预特别规则】
 必须直接研究 EMA/ESM、密集纵向测量、EMI、JITAI、微随机试验、数字表型或被动感知中的至少一种。对于 EMA/ESM 或日记法评估研究，若仅是简单自评问卷且不涉及干预，也不结合 ECG、PPG、HRV、EDA/皮电、呼吸、活动记录、可穿戴或其他客观生理/传感指标，一律排除。仅因出现 ECG、PPG、HRV、EEG、可穿戴或 App，不能标注为本主题；它们只有构成上述设计或主要研究结局时才相关。若这些指标用于心理生理、心脑交互、迷走神经或自主神经研究，应优先判断为“心脑轴”。
@@ -58,11 +74,15 @@ HRV、迷走神经、自主神经系统或副交感神经相关研究，只有�
 【心理健康与数字心理干预特别规则】
 必须同时满足：（1）心理、情绪、行为、主观体验或心理生理指标是主要结局或核心目标；（2）研究实际关注明确的干预、治疗、试验、随机试验、方案或项目设计。特别关注正念、呼吸训练、冥想、放松训练、HRV 生物反馈等身心取向干预。数字/移动递送是加分项，而非必要条件。仅在背景中提及心理健康、正念、幸福感、App 或数字技术，或没有实际干预评价的描述性研究，一律排除。笼统的长程 CBT、ACT 治疗若没有微干预、身心干预、数字递送或与三条主线的直接联系，通常排除。
 
-【核心收录阈值】
-仅在论文的主要研究问题、方法或主要结局直接对应至少一条追踪主线，且不是边缘提及、背景引用或宽泛相邻主题时，才能收录。任何不确定或仅部分相关的论文均排除；不要为了提高数量而收录。
+【收录阈值】
+只要论文的主要研究问题、方法或主要结局直接对应至少一条追踪主线，就应收录；它不必同时满足“重点推荐”的条件。排除仅在背景中或边缘提及主线、与心理学/神经科学无关、或相关性无法从标题和摘要确认的研究。不要为凑数量收录宽泛相邻主题。
+
+【篇幅管理】
+周报通常希望最终保留约 20–40 篇。这个范围是严格判断“直接相关”后的自然目标，不是机械配额：普通直接相关研究应收录在对应主线下；只有不够直接、研究重点偏离三条主线或无法确认相关性时才排除。
 
 标题：{title}
 摘要：{summary}
+{journal_context}
 
 【输出规则】
 若应排除，仅输出：收录决定：排除
@@ -70,14 +90,14 @@ HRV、迷走神经、自主神经系统或副交感神经相关研究，只有�
 若相关，严格逐行输出。不要使用方括号、中括号、引号、Markdown 列表或 JSON。
 主题标签只能使用以下三个标准名称；多标签以中文分号分隔：心脑轴；生态瞬时干预；心理健康与数字心理干预。
 
-收录决定：核心收录
+收录决定：收录
 主题标签：心脑轴；生态瞬时干预
 优先级：重点推荐
 标题：中文标题
 摘要：中文摘要
 关键词：关键词一；关键词二；关键词三
 
-“重点推荐”仅用于以下情形：真实跨越两条及以上主线；明确将 EMA/ESM、EMI/JITAI 与 ECG、PPG、HRV、EDA/皮电、呼吸、活动记录或其他客观生理/传感指标结合；心脑指标被直接用于心理或身心干预；或具有明显方法学或临床价值的核心研究。不要因为文章同时出现生理信号和干预词就虚构跨主线关系。否则标为“常规收录”。"""
+“重点推荐”与“是否收录”完全独立，仅用于以下任一情形：真实跨越两条及以上主线；明确将 EMA/ESM、EMI/JITAI 与 ECG、PPG、HRV、EDA/皮电等客观生理数据紧密结合；心脑指标被直接用于身心干预；同时测量 EEG 与 ECG；顶级期刊，或具有显著方法学/临床价值的研究。不要因为文章同时出现生理信号和干预词就虚构跨主线关系。其他直接相关论文一律标为“常规收录”。"""
 
 
 @require_auth
@@ -136,7 +156,9 @@ def _screening_identity(paper):
 
 
 def _content_hash(title, summary):
-    return hashlib.sha256(f"{title}\n{summary}".encode("utf-8")).hexdigest()
+    return hashlib.sha256(
+        f"{SCREENING_POLICY_VERSION}\n{title}\n{summary}".encode("utf-8")
+    ).hexdigest()
 
 
 def _topic_labels_line(translation):
@@ -160,6 +182,11 @@ def _validated_translation_labels(translation, title, summary):
     model_labels = normalize_topic_labels(_topic_labels_line(translation))
     eligible = set(topic_label_eligibility(title, summary))
     labels = [label for label in model_labels if label in eligible]
+    if not labels:
+        # 模型已经作出“收录”决定时，不能仅因输出标签漏写或错写而把直接
+        # 相关论文排除。回退到本地规则支持的标准标签，同时阻止生理指标被
+        # 误贴为 EMA/EMI。
+        labels = [label for label in CANONICAL_TOPIC_LABELS if label in eligible]
     if not labels:
         return ""
     return _replace_topic_labels(translation, labels)
@@ -246,7 +273,9 @@ def process_papers(start_date=None, end_date=None, weekly_key=None):
             continue
         try:
             logger.info("正在处理第 %d/%d 篇候选文献", index, len(papers))
-            response = call_deepseek_api(_build_prompt(title, summary))
+            response = call_deepseek_api(
+                _build_prompt(title, summary, paper.get("journal", ""), paper.get("journal_metrics"))
+            )
             translation = (response.choices[0].message.content or "").strip()
             if _should_filter_by_relevance(translation):
                 cache_entries[identity] = {
