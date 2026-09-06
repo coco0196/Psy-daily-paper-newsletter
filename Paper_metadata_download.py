@@ -399,14 +399,17 @@ def _strip_crossref_abstract(raw):
 
 def _crossref_query_params():
     """
-    构建 Crossref 检索参数：截断关键词并用 query.abstract OR 组合，
-    避免将全部关键词 AND 进 query 导致空结果或无效查询。
+    构建 Crossref 检索参数。
+
+    Crossref ``/works`` 不支持 ``query.abstract``；使用该字段会返回
+    ``400 field-query-not-available``。这里使用官方支持的
+    ``query.bibliographic``，再由期刊白名单和本地关键词预筛保证领域相关性。
     """
     max_kw = int(os.getenv("CROSSREF_QUERY_KEYWORDS_MAX", "10"))
     max_kw = max(1, min(max_kw, len(CROSSREF_QUERY_TERMS)))
     kw_subset = CROSSREF_QUERY_TERMS[:max_kw]
-    abstract_query = " OR ".join(kw_subset)
-    return {"query.abstract": abstract_query}
+    bibliographic_query = " OR ".join(kw_subset)
+    return {"query.bibliographic": bibliographic_query}
 
 
 def _fetch_crossref(session, date_str, retmax=80):
