@@ -81,9 +81,14 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             "A just-in-time adaptive intervention for anxiety",
             "A smartphone intervention delivered support in daily life.",
         )
+        digital_phenotyping = local_prefilter_decision(
+            "Digital phenotyping in intensive longitudinal mental health research",
+            "Passive sensing captured daily-life behavioral signals.",
+        )
         self.assertFalse(questionnaire_only["accepted"])
         self.assertTrue(physiology_ema["accepted"])
         self.assertTrue(emi["accepted"])
+        self.assertTrue(digital_phenotyping["accepted"])
 
     def test_unrelated_record_is_rejected(self):
         result = local_prefilter_decision(
