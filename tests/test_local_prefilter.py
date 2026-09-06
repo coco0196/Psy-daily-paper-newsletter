@@ -1,6 +1,6 @@
 import unittest
 
-from domain_config import local_prefilter_decision
+from domain_config import local_prefilter_decision, topic_label_eligibility
 
 
 class LocalKeywordPrefilterTests(unittest.TestCase):
@@ -68,6 +68,21 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         self.assertTrue(accepted["accepted"])
         self.assertFalse(rejected["accepted"])
 
+    def test_non_digital_mind_body_intervention_is_eligible(self):
+        result = local_prefilter_decision(
+            "HRV biofeedback for stress and insomnia",
+            "A randomized relaxation intervention assessed perceived stress, sleep and heart rate variability.",
+        )
+        self.assertTrue(result["accepted"])
+        self.assertIn("心理健康与数字心理干预", result["groups"])
+
+    def test_physiology_alone_does_not_create_emi_label(self):
+        labels = topic_label_eligibility(
+            "Concurrent EEG and ECG during emotion regulation",
+            "We examined brain-heart coupling, heart rate variability and psychological stress.",
+        )
+        self.assertEqual(labels, ["心脑轴"])
+
     def test_questionnaire_only_ema_is_rejected_but_physiology_or_emi_is_accepted(self):
         questionnaire_only = local_prefilter_decision(
             "Ecological momentary assessment of mood",
@@ -100,4 +115,3 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
