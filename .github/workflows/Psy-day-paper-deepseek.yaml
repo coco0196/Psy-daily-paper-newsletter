@@ -46,12 +46,24 @@ jobs:
               archive_format: 'zip',
             });
             require('fs').writeFileSync('workflow-data.zip', Buffer.from(response.data));
+      - name: Restore unchanged DeepSeek screening cache
+        id: screening-cache-key
+        shell: bash
+        run: |
+          unzip -o workflow-data.zip
+          WEEKLY_KEY=$(sed -n '3p' weekly_range.txt)
+          INPUT_FILE="Paper_metadata_download/${WEEKLY_KEY}_weekly.json"
+          CACHE_HASH=$(cat "$INPUT_FILE" domain_config.py Psy-day-paper-deepseek.py | sha256sum | cut -d ' ' -f1)
+          echo "key=deepseek-screening-v1-${WEEKLY_KEY}-${CACHE_HASH}" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@v4
+        with:
+          path: Psy-day-paper-deepseek/*_screening_cache.json
+          key: ${{ steps.screening-cache-key.outputs.key }}
       - name: Generate Newsletter
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          unzip -o workflow-data.zip
           START_DATE=$(sed -n '1p' weekly_range.txt)
           END_DATE=$(sed -n '2p' weekly_range.txt)
           WEEKLY_KEY=$(sed -n '3p' weekly_range.txt)
@@ -59,6 +71,11 @@ jobs:
             --start-date "$START_DATE" \
             --end-date "$END_DATE" \
             --weekly-key "$WEEKLY_KEY"
+      - name: Save DeepSeek screening cache
+        uses: actions/cache/save@v4
+        with:
+          path: Psy-day-paper-deepseek/*_screening_cache.json
+          key: ${{ steps.screening-cache-key.outputs.key }}
       - name: Commit Newsletter and analytics
         run: |
           WEEKLY_KEY=$(sed -n '3p' weekly_range.txt)
