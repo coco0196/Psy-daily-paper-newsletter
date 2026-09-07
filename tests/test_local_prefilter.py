@@ -34,6 +34,14 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         )
         self.assertFalse(result["accepted"])
 
+    def test_animal_study_cannot_bypass_through_mental_health_track(self):
+        result = local_prefilter_decision(
+            "Mindfulness-related intervention for depression-like behavior in mice",
+            "A mouse model received treatment and behavioral testing.",
+        )
+        self.assertFalse(result["accepted"])
+        self.assertEqual(result["reason"], "nonhuman_or_cell_study")
+
     def test_synchronous_eeg_ecg_with_psychological_context_is_heart_brain(self):
         result = local_prefilter_decision(
             "Concurrent EEG and ECG during emotion regulation",
@@ -132,6 +140,14 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         )
         self.assertIn("心脑轴", heart_review["groups"])
         self.assertIn("生态瞬时干预", ema_review["groups"])
+
+    def test_human_health_digital_phenotyping_review_is_kept(self):
+        result = local_prefilter_decision(
+            "Digital phenotyping in human health research: a scoping review",
+            "This review synthesizes wearable and passive sensing studies in healthcare.",
+        )
+        self.assertTrue(result["accepted"])
+        self.assertIn("生态瞬时干预", result["groups"])
 
     def test_generic_clinical_intervention_without_psychology_or_neuroscience_is_rejected(self):
         result = local_prefilter_decision(
