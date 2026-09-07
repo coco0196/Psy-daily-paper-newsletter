@@ -208,14 +208,21 @@ def get_journal_profile(journal_name=None, issns=None):
 
 
 def filter_by_journal(journal_name=None, issns=None, journal_names=None):
-    """默认启用领域白名单；仅显式设为 false 时供本地调试绕过。"""
+    """仅排除现有 2025 指标中明确为 Q3/Q4 的期刊；未知分区保留。"""
     if os.getenv("JOURNAL_FILTER_ENABLED", "true").strip().lower() in {"0", "false", "no", "off"}:
         return True
     candidates = [issns] if isinstance(issns, str) else (issns or [])
-    if candidates:
-        return any(normalize_issn(issn) in _BY_ISSN for issn in candidates)
     names = [journal_name] if journal_name else []
     if journal_names:
         names.extend([journal_names] if isinstance(journal_names, str) else journal_names)
-    return any(_normalise_name(name) in _BY_NAME for name in names if name)
-
+    profile = None
+    for issn in candidates:
+        profile = _BY_ISSN.get(normalize_issn(issn))
+        if profile:
+            break
+    if profile is None:
+        for name in names:
+            profile = _BY_NAME.get(_normalise_name(name))
+            if profile:
+                break
+    return not profile or profile.get("jcr_quartile") not in {"Q3", "Q4"}
