@@ -14,12 +14,12 @@ class JournalRegistryTests(unittest.TestCase):
     def test_unknown_journal_is_not_mislabelled(self):
         self.assertIsNone(get_journal_profile("A New Journal"))
 
-    def test_issn_match_is_required_when_issn_is_present(self):
+    def test_unknown_journal_or_issn_is_retained(self):
         self.assertTrue(filter_by_journal(issns=["1438-8871"]))
-        self.assertFalse(filter_by_journal(journal_name="JMIR", issns=["0000-0000"]))
+        self.assertTrue(filter_by_journal(journal_name="JMIR", issns=["0000-0000"]))
 
-    def test_q3_journal_is_not_in_whitelist(self):
-        self.assertFalse(filter_by_journal(issns=["1070-5503"]))
+    def test_unprofiled_journal_is_not_treated_as_q3_or_q4(self):
+        self.assertTrue(filter_by_journal(issns=["1070-5503"]))
 
     def test_relevant_q1_flagship_is_in_whitelist_but_still_needs_topic_screening(self):
         self.assertTrue(filter_by_journal(issns=["0028-0836"]))
@@ -37,4 +37,3 @@ class JournalRegistryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
