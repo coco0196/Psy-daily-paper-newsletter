@@ -21,6 +21,9 @@ TOPIC_GROUPS = {
             "brain-heart coupling", "heart-brain coupling",
             "brain-heart dynamics", "neurovisceral integration",
             "central autonomic network", "cardiac interoception", "interoception",
+            "cardiac-brain synchrony", "heart-brain synchrony",
+            "brain-heart coherence", "cardiac-neural coupling",
+            "interoceptive inference", "neurocardiac", "baroreceptor",
             "heart rate variability",
             "vagally mediated heart rate variability",
             "respiratory heart rate variability", "respiratory sinus arrhythmia",
@@ -28,6 +31,7 @@ TOPIC_GROUPS = {
             "vagus nerve", "vagal tone", "cardiac vagal control",
             "parasympathetic nervous system", "autonomic nervous system",
             "autonomic regulation", "autonomic function",
+            "hrv", "vmhrv", "rsa",
         ],
     },
     "emi": {
@@ -44,6 +48,7 @@ TOPIC_GROUPS = {
             "adaptive treatment", "personalized intervention",
             "personalised intervention", "digital phenotyping",
             "passive sensing", "mobile sensing", "mobile health",
+            "ema", "esm", "emi", "jitai", "mrt", "mhealth",
         ],
     },
     "mental_health": {
@@ -61,6 +66,10 @@ TOPIC_GROUPS = {
             "heart rate variability biofeedback", "hrv biofeedback",
             "somatic intervention", "body-oriented psychotherapy",
             "micro-intervention", "microintervention",
+            "digital mental health", "dmh", "dmhi", "ehealth", "icbt",
+            "digital therapeutics", "ai-assisted intervention",
+            "virtual reality intervention", "wearable intervention",
+            "brief intervention", "single-session intervention",
         ],
     },
 }
@@ -69,16 +78,17 @@ TOPIC_GROUPS = {
 # 在同一查询中相互放大，并让每条主线都有稳定的召回入口。
 CROSSREF_TRACK_QUERIES = {
     "heart_brain": (
-        "heart brain interaction coupling neurovisceral autonomic vagal HRV psychological neuroscience",
-        "EEG ECG heart rate variability psychophysiology emotion cognition stress intervention",
+        "heart brain interaction coupling synchrony coherence neurovisceral autonomic vagal cardiac neural coupling interoception",
+        "heart rate variability HRV respiratory sinus arrhythmia baroreflex vagal tone cardiac autonomic regulation allostatic load",
+        "EEG ECG electroencephalography electrocardiography heart rate variability HRV respiratory sinus arrhythmia emotion stress cognition intervention",
     ),
     "emi": (
-        "ecological momentary assessment experience sampling intervention just in time adaptive physiological wearable",
-        "digital phenotyping passive sensing intensive longitudinal mental health psychology",
+        "ecological momentary assessment EMA experience sampling ambulatory assessment daily diary intensive longitudinal mobile sensing passive sensing",
+        "ecological momentary intervention EMI just-in-time adaptive intervention JITAI micro-randomized trial MRT context-aware intervention adaptive intervention",
+        "digital phenotyping passive sensing mobile sensing digital biomarkers intensive longitudinal mental health psychology",
     ),
     "mental_health": (
-        "mental health emotion regulation stress anxiety psychological intervention psychotherapy",
-        "mind body mindfulness meditation breathing relaxation biofeedback somatic body oriented",
+        "digital intervention mobile intervention smartphone intervention app-based intervention internet-based intervention digital therapeutics eHealth iCBT virtual reality intervention wearable intervention",
     ),
 }
 
@@ -90,18 +100,18 @@ EEG_TERMS = {
 }
 ECG_TERMS = {
     "ecg", "electrocardiography", "electrocardiogram",
+    "hrv", "heart rate variability", "hr", "heart rate", "rsa",
+    "respiratory sinus arrhythmia", "heartbeat-evoked response",
 }
 EEG_ECG_PUBMED_QUERY = (
     '(("electroencephalography"[Title/Abstract] OR '
-    '"electroencephalogram"[Title/Abstract] OR EEG[Title/Abstract]) '
+    '"electroencephalogram"[Title/Abstract] OR "EEG"[Title/Abstract]) '
     'AND ("electrocardiography"[Title/Abstract] OR '
-    '"electrocardiogram"[Title/Abstract] OR ECG[Title/Abstract]) '
-    'AND (psychological[Title/Abstract] OR mental[Title/Abstract] OR '
-    'emotion[Title/Abstract] OR stress[Title/Abstract] OR cognitive[Title/Abstract] '
-    'OR behavior[Title/Abstract] OR behaviour[Title/Abstract] OR '
-    'intervention[Title/Abstract] OR neuroscience[Title/Abstract] OR '
-    'neural[Title/Abstract] OR brain[Title/Abstract] OR '
-    'psychophysiology[Title/Abstract]))'
+    '"electrocardiogram"[Title/Abstract] OR "ECG"[Title/Abstract] OR '
+    '"heart rate variability"[Title/Abstract] OR "HRV"[Title/Abstract] OR '
+    '"heart rate"[Title/Abstract] OR "HR"[Title/Abstract] OR '
+    '"respiratory sinus arrhythmia"[Title/Abstract] OR "RSA"[Title/Abstract] OR '
+    '"heartbeat-evoked response"[Title/Abstract]))'
 )
 
 # 以下心脑术语在纯心血管/解剖/生理文献中也常见，必须带心理学语境才放行。
@@ -118,17 +128,28 @@ HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS = {
     "emotion", "affect", "cognitive", "behavior", "behaviour", "wellbeing",
     "well-being", "resilience", "mindfulness", "intervention", "therapy",
     "treatment", "ecological", "experience sampling", "ambulatory", "daily diary",
-    "neuroscience", "neuroscientific", "neural", "brain", "eeg",
+    "daily monitoring", "dynamic measurement", "dynamic monitoring",
+    "neuroscience", "neuroscientific", "neuroimaging", "neural", "brain", "eeg",
+    "erp", "hep", "psychophysiolog", "interoception",
 }
 
 # 这些信号几乎总是基础/医学研究而非本项目所需的心理学或神经科学语境。
 # 疾病名称本身不再一刀切排除：若其确实研究心理行为或身心干预，交由
 # DeepSeek 根据摘要作最终判断。
-HEART_BRAIN_EXCLUSION_TERMS = {
-    "animal", "mice", "mouse", "rat", "rats", "rodent", "canine", "porcine",
-    "cell culture", "in vitro", "anatomical", "anatomy", "histology",
-    "cardiac surgery", "postoperative", "post-operative", "catheter", "stent",
-    "drug administration", "dose response",
+NONHUMAN_OR_CELL_TERMS = {
+    "animal", "animal model", "mice", "mouse", "murine", "rat", "rats", "rodent",
+    "canine", "porcine", "zebrafish", "cell culture", "cell line", "in vitro",
+    "ex vivo", "histology", "immunofluorescence", "western blot",
+}
+HUMAN_STUDY_TERMS = {
+    "human", "humans", "participant", "participants", "patient", "patients",
+    "adult", "adults", "adolescent", "adolescents", "child", "children",
+    "healthy volunteer", "healthy volunteers", "people", "individuals", "cohort",
+}
+PURE_MECHANISTIC_TERMS = {
+    "cellular mechanism", "molecular mechanism", "biological mechanism",
+    "physiological mechanism", "neural mechanism", "receptor expression",
+    "protein expression", "gene expression", "histology", "immunofluorescence",
 }
 
 MENTAL_HEALTH_OUTCOME_TERMS = {
@@ -141,6 +162,7 @@ MENTAL_HEALTH_OUTCOME_TERMS = {
     "self-regulation", "sleep", "insomnia", "pain", "medication adherence",
     "treatment adherence", "heart rate variability", "hrv", "heart rate",
     "psychophysiological", "psychophysiology",
+    "flourishing", "resilience", "emotion experience", "subjective experience",
 }
 
 MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS = {
@@ -155,6 +177,17 @@ MENTAL_HEALTH_INTERVENTION_TERMS = {
     "mind-body intervention", "mindfulness-based", "mindfulness intervention",
     "meditation intervention", "relaxation intervention", "breathing intervention",
     "somatic intervention", "body-oriented psychotherapy",
+    "mindfulness-based intervention", "mindfulness intervention", "mindfulness practice",
+    "meditation training", "meditation program", "loving-kindness meditation",
+    "compassion meditation", "body scan", "mindful movement",
+    "relaxation therapy", "relaxation training", "relaxation technique",
+    "progressive muscle relaxation", "autogenic training", "guided imagery",
+    "breathing exercise", "paced breathing", "slow breathing", "slow-paced breathing",
+    "mindful breathing", "diaphragmatic breathing", "deep breathing", "breathwork",
+    "somatic therapy", "somatic experiencing", "body psychotherapy",
+    "dance movement therapy", "mind-body exercise", "mind-body therapy",
+    "behavioral activation", "behavioural activation", "brief intervention",
+    "single-session intervention",
 }
 
 # PubMed 是严格布尔检索。第三主线使用“核心心理/行为主题 AND 一般干预”
@@ -163,6 +196,10 @@ MENTAL_HEALTH_INTERVENTION_TERMS = {
 MENTAL_HEALTH_RETRIEVAL_OUTCOME_TERMS = (
     "mental health", "emotion regulation", "psychological distress", "stress",
     "anxiety", "depression", "mood", "affect", "well-being",
+    "mental wellbeing", "psychological well-being", "flourishing", "resilience",
+    "loneliness", "coping", "self-efficacy", "quality of life",
+    "health behavior", "health behaviour", "self-regulation",
+    "sleep", "insomnia", "pain",
 )
 MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS = (
     "intervention", "therapy", "treatment", "psychotherapy", "randomized",
@@ -172,15 +209,27 @@ MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS = (
 MENTAL_HEALTH_HIGH_SPECIFIC_INTERVENTION_TERMS = (
     "mind-body intervention",
     "mindfulness-based intervention", "mindfulness intervention",
-    "meditation intervention", "relaxation intervention", "breathing intervention",
+    "mindfulness practice", "meditation intervention", "meditation training",
+    "meditation program", "loving-kindness meditation", "compassion meditation",
+    "body scan", "mindful movement", "relaxation intervention", "relaxation therapy",
+    "relaxation training", "relaxation technique", "progressive muscle relaxation",
+    "autogenic training", "guided imagery", "breathing intervention", "breathing exercise",
+    "paced breathing", "slow breathing", "slow-paced breathing", "mindful breathing",
+    "diaphragmatic breathing", "deep breathing", "breathwork",
     "biofeedback", "heart rate variability biofeedback", "hrv biofeedback",
-    "somatic intervention", "body-oriented psychotherapy", "micro-intervention",
-    "behavioral activation",
+    "somatic intervention", "somatic therapy", "somatic experiencing",
+    "body-oriented psychotherapy", "body psychotherapy", "dance movement therapy",
+    "mind-body exercise", "mind-body therapy", "micro-intervention", "microintervention",
+    "brief intervention", "single-session intervention", "behavioral activation",
+    "behavioural activation",
 )
 MENTAL_HEALTH_DIGITAL_RETRIEVAL_TERMS = (
     "digital mental health", "digital psychological intervention", "digital intervention",
     "mobile intervention", "smartphone intervention", "app-based intervention",
     "web-based intervention", "internet-based intervention", "mhealth intervention",
+    "digital therapeutics", "dmhi", "ehealth", "icbt", "ai-assisted intervention",
+    "virtual reality intervention", "wearable intervention", "brief intervention",
+    "single-session intervention",
 )
 
 
@@ -195,6 +244,21 @@ PUBMED_MENTAL_HEALTH_QUERY = (
     f"OR ({_pubmed_title_abstract_any(MENTAL_HEALTH_DIGITAL_RETRIEVAL_TERMS)}))"
 )
 
+# PubMed 检索按三条主线分为三个 tiab 模块。语境限制放在本地预筛和
+# DeepSeek 阶段，以首先建立宽而结构化的候选池。
+PUBMED_HEART_BRAIN_QUERY = (
+    f"(({_pubmed_title_abstract_any(TOPIC_GROUPS['heart_brain']['terms'])}) "
+    f"OR ({EEG_ECG_PUBMED_QUERY}))"
+)
+PUBMED_EMA_EMI_QUERY = (
+    f"({_pubmed_title_abstract_any(TOPIC_GROUPS['emi']['terms'])})"
+)
+PUBMED_QUERY_MODULES = {
+    "heart_brain": PUBMED_HEART_BRAIN_QUERY,
+    "emi": PUBMED_EMA_EMI_QUERY,
+    "mental_health": PUBMED_MENTAL_HEALTH_QUERY,
+}
+
 # EMA/ESM 的一般自评问卷研究数量很大，且未必符合本项目的重点。EMA/EMI
 # 主线要求明确的瞬时/密集纵向方法，并进一步要求：要么是主动干预，要么结合
 # 客观生理数据（含心血管与可穿戴感测）。数字表型和被动感测被视为传感路径，
@@ -206,6 +270,7 @@ EMA_EMI_CORE_METHOD_TERMS = {
     "just-in-time adaptive intervention", "just-in-time intervention",
     "micro-randomized trial", "micro-randomized trials", "digital phenotyping",
     "passive sensing", "mobile sensing",
+    "ema", "esm", "emi", "jitai", "mrt", "mobile health", "mhealth",
 }
 EMA_EMI_INTERVENTION_TERMS = {
     "ecological momentary intervention", "just-in-time adaptive intervention",
@@ -213,6 +278,7 @@ EMA_EMI_INTERVENTION_TERMS = {
     "digital micro-intervention", "digital micro-interventions", "microintervention",
     "microinterventions", "context-aware intervention", "adaptive intervention",
     "adaptive treatment", "personalized intervention", "personalised intervention",
+    "emi", "jitai", "mrt",
 }
 EMA_EMI_PHYSIOLOGICAL_TERMS = {
     "ecg", "electrocardiography", "electrocardiogram", "ppg", "photoplethysmography",
@@ -221,6 +287,11 @@ EMA_EMI_PHYSIOLOGICAL_TERMS = {
     "biosensor", "biosensors", "wearable", "wearables", "actigraphy",
     "respiration", "respiratory", "accelerometry", "digital phenotyping",
     "passive sensing", "mobile sensing",
+    "hr", "hrv", "eeg", "ecg",
+}
+DIGITAL_PHENOTYPING_HUMAN_HEALTH_TERMS = {
+    "digital phenotyping", "passive sensing", "mobile sensing", "wearable",
+    "wearables", "health", "healthcare", "public health", "patient", "patients",
 }
 
 REVIEW_TERMS = {
@@ -237,7 +308,12 @@ PSYCHOLOGY_NEUROSCIENCE_CONTEXT_TERMS = {
     "wellbeing", "well-being", "quality of life", "subjective", "experience",
     "neuroscience", "neural", "brain", "eeg", "psychophysiolog", "hrv",
     "mindfulness", "meditation", "relaxation", "breathing", "biofeedback",
-    "sleep", "insomnia", "pain", "adherence",
+    "sleep", "insomnia", "pain", "adherence", "coping", "self-efficacy",
+    "loneliness", "flourishing", "health behavior", "health behaviour",
+    "self-regulation", "motivation", "attention", "executive", "decision",
+    "social cognition", "daily monitoring", "dynamic measurement", "dynamic monitoring",
+    "ambulatory monitoring", "ecological", "experience sampling", "ema", "esm",
+    "neuroimaging", "fmri", "erp", "hep", "interoception", "hrv", "heart rate",
 }
 
 # 第三主线允许睡眠、疼痛、身体活动或依从性作为身心干预结局，但这些健康词
@@ -248,7 +324,9 @@ MENTAL_HEALTH_CONTEXT_TERMS = {
     "wellbeing", "well-being", "quality of life", "subjective", "experience",
     "psychophysiolog", "heart rate variability", "hrv", "biofeedback",
     "mindfulness", "meditation", "relaxation", "breathing", "mind-body",
-    "somatic", "body-oriented",
+    "somatic", "body-oriented", "coping", "self-efficacy", "loneliness",
+    "flourishing", "health behavior", "health behaviour", "self-regulation",
+    "daily monitoring", "dynamic measurement", "dynamic monitoring", "hrv", "heart rate",
 }
 MENTAL_HEALTH_SUPPORTING_OUTCOME_TERMS = {
     "sleep", "insomnia", "pain", "physical activity", "adherence",
@@ -334,6 +412,16 @@ def local_prefilter_decision(title, abstract):
     由 DeepSeek 判定。因此它不把“不是重点推荐”误当作“不能收录”。
     """
     text = " ".join(str(value or "") for value in (title, abstract))
+    has_human_signal = _has_any_whole_phrase(text, HUMAN_STUDY_TERMS)
+    has_nonhuman_or_cell_signal = _has_any_whole_phrase(text, NONHUMAN_OR_CELL_TERMS)
+    # 动物、细胞与体外研究是全局排除项。人类研究或人类综述偶尔会提及
+    # 动物证据，故有明确人类信号时不在本地阶段误删，交由 DeepSeek 终审。
+    if has_nonhuman_or_cell_signal and not has_human_signal:
+        return {
+            "accepted": False,
+            "groups": [],
+            "reason": "nonhuman_or_cell_study",
+        }
     has_psych_neuro_context = _has_any(text, PSYCHOLOGY_NEUROSCIENCE_CONTEXT_TERMS)
     is_review = _has_any(text, REVIEW_TERMS)
     accepted_groups = []
@@ -351,8 +439,6 @@ def local_prefilter_decision(title, abstract):
         ):
             continue
         if group_id == "heart_brain":
-            if _has_any_whole_phrase(text, HEART_BRAIN_EXCLUSION_TERMS):
-                continue
             # HRV/迷走/自主神经等词非常宽泛，仍需心理或神经科学语境；直接
             # 心脑研究和综述同样须落在这一语境，而不是纯心血管生理。
             if not (
@@ -395,6 +481,11 @@ def local_prefilter_decision(title, abstract):
             has_core_method = _has_any(text, EMA_EMI_CORE_METHOD_TERMS)
             has_intervention = _has_any(text, EMA_EMI_INTERVENTION_TERMS)
             has_physiology = _has_any_whole_phrase(text, EMA_EMI_PHYSIOLOGICAL_TERMS)
+            is_human_health_digital_phenotyping_review = (
+                is_review
+                and _has_any(text, {"digital phenotyping", "passive sensing", "mobile sensing"})
+                and _has_any(text, DIGITAL_PHENOTYPING_HUMAN_HEALTH_TERMS)
+            )
             # 排除只做自评问卷的 EMA/ESM；需为直接干预，或结合客观生理/传感
             # 指标。两者兼具的论文会在 DeepSeek 阶段获得重点推荐资格。
             # EMA/ESM 的方法学门槛保持不变；但直接讨论该方法学的综述也有
@@ -402,7 +493,7 @@ def local_prefilter_decision(title, abstract):
             if not (
                 has_core_method
                 and (has_intervention or has_physiology or is_review)
-                and has_psych_neuro_context
+                and (has_psych_neuro_context or is_human_health_digital_phenotyping_review)
             ):
                 continue
             accepted_groups.append(group["label"])
@@ -421,6 +512,12 @@ def local_prefilter_decision(title, abstract):
             continue
         accepted_groups.append(group["label"])
         reasons.append("broad_term_with_context" if only_broad else "specific_term")
+    if not accepted_groups and _has_any_whole_phrase(text, PURE_MECHANISTIC_TERMS):
+        return {
+            "accepted": False,
+            "groups": [],
+            "reason": "pure_mechanistic_without_target_context",
+        }
     return {
         "accepted": bool(accepted_groups),
         "groups": accepted_groups,
