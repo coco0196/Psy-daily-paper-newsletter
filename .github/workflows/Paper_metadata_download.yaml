@@ -1,9 +1,7 @@
 name: Download tracker metadata
 
+
 on:
-  schedule:
-    # 每周一 UTC 04:00，即北京时间 12:00。
-    - cron: '0 4 * * 1'
   workflow_dispatch:
     inputs:
       start_date:
@@ -15,8 +13,10 @@ on:
         required: false
         type: string
 
+
 permissions:
   contents: read
+
 
 jobs:
   download:
@@ -34,30 +34,3 @@ jobs:
         id: set-date
         shell: bash
         run: |
-          export TZ='Asia/Shanghai'
-          if [ -n "${{ github.event.inputs.start_date }}" ] && [ -n "${{ github.event.inputs.end_date }}" ]; then
-            START_DATE="${{ github.event.inputs.start_date }}"
-            END_DATE="${{ github.event.inputs.end_date }}"
-          else
-            read START_DATE END_DATE <<< $(python -c "from utils import get_last_week_range; print(*get_last_week_range())")
-          fi
-          WEEKLY_KEY="${START_DATE}_to_${END_DATE}"
-          printf '%s\n%s\n%s\n' "$START_DATE" "$END_DATE" "$WEEKLY_KEY" > weekly_range.txt
-          echo "weekly_key=$WEEKLY_KEY" >> "$GITHUB_OUTPUT"
-      - name: Download and locally prefilter candidates
-        env:
-          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
-          NCBI_EMAIL: ${{ secrets.NCBI_EMAIL }}
-          CROSSREF_MAILTO: ${{ vars.CROSSREF_MAILTO }}
-        run: |
-          python Paper_metadata_download.py \
-            --start-date "$(sed -n '1p' weekly_range.txt)" \
-            --end-date "$(sed -n '2p' weekly_range.txt)"
-      - name: Upload ephemeral processing data
-        uses: actions/upload-artifact@v4
-        with:
-          name: workflow-data
-          path: |
-            weekly_range.txt
-            Paper_metadata_download/${{ steps.set-date.outputs.weekly_key }}_weekly.json
-          retention-days: 1
