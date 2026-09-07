@@ -6,7 +6,6 @@ import time
 import datetime
 import unicodedata
 from difflib import SequenceMatcher
-from math import ceil
 from collections import Counter
 import requests
 import argparse
@@ -18,9 +17,7 @@ from utils import setup_logger, get_last_week_range, weekly_basename, iter_date_
 from journal_registry import filter_by_journal, get_journal_profile
 from domain_config import (
     CROSSREF_TRACK_QUERIES,
-    EEG_ECG_PUBMED_QUERY,
-    PUBMED_MENTAL_HEALTH_QUERY,
-    iter_topic_terms,
+    PUBMED_QUERY_MODULES,
     local_prefilter_decision,
 )
 
@@ -375,13 +372,9 @@ def _parse_pubmed_xml_batch(xml_bytes):
     return results
 
 
-def _esearch_pubmed(session, date_str, retmax=10000):
-    """按日期 + 标题/摘要关键词检索 PubMed；retmax 默认 10000。"""
-    keyword_query = " OR ".join(
-        [f'"{term}"[Title/Abstract]' for term in iter_topic_terms()]
-        + [EEG_ECG_PUBMED_QUERY, PUBMED_MENTAL_HEALTH_QUERY]
-    )
-    term = f'"{date_str}"[dp] AND ({keyword_query})'
+def _esearch_pubmed(session, date_str, module_query, retmax=10000):
+    """按日期与单个三主线 tiab 模块检索 PubMed。"""
+    term = f'"{date_str}"[dp] AND ({module_query})'
     url = f"{EUTILS_BASE}/esearch.fcgi"
     params = {
         **_ncbi_common_params(),
@@ -464,11 +457,10 @@ def _crossref_published_date(item, fallback):
     return fallback
 
 
-def _fetch_crossref(session, date_str, retmax=120):
+def _fetch_crossref(session, date_str, page_size=100):
     """
     从 Crossref REST API 拉取指定发表日、含摘要的文献，映射为与 PubMed 一致的结构，并标记 source=Crossref。
-    retmax 是全部子查询合计的近似 rows 上限。每条主线使用两条短的定向查询，
-    以兼顾召回率与 Crossref 的相关性排序特性。
+    每个主题查询均以 100 条为一页使用 cursor 连续分页，不以总条数截断。
     失败时记录 warning 并返回空列表，不向上抛出以免中断主流程。
     """
     try:
@@ -480,66 +472,82 @@ def _fetch_crossref(session, date_str, retmax=120):
             for track, queries in CROSSREF_TRACK_QUERIES.items()
             for query_text in (queries if isinstance(queries, (tuple, list)) else (queries,))
         ]
-        per_track_rows = max(1, min(100, ceil(int(retmax) / len(track_queries))))
+        page_size = max(1, min(int(page_size), 1000))
         crossref_delay = float(os.getenv("CROSSREF_INTER_REQUEST_DELAY_SEC", "1.0"))
         for index, (track, query_text) in enumerate(track_queries):
-            params = {
-                **_crossref_query_params(query_text),
-                "filter": filter_str,
-                "rows": per_track_rows,
-                "mailto": os.getenv("CROSSREF_MAILTO", "zhugamen@gmail.com"),
-            }
-            r = _api_get(
-                session,
-                CROSSREF_WORKS_URL,
-                params=params,
-                timeout=90,
-                label=f"Crossref:{track}:{index + 1}",
-            )
-            r.raise_for_status()
-            items = ((r.json().get("message") or {}).get("items") or [])
-            logger.info("Crossref %s 子查询 %d 返回 %d 条", track, index + 1, len(items))
-            for item in items:
-                doi = (item.get("DOI") or "").strip()
-                if not doi or doi.casefold() in seen_dois:
-                    continue
-                seen_dois.add(doi.casefold())
-                titles = item.get("title") or []
-                title = (titles[0] if titles else "").strip()
-                container_titles = item.get("container-title") or []
-                journal_name = (container_titles[0] if container_titles else "").strip()
-                if not journal_name:
-                    journal_name = ((item.get("short-container-title") or [""])[0] or "").strip()
-                item_issns = item.get("ISSN") or []
-                if isinstance(item_issns, str):
-                    item_issns = [item_issns]
-                if not filter_by_journal(journal_name=journal_name, issns=item_issns):
-                    continue
-                raw_abs = item.get("abstract")
-                if isinstance(raw_abs, list):
-                    raw_abs = " ".join(str(x) for x in raw_abs)
-                summary = _strip_crossref_abstract(raw_abs)
-                authors_out = [
-                    {"name": f"{author.get('given', '') or ''} {author.get('family', '') or ''}".strip()}
-                    for author in item.get("author") or []
-                    if isinstance(author, dict)
-                    and f"{author.get('given', '') or ''} {author.get('family', '') or ''}".strip()
-                ]
-                if not title or not summary:
-                    continue
-                out.append({"paper": _attach_journal_profile({
-                    "id": doi,
-                    "doi": _normalise_doi(doi),
-                    "title": title,
-                    "summary": summary,
-                    "authors": authors_out or [{"name": "Unknown"}],
-                    "publishedAt": _crossref_published_date(item, date_str),
-                    "publicationDateSource": "crossref_published",
-                    "source": "Crossref",
-                    "sources": ["Crossref"],
-                    "journal": journal_name,
-                    "issns": item_issns,
-                })})
+            cursor = "*"
+            page_number = 0
+            while cursor:
+                params = {
+                    **_crossref_query_params(query_text),
+                    "filter": filter_str,
+                    "rows": page_size,
+                    "cursor": cursor,
+                    "mailto": os.getenv("CROSSREF_MAILTO", "zhugamen@gmail.com"),
+                }
+                r = _api_get(
+                    session,
+                    CROSSREF_WORKS_URL,
+                    params=params,
+                    timeout=90,
+                    label=f"Crossref:{track}:{index + 1}:page:{page_number + 1}",
+                )
+                r.raise_for_status()
+                message = r.json().get("message") or {}
+                items = message.get("items") or []
+                page_number += 1
+                logger.info(
+                    "Crossref %s 子查询 %d 第 %d 页返回 %d 条",
+                    track, index + 1, page_number, len(items),
+                )
+                for item in items:
+                    doi = (item.get("DOI") or "").strip()
+                    if not doi or doi.casefold() in seen_dois:
+                        continue
+                    seen_dois.add(doi.casefold())
+                    titles = item.get("title") or []
+                    title = (titles[0] if titles else "").strip()
+                    container_titles = item.get("container-title") or []
+                    journal_name = (container_titles[0] if container_titles else "").strip()
+                    if not journal_name:
+                        journal_name = ((item.get("short-container-title") or [""])[0] or "").strip()
+                    item_issns = item.get("ISSN") or []
+                    if isinstance(item_issns, str):
+                        item_issns = [item_issns]
+                    if not filter_by_journal(journal_name=journal_name, issns=item_issns):
+                        continue
+                    raw_abs = item.get("abstract")
+                    if isinstance(raw_abs, list):
+                        raw_abs = " ".join(str(x) for x in raw_abs)
+                    summary = _strip_crossref_abstract(raw_abs)
+                    authors_out = [
+                        {"name": f"{author.get('given', '') or ''} {author.get('family', '') or ''}".strip()}
+                        for author in item.get("author") or []
+                        if isinstance(author, dict)
+                        and f"{author.get('given', '') or ''} {author.get('family', '') or ''}".strip()
+                    ]
+                    if not title or not summary:
+                        continue
+                    out.append({"paper": _attach_journal_profile({
+                        "id": doi,
+                        "doi": _normalise_doi(doi),
+                        "title": title,
+                        "summary": summary,
+                        "authors": authors_out or [{"name": "Unknown"}],
+                        "publishedAt": _crossref_published_date(item, date_str),
+                        "publicationDateSource": "crossref_published",
+                        "source": "Crossref",
+                        "sources": ["Crossref"],
+                        "journal": journal_name,
+                        "issns": item_issns,
+                    })})
+                if len(items) < page_size:
+                    break
+                cursor = message.get("next-cursor")
+                if not cursor:
+                    break
+                if crossref_delay > 0:
+                    time.sleep(crossref_delay)
             if index + 1 < len(track_queries) and crossref_delay > 0:
                 time.sleep(crossref_delay)
         return out
@@ -690,12 +698,25 @@ def download_papers_for_date(date_str, retmax=10000):
     pubmed_papers = []
     crossref_papers = []
     inter_delay = float(os.getenv("NCBI_INTER_REQUEST_DELAY_SEC", "0.35"))
-    crossref_rows = int(os.getenv("CROSSREF_ROWS", "120"))
+    crossref_page_size = int(os.getenv("CROSSREF_PAGE_SIZE", "100"))
     session = _make_api_session()
     try:
         try:
-            pmids = _esearch_pubmed(session, target_date, retmax=retmax)
-            logger.info(f"PubMed esearch 返回 PMID 数量: {len(pmids)}")
+            pmids = []
+            seen_pmids = set()
+            for module_name, module_query in PUBMED_QUERY_MODULES.items():
+                module_pmids = _esearch_pubmed(
+                    session, target_date, module_query, retmax=retmax
+                )
+                logger.info(
+                    "PubMed %s 模块返回 PMID 数量: %d",
+                    module_name, len(module_pmids),
+                )
+                for pmid in module_pmids:
+                    if pmid not in seen_pmids:
+                        seen_pmids.add(pmid)
+                        pmids.append(pmid)
+            logger.info("PubMed 三模块合并后 PMID 数量: %d", len(pmids))
             if pmids:
                 if inter_delay > 0:
                     time.sleep(inter_delay)
@@ -728,7 +749,9 @@ def download_papers_for_date(date_str, retmax=10000):
         except ET.ParseError as e:
             logger.error(f"解析 PubMed XML 失败: {e}")
 
-        crossref_papers = _fetch_crossref(session, target_date, retmax=crossref_rows)
+        crossref_papers = _fetch_crossref(
+            session, target_date, page_size=crossref_page_size
+        )
         logger.info(f"Crossref 返回条目数量: {len(crossref_papers)}")
     finally:
         session.close()
