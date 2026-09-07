@@ -10,7 +10,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from Paper_metadata_download import _crossref_query_params, _normalised_title_key
-from domain_config import CROSSREF_TRACK_QUERIES, PUBMED_MENTAL_HEALTH_QUERY
+from domain_config import CROSSREF_TRACK_QUERIES, PUBMED_MENTAL_HEALTH_QUERY, PUBMED_QUERY_MODULES
 
 
 class CrossrefQueryParamsTests(unittest.TestCase):
@@ -45,9 +45,17 @@ class CrossrefQueryParamsTests(unittest.TestCase):
         self.assertNotIn('"protocol"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
         self.assertNotIn('"programme"[Title/Abstract]', PUBMED_MENTAL_HEALTH_QUERY)
 
-    def test_crossref_uses_two_targeted_queries_per_track(self):
+    def test_pubmed_has_three_confirmed_modules_with_requested_abbreviations(self):
+        self.assertEqual(set(PUBMED_QUERY_MODULES), {"heart_brain", "emi", "mental_health"})
+        self.assertIn('"hrv"[title/abstract]', PUBMED_QUERY_MODULES["heart_brain"].lower())
+        self.assertIn('"ema"[title/abstract]', PUBMED_QUERY_MODULES["emi"].lower())
+        self.assertIn('"dmhi"[title/abstract]', PUBMED_QUERY_MODULES["mental_health"].lower())
+
+    def test_crossref_uses_the_confirmed_seven_topic_queries(self):
         self.assertEqual(set(CROSSREF_TRACK_QUERIES), {"heart_brain", "emi", "mental_health"})
-        self.assertTrue(all(len(queries) == 2 for queries in CROSSREF_TRACK_QUERIES.values()))
+        self.assertEqual(sum(len(queries) for queries in CROSSREF_TRACK_QUERIES.values()), 7)
+        self.assertIn("MRT", CROSSREF_TRACK_QUERIES["emi"][1])
+        self.assertIn("digital therapeutics", CROSSREF_TRACK_QUERIES["mental_health"][0])
 
 
 if __name__ == "__main__":
