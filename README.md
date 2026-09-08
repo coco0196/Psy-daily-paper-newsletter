@@ -8,15 +8,15 @@
 
 1. **心脑轴**：覆盖心脑交互/耦合、迷走神经、自主神经系统、HRV、RSA、HEP、神经内脏整合等；其中 HRV、迷走神经和自主神经系统相关研究必须具有心理、行为或心理健康语境才会被纳入。
 2. **生态瞬时干预**：覆盖 EMA/ESM、密集纵向测量、EMI、JITAI、MRT、数字表型、被动感知与实时个体化干预。
-3. **心理健康与数字心理干预**：覆盖心理健康、情绪调节、幸福感/复原力，以及数字、移动、自助和心理治疗干预。
+3. **心理微干预**：覆盖以心理、情绪、行为、主观体验或心理生理为结局的微干预、简短干预、数字/移动自助干预与身心干预。
 
 每周一北京时间 12:00，GitHub Actions 自动检索上一个完整自然周的 PubMed 与 Crossref 文献。候选文献依次经过：
 
-1. 与三条主线相关的期刊白名单过滤；
+1. 基于 2026 年 JCR 数据的期刊分区过滤：排除未列入例外名单的 Q3/Q4 期刊；
 2. 本地关键词和心理学语境预筛；
 3. DeepSeek 相关性判断、中文标题与摘要解读、关键词提取及主题标注。
 
-最终报告固定使用三个标准标签：`心脑轴`、`生态瞬时干预`、`心理健康与数字心理干预`。每篇入选论文包含中文标题、中文摘要、关键词、作者、期刊、IF、JCR 分区、发表时间和原文链接；跨主线或高优先级论文会进入“重点推荐”板块。
+最终报告固定使用三个标准标签：`心脑轴`、`生态瞬时干预`、`心理微干预`。每篇入选论文包含中文标题、中文摘要、关键词、作者、期刊、IF、JCR 分区、发表时间和原文链接；跨主线或高优先级论文会进入“重点推荐”板块。
 
 周报以 Markdown 和 HTML 两种格式保存于 `newsletters/`，便于在 GitHub 中阅读、下载或分享。
 
@@ -69,10 +69,11 @@ python Psy-day-paper-deepseek.py --start-date 2026-08-24 --end-date 2026-08-30
 ├── .github/workflows/
 │   ├── Paper_metadata_download.yaml      # 每周下载与本地预筛工作流
 │   └── Psy-day-paper-deepseek.yaml       # DeepSeek、Newsletter 与分析工作流
-├── Paper_metadata_download.py            # PubMed/Crossref 获取、期刊白名单与本地预筛
+├── Paper_metadata_download.py            # PubMed/Crossref 获取、JCR 分区过滤与本地预筛
 ├── Psy-day-paper-deepseek.py              # DeepSeek 语义筛选与中文解读
 ├── domain_config.py                       # 三条主线关键词、别名与心理学语境规则
-├── journal_registry.py                    # 期刊 ISSN 白名单、IF、JCR 分区与领域信息
+├── journal_registry.py                    # 期刊 ISSN、IF、JCR 分区与 Q3/Q4 例外名单
+├── data/jcr_2026_journals.csv             # 2026 年 JCR 期刊分区与 IF 索引
 ├── newsletter.py                          # Markdown/HTML Newsletter 生成
 ├── analytics.py                           # 词云、趋势图、热门主题和周度指标生成
 ├── requirements.txt                       # Python 依赖
@@ -114,8 +115,9 @@ python -m pip install -r requirements.txt
 ## 期刊与关键词维护
 
 - 修改三条主线的关键词、心理学语境规则或主题标签别名：编辑 `domain_config.py`；
-- 修改期刊白名单、ISSN、IF、JCR 分区或所属主线：编辑 `journal_registry.py`；
+- 修改 Q3/Q4 例外期刊、ISSN 匹配或分区过滤逻辑：编辑 `journal_registry.py`；
+- 更新 JCR 原始数据后，运行 `scripts/build_jcr_registry.py` 重新生成 `data/jcr_2026_journals.csv`；
 - 修改 Newsletter 的栏目与排版：编辑 `newsletter.py`；
 - 修改词云、趋势图与统计口径：编辑 `analytics.py`。
 
-期刊白名单默认启用。带 ISSN 的论文会优先按 ISSN 精确匹配；只有与三条主线相关且收录于白名单的期刊，才会进入后续 DeepSeek 处理，从而控制成本并提高相关性。
+期刊分区过滤默认启用。带 ISSN 的论文会优先按 ISSN 精确匹配；Q1/Q2 及未识别分区的期刊保留，Q3/Q4 期刊仅在例外名单中时保留。多学科分区按该期刊的最高分区判断。
