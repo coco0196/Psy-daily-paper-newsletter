@@ -14,7 +14,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.exceptions import ProtocolError
 from urllib3.util.retry import Retry
 from utils import setup_logger, get_last_week_range, weekly_basename, iter_date_range
-from journal_registry import filter_by_journal, get_journal_profile
+from journal_registry import get_journal_profile, journal_filter_decision
 from domain_config import (
     CROSSREF_TRACK_QUERIES,
     PUBMED_QUERY_MODULES,
@@ -342,18 +342,6 @@ def _parse_pubmed_xml_batch(xml_bytes):
             continue
 
         journal_name = journal_title or journal_abbrev
-        if not filter_by_journal(
-            journal_names=[journal_title, journal_abbrev],
-            issns=journal_issns,
-        ):
-            logger.debug(
-                "PubMed 期刊过滤丢弃 PMID=%s, journal=%r, abbrev=%r, issns=%r",
-                pmid,
-                journal_title,
-                journal_abbrev,
-                journal_issns,
-            )
-            continue
 
         results.append(
             {
@@ -457,106 +445,100 @@ def _crossref_published_date(item, fallback):
     return fallback
 
 
-def _fetch_crossref(session, date_str, page_size=100):
+def _fetch_crossref(session, date_str, max_results_per_query=30, return_stats=False):
     """
     从 Crossref REST API 拉取指定发表日、含摘要的文献，映射为与 PubMed 一致的结构，并标记 source=Crossref。
-    每个主题查询均以 100 条为一页使用 cursor 连续分页，不以总条数截断。
+    每个主题短查询仅取相关性排序靠前的 30 条，不使用 cursor 翻页。
+    日期过滤使用 pub-date，避免按 Crossref 入库/索引日期检索。
     失败时记录 warning 并返回空列表，不向上抛出以免中断主流程。
     """
     try:
         out = []
         seen_dois = set()
+        module_stats = {
+            track: {"returned_items": 0, "downloaded_metadata": 0}
+            for track in CROSSREF_TRACK_QUERIES
+        }
         filter_str = f"from-pub-date:{date_str},until-pub-date:{date_str},has-abstract:true"
         track_queries = [
             (track, query_text)
             for track, queries in CROSSREF_TRACK_QUERIES.items()
             for query_text in (queries if isinstance(queries, (tuple, list)) else (queries,))
         ]
-        page_size = max(1, min(int(page_size), 1000))
+        max_results_per_query = max(1, min(int(max_results_per_query), 30))
         crossref_delay = float(os.getenv("CROSSREF_INTER_REQUEST_DELAY_SEC", "1.0"))
         for index, (track, query_text) in enumerate(track_queries):
-            cursor = "*"
-            page_number = 0
-            while cursor:
-                params = {
-                    **_crossref_query_params(query_text),
-                    "filter": filter_str,
-                    "rows": page_size,
-                    "cursor": cursor,
-                    "mailto": os.getenv("CROSSREF_MAILTO", "zhugamen@gmail.com"),
-                }
-                r = _api_get(
-                    session,
-                    CROSSREF_WORKS_URL,
-                    params=params,
-                    timeout=90,
-                    label=f"Crossref:{track}:{index + 1}:page:{page_number + 1}",
-                )
-                r.raise_for_status()
-                message = r.json().get("message") or {}
-                items = message.get("items") or []
-                page_number += 1
-                logger.info(
-                    "Crossref %s 子查询 %d 第 %d 页返回 %d 条",
-                    track, index + 1, page_number, len(items),
-                )
-                for item in items:
-                    doi = (item.get("DOI") or "").strip()
-                    if not doi or doi.casefold() in seen_dois:
-                        continue
-                    seen_dois.add(doi.casefold())
-                    titles = item.get("title") or []
-                    title = (titles[0] if titles else "").strip()
-                    container_titles = item.get("container-title") or []
-                    journal_name = (container_titles[0] if container_titles else "").strip()
-                    if not journal_name:
-                        journal_name = ((item.get("short-container-title") or [""])[0] or "").strip()
-                    item_issns = item.get("ISSN") or []
-                    if isinstance(item_issns, str):
-                        item_issns = [item_issns]
-                    if not filter_by_journal(journal_name=journal_name, issns=item_issns):
-                        continue
-                    raw_abs = item.get("abstract")
-                    if isinstance(raw_abs, list):
-                        raw_abs = " ".join(str(x) for x in raw_abs)
-                    summary = _strip_crossref_abstract(raw_abs)
-                    authors_out = [
-                        {"name": f"{author.get('given', '') or ''} {author.get('family', '') or ''}".strip()}
-                        for author in item.get("author") or []
-                        if isinstance(author, dict)
-                        and f"{author.get('given', '') or ''} {author.get('family', '') or ''}".strip()
-                    ]
-                    if not title or not summary:
-                        continue
-                    out.append({"paper": _attach_journal_profile({
-                        "id": doi,
-                        "doi": _normalise_doi(doi),
-                        "title": title,
-                        "summary": summary,
-                        "authors": authors_out or [{"name": "Unknown"}],
-                        "publishedAt": _crossref_published_date(item, date_str),
-                        "publicationDateSource": "crossref_published",
-                        "source": "Crossref",
-                        "sources": ["Crossref"],
-                        "journal": journal_name,
-                        "issns": item_issns,
-                    })})
-                if len(items) < page_size:
-                    break
-                cursor = message.get("next-cursor")
-                if not cursor:
-                    break
-                if crossref_delay > 0:
-                    time.sleep(crossref_delay)
+            params = {
+                **_crossref_query_params(query_text),
+                "filter": filter_str,
+                "rows": max_results_per_query,
+                "mailto": os.getenv("CROSSREF_MAILTO", "zhugamen@gmail.com"),
+            }
+            r = _api_get(
+                session,
+                CROSSREF_WORKS_URL,
+                params=params,
+                timeout=90,
+                label=f"Crossref:{track}:{index + 1}",
+            )
+            r.raise_for_status()
+            message = r.json().get("message") or {}
+            items = message.get("items") or []
+            logger.info(
+                "Crossref %s 子查询 %d 返回 %d 条（每条上限 %d）",
+                track, index + 1, len(items), max_results_per_query,
+            )
+            module_stats[track]["returned_items"] += len(items)
+            for item in items:
+                doi = (item.get("DOI") or "").strip()
+                if not doi or doi.casefold() in seen_dois:
+                    continue
+                seen_dois.add(doi.casefold())
+                titles = item.get("title") or []
+                title = (titles[0] if titles else "").strip()
+                container_titles = item.get("container-title") or []
+                journal_name = (container_titles[0] if container_titles else "").strip()
+                if not journal_name:
+                    journal_name = ((item.get("short-container-title") or [""])[0] or "").strip()
+                item_issns = item.get("ISSN") or []
+                if isinstance(item_issns, str):
+                    item_issns = [item_issns]
+                raw_abs = item.get("abstract")
+                if isinstance(raw_abs, list):
+                    raw_abs = " ".join(str(x) for x in raw_abs)
+                summary = _strip_crossref_abstract(raw_abs)
+                authors_out = [
+                    {"name": f"{author.get('given', '') or ''} {author.get('family', '') or ''}".strip()}
+                    for author in item.get("author") or []
+                    if isinstance(author, dict)
+                    and f"{author.get('given', '') or ''} {author.get('family', '') or ''}".strip()
+                ]
+                if not title or not summary:
+                    continue
+                out.append({"paper": _attach_journal_profile({
+                    "id": doi,
+                    "doi": _normalise_doi(doi),
+                    "title": title,
+                    "summary": summary,
+                    "authors": authors_out or [{"name": "Unknown"}],
+                    "publishedAt": _crossref_published_date(item, date_str),
+                    "publicationDateSource": "crossref_published",
+                    "source": "Crossref",
+                    "sources": ["Crossref"],
+                    "retrieval_modules": {"Crossref": [track]},
+                    "journal": journal_name,
+                    "issns": item_issns,
+                })})
+                module_stats[track]["downloaded_metadata"] += 1
             if index + 1 < len(track_queries) and crossref_delay > 0:
                 time.sleep(crossref_delay)
-        return out
+        return (out, module_stats) if return_stats else out
     except (
         requests.exceptions.RequestException,
         ValueError,
     ) as e:
         logger.warning("Crossref 数据拉取失败，将跳过: %s", e)
-        return []
+        return ([], module_stats) if return_stats else []
 
 
 def _validate_and_save_papers(papers, output_file, label):
@@ -678,9 +660,43 @@ def _attach_journal_profile(paper):
     return paper
 
 
-def download_papers_for_date(date_str, retmax=10000):
+def _apply_journal_quartile_filter(papers, return_stats=False):
+    """在元数据齐备、关键词预筛之前落实 JCR Q3/Q4 规则。
+
+    仅有匹配档案且其最高分区为 Q3/Q4 的期刊会被排除；用户指定的低分区
+    白名单和未匹配到 JCR 的期刊均保留，并在统计中可追溯。
     """
-    从 PubMed 与 Crossref 下载指定日期的论文元数据（已按目标期刊过滤）。
+    accepted = []
+    reasons = Counter()
+    for item in papers:
+        paper = item.get("paper", {})
+        allowed, reason, profile = journal_filter_decision(
+            journal_name=paper.get("journal"), issns=paper.get("issns")
+        )
+        paper["journal_metrics"] = profile
+        if allowed:
+            accepted.append(item)
+        else:
+            reasons[reason] += 1
+
+    rejected = len(papers) - len(accepted)
+    logger.info(
+        "JCR Q3/Q4 期刊过滤：输入 %d 篇，保留 %d 篇，剔除 %d 篇（%s）",
+        len(papers), len(accepted), rejected,
+        ", ".join(f"{key}={value}" for key, value in sorted(reasons.items())) or "无",
+    )
+    stats = {
+        "input": len(papers),
+        "accepted": len(accepted),
+        "rejected": rejected,
+        "reasons": dict(reasons),
+    }
+    return (accepted, stats) if return_stats else accepted
+
+
+def download_papers_for_date(date_str, retmax=10000, return_stats=False):
+    """
+    从 PubMed 与 Crossref 下载指定日期的论文元数据并跨来源去重。
     返回 list[dict] 或空列表。
     """
     retmax = int(retmax)
@@ -697,13 +713,24 @@ def download_papers_for_date(date_str, retmax=10000):
 
     pubmed_papers = []
     crossref_papers = []
+    retrieval_stats = {
+        "PubMed": {
+            module: {"search_result_pmids": 0, "downloaded_metadata": 0}
+            for module in PUBMED_QUERY_MODULES
+        },
+        "Crossref": {
+            module: {"returned_items": 0, "downloaded_metadata": 0}
+            for module in CROSSREF_TRACK_QUERIES
+        },
+    }
     inter_delay = float(os.getenv("NCBI_INTER_REQUEST_DELAY_SEC", "0.35"))
-    crossref_page_size = int(os.getenv("CROSSREF_PAGE_SIZE", "100"))
+    crossref_max_results_per_query = int(os.getenv("CROSSREF_PAGE_SIZE", "30"))
     session = _make_api_session()
     try:
         try:
             pmids = []
             seen_pmids = set()
+            pmid_modules = {}
             for module_name, module_query in PUBMED_QUERY_MODULES.items():
                 module_pmids = _esearch_pubmed(
                     session, target_date, module_query, retmax=retmax
@@ -712,7 +739,11 @@ def download_papers_for_date(date_str, retmax=10000):
                     "PubMed %s 模块返回 PMID 数量: %d",
                     module_name, len(module_pmids),
                 )
+                retrieval_stats["PubMed"][module_name]["search_result_pmids"] = len(
+                    module_pmids
+                )
                 for pmid in module_pmids:
+                    pmid_modules.setdefault(pmid, set()).add(module_name)
                     if pmid not in seen_pmids:
                         seen_pmids.add(pmid)
                         pmids.append(pmid)
@@ -726,6 +757,8 @@ def download_papers_for_date(date_str, retmax=10000):
                     rec = by_pmid.get(pmid)
                     if not rec:
                         continue
+                    for module_name in pmid_modules.get(pmid, set()):
+                        retrieval_stats["PubMed"][module_name]["downloaded_metadata"] += 1
                     pubmed_papers.append(
                         {
                             "paper": _attach_journal_profile({
@@ -739,6 +772,9 @@ def download_papers_for_date(date_str, retmax=10000):
                                 "publicationDateSource": rec.get("publication_date_source", ""),
                                 "source": "PubMed",
                                 "sources": ["PubMed"],
+                                "retrieval_modules": {
+                                    "PubMed": sorted(pmid_modules.get(pmid, set()))
+                                },
                                 "journal": rec.get("journal", ""),
                                 "issns": rec.get("issns", []),
                                 })
@@ -749,9 +785,13 @@ def download_papers_for_date(date_str, retmax=10000):
         except ET.ParseError as e:
             logger.error(f"解析 PubMed XML 失败: {e}")
 
-        crossref_papers = _fetch_crossref(
-            session, target_date, page_size=crossref_page_size
+        crossref_papers, crossref_stats = _fetch_crossref(
+            session,
+            target_date,
+            max_results_per_query=crossref_max_results_per_query,
+            return_stats=True,
         )
+        retrieval_stats["Crossref"] = crossref_stats
         logger.info(f"Crossref 返回条目数量: {len(crossref_papers)}")
     finally:
         session.close()
@@ -759,14 +799,15 @@ def download_papers_for_date(date_str, retmax=10000):
     papers = pubmed_papers + crossref_papers
     if not papers:
         logger.warning(f"{target_date} PubMed 与 Crossref 均无可用论文数据")
-        return []
+        return ([], retrieval_stats) if return_stats else []
 
     logger.info(
         f"{target_date} 合并后原始条目: PubMed {len(pubmed_papers)} 篇 + Crossref {len(crossref_papers)} 篇 = {len(papers)} 篇"
     )
-    # 日粒度只负责抓取、期刊白名单和跨来源 DOI 去重。周度合并后再预筛，
-    # 这样日志与配额反映的是完整周，而不会出现按天筛选造成的计数失真。
-    return _deduplicate_papers(papers, f"{target_date} 跨来源")
+    # 日粒度只负责抓取和跨来源 DOI 去重。周度合并、JCR 分区过滤及关键词
+    # 预筛依次执行，确保期刊判断使用完整元数据且统计反映完整周。
+    deduplicated = _deduplicate_papers(papers, f"{target_date} 跨来源")
+    return (deduplicated, retrieval_stats) if return_stats else deduplicated
 
 
 def _normalised_title_key(title):
@@ -812,6 +853,12 @@ def _merge_record_provenance(existing, duplicate):
     for source in incoming.get("sources", [incoming.get("source", "")]):
         if source and source not in target_sources:
             target_sources.append(source)
+    target_modules = target.setdefault("retrieval_modules", {})
+    for source, modules in (incoming.get("retrieval_modules") or {}).items():
+        source_modules = target_modules.setdefault(source, [])
+        for module in modules:
+            if module not in source_modules:
+                source_modules.append(module)
     for field in ("doi", "pmid"):
         if not target.get(field) and incoming.get(field):
             target[field] = incoming[field]
@@ -889,18 +936,51 @@ def metadata_pilot(start_date=None, end_date=None, retmax=10000):
         target_start = target_end
 
     daily_counts = {}
+    retrieval_by_source_and_module = {
+        "PubMed": {
+            module: {"search_result_pmids": 0, "downloaded_metadata": 0}
+            for module in PUBMED_QUERY_MODULES
+        },
+        "Crossref": {
+            module: {"returned_items": 0, "downloaded_metadata": 0}
+            for module in CROSSREF_TRACK_QUERIES
+        },
+    }
     records = []
     for day in iter_date_range(target_start, target_end):
-        day_records = download_papers_for_date(day, retmax=retmax)
+        day_result = download_papers_for_date(day, retmax=retmax, return_stats=True)
+        # 兼容现有调用方和测试中仍返回纯列表的 mock。
+        if isinstance(day_result, tuple):
+            day_records, day_stats = day_result
+        else:
+            day_records, day_stats = day_result, {}
         daily_counts[day] = len(day_records)
         records.extend(day_records)
+        for source, modules in day_stats.items():
+            for module, counters in modules.items():
+                total = retrieval_by_source_and_module[source][module]
+                for key, value in counters.items():
+                    total[key] = total.get(key, 0) + value
 
     merged = _deduplicate_papers(records, "metadata pilot 整周候选")
-    local, prefilter_stats = _apply_local_keyword_prefilter(merged, return_stats=True)
+    journal_filtered, journal_filter_stats = _apply_journal_quartile_filter(
+        merged, return_stats=True
+    )
+    local, prefilter_stats = _apply_local_keyword_prefilter(
+        journal_filtered, return_stats=True
+    )
     source_provenance = Counter()
+    source_module_after_dedup = {
+        source: {module: 0 for module in modules}
+        for source, modules in retrieval_by_source_and_module.items()
+    }
     for item in merged:
         paper = item.get("paper", {})
         source_provenance.update(paper.get("sources") or [paper.get("source", "未知")])
+        for source, modules in (paper.get("retrieval_modules") or {}).items():
+            for module in modules:
+                if source in source_module_after_dedup and module in source_module_after_dedup[source]:
+                    source_module_after_dedup[source][module] += 1
 
     return {
         "status": "success",
@@ -912,6 +992,9 @@ def metadata_pilot(start_date=None, end_date=None, retmax=10000):
         "daily_source_after_dedup": daily_counts,
         "weekly_source_after_dedup": len(merged),
         "source_provenance_after_dedup": dict(source_provenance),
+        "retrieval_by_source_and_module": retrieval_by_source_and_module,
+        "source_module_after_weekly_dedup": source_module_after_dedup,
+        "journal_quartile_filter": journal_filter_stats,
         "local_prefilter": prefilter_stats,
         "deepseek_candidate_count": len(local),
     }
@@ -931,6 +1014,7 @@ def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000)
     try:
         if date_str:
             papers = download_papers_for_date(date_str, retmax=retmax)
+            papers = _apply_journal_quartile_filter(papers)
             papers = _apply_local_keyword_prefilter(papers)
             if not papers:
                 return {"status": "no_data", "date": date_str}
@@ -956,6 +1040,9 @@ def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000)
 
         merged = _deduplicate_papers(merged, "周报候选")
         source_count = len(merged)
+        merged, journal_filter_stats = _apply_journal_quartile_filter(
+            merged, return_stats=True
+        )
         merged = _apply_local_keyword_prefilter(merged)
 
         basename = weekly_basename(target_start, target_end)
@@ -983,6 +1070,7 @@ def download_papers(start_date=None, end_date=None, date_str=None, retmax=10000)
             "end_date": target_end,
             "count": len(valid),
             "source_count": source_count,
+            "journal_quartile_filter": journal_filter_stats,
             "local_prefilter_count": len(valid),
             "file": output_file,
         }

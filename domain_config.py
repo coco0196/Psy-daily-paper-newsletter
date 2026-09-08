@@ -1,14 +1,14 @@
-"""心脑、生态瞬时干预与数字心理健康文献追踪配置。"""
+"""心脑、生态瞬时干预与心理微干预文献追踪配置。"""
 
 import re
 
-REPORT_TITLE = "心脑、生态瞬时干预与数字心理健康文献周报"
+REPORT_TITLE = "心脑、生态瞬时干预与心理微干预文献周报"
 
 # 这三个值既是 DeepSeek 的唯一允许输出，也是 Newsletter 的固定分栏顺序。
 CANONICAL_TOPIC_LABELS = (
     "心脑轴",
     "生态瞬时干预",
-    "心理健康与数字心理干预",
+    "心理微干预",
 )
 
 TOPIC_GROUPS = {
@@ -52,7 +52,7 @@ TOPIC_GROUPS = {
         ],
     },
     "mental_health": {
-        "label": "心理健康与数字心理干预",
+        "label": "心理微干预",
         "terms": [
             "mental health", "mental well-being", "mental wellbeing",
             "psychological well-being", "psychological wellbeing", "flourishing",
@@ -78,17 +78,19 @@ TOPIC_GROUPS = {
 # 在同一查询中相互放大，并让每条主线都有稳定的召回入口。
 CROSSREF_TRACK_QUERIES = {
     "heart_brain": (
-        "heart brain interaction coupling synchrony coherence neurovisceral autonomic vagal cardiac neural coupling interoception",
-        "heart rate variability HRV respiratory sinus arrhythmia baroreflex vagal tone cardiac autonomic regulation allostatic load",
-        "EEG ECG electroencephalography electrocardiography heart rate variability HRV respiratory sinus arrhythmia emotion stress cognition intervention",
+        "heart brain axis heart brain interaction heart brain coupling cardiac brain synchrony heart brain synchrony brain heart coherence cardiac neural coupling neurocardiac interoception",
+        "neurovisceral integration heart rate variability HRV vagal tone cardiac vagal control respiratory sinus arrhythmia psychophysiology emotion stress",
+        "EEG ECG electroencephalography electrocardiography heart brain coupling cardiac neural coupling heartbeat evoked potential heart rate variability HRV",
     ),
     "emi": (
-        "ecological momentary assessment EMA experience sampling ambulatory assessment daily diary intensive longitudinal mobile sensing passive sensing",
-        "ecological momentary intervention EMI just-in-time adaptive intervention JITAI micro-randomized trial MRT context-aware intervention adaptive intervention",
-        "digital phenotyping passive sensing mobile sensing digital biomarkers intensive longitudinal mental health psychology",
+        "ecological momentary assessment EMA experience sampling ambulatory assessment intensive longitudinal",
+        "ecological momentary intervention EMI just-in-time adaptive intervention JITAI just-in-time intervention micro-randomized trial MRT digital micro-intervention",
+        "digital phenotyping passive sensing mobile sensing wearable sensing digital biomarkers",
     ),
     "mental_health": (
-        "digital intervention mobile intervention smartphone intervention app-based intervention internet-based intervention digital therapeutics eHealth iCBT virtual reality intervention wearable intervention",
+        "digital mental health digital psychological intervention smartphone intervention mobile intervention app-based intervention mHealth intervention iCBT",
+        "digital therapeutics DMHI AI-assisted intervention wearable intervention mental health",
+        "micro-intervention microintervention brief intervention single-session intervention mindfulness meditation breathing relaxation biofeedback somatic intervention stress emotion",
     ),
 }
 
@@ -126,30 +128,50 @@ HEART_BRAIN_CONTEXT_REQUIRED_TERMS = {
 HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS = {
     "mental", "psycholog", "psychiatr", "depress", "anxiety", "stress",
     "emotion", "affect", "cognitive", "behavior", "behaviour", "wellbeing",
-    "well-being", "resilience", "mindfulness", "intervention", "therapy",
-    "treatment", "ecological", "experience sampling", "ambulatory", "daily diary",
+    "well-being", "resilience", "feeling", "mindfulness", "intervention",
     "daily monitoring", "dynamic measurement", "dynamic monitoring",
-    "neuroscience", "neuroscientific", "neuroimaging", "neural", "brain", "eeg",
-    "erp", "hep", "psychophysiolog", "interoception",
+    "neuroscience", "neuroimaging", "hrv", "hep", "psychophysiolog",
+    "interoception",
 }
 
 # 这些信号几乎总是基础/医学研究而非本项目所需的心理学或神经科学语境。
 # 疾病名称本身不再一刀切排除：若其确实研究心理行为或身心干预，交由
 # DeepSeek 根据摘要作最终判断。
-NONHUMAN_OR_CELL_TERMS = {
+ANIMAL_TITLE_TERMS = {
     "animal", "animal model", "mice", "mouse", "murine", "rat", "rats", "rodent",
-    "canine", "porcine", "zebrafish", "cell culture", "cell line", "in vitro",
-    "ex vivo", "histology", "immunofluorescence", "western blot",
-}
-HUMAN_STUDY_TERMS = {
-    "human", "humans", "participant", "participants", "patient", "patients",
-    "adult", "adults", "adolescent", "adolescents", "child", "children",
-    "healthy volunteer", "healthy volunteers", "people", "individuals", "cohort",
+    "rodents", "zebrafish", "canine", "porcine", "swine", "pig", "pigs",
+    "dog", "dogs", "canines", "rabbit", "rabbits", "hamster", "hamsters",
+    "guinea pig", "guinea pigs", "macaque", "macaques", "primate", "primates",
+    "nonhuman primate", "monkey", "monkeys", "drosophila", "c. elegans",
+    "knockout mouse", "transgenic mouse",
 }
 PURE_MECHANISTIC_TERMS = {
-    "cellular mechanism", "molecular mechanism", "biological mechanism",
-    "physiological mechanism", "neural mechanism", "receptor expression",
-    "protein expression", "gene expression", "histology", "immunofluorescence",
+    "cellular", "cell culture", "cell line", "in vitro", "ex vivo", "histology",
+    "immunofluorescence", "western blot", "molecular mechanism",
+    "cellular mechanism", "biological mechanism", "physiological mechanism",
+    "neural mechanism", "neurophysiological mechanism", "receptor expression",
+    "receptor binding", "protein expression", "gene expression", "genetic expression",
+    "molecular pathway", "signaling pathway", "mechanistic study",
+    "organoid", "organoids", "tissue culture", "neuronal culture", "cell assay",
+    "immunoblot", "rna sequencing", "rna-seq", "transcriptomic", "proteomic",
+    "knockout", "transgenic", "gene knockout", "receptor agonist", "receptor antagonist",
+}
+
+# 此集合专用于“纯机制”排除条件；心率、HRV 等生理指标本身不构成心理结局。
+PSYCHOLOGICAL_OUTCOME_TERMS = {
+    "mental", "psycholog", "psychiatr", "depress", "anxiety", "stress",
+    "emotion", "affect", "mood", "cognitive", "behavior", "behaviour",
+    "wellbeing", "well-being", "quality of life", "subjective", "experience",
+    "sleep", "insomnia", "pain", "coping", "self-efficacy", "loneliness",
+    "flourishing", "resilience", "self-regulation", "health behavior",
+    "health behaviour", "attention", "executive", "decision", "social cognition",
+}
+OBJECTIVE_DYNAMIC_MEASUREMENT_TERMS = {
+    "ecological momentary assessment", "experience sampling", "ambulatory assessment",
+    "intensive longitudinal", "daily diary", "digital phenotyping", "passive sensing",
+    "mobile sensing", "wearable", "wearables", "biosensor", "biosensors",
+    "actigraphy", "accelerometry", "electrodermal activity", "skin conductance",
+    "photoplethysmography", "ppg", "ecg", "eeg", "heart rate variability", "hrv",
 }
 
 MENTAL_HEALTH_OUTCOME_TERMS = {
@@ -165,46 +187,80 @@ MENTAL_HEALTH_OUTCOME_TERMS = {
     "flourishing", "resilience", "emotion experience", "subjective experience",
 }
 
-MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS = {
-    "digital", "mobile", "smartphone", "smartphone app", "mobile app", "app-based",
-    "web-based", "online", "mhealth", "telehealth", "internet-based",
+# 心理微干预必须先命中明确的干预锚点；泛 ``therapy/treatment/trial/protocol``
+# 不能单独构成干预证据，以免普通长程 CBT/ACT 或一般医疗治疗进入候选池。
+MENTAL_MICRO_OUTCOME_TERMS = {
+    "mental health", "mental", "psycholog", "psychiatr", "depress", "anxiety",
+    "stress", "emotion", "affect", "mood", "cognitive", "behavior", "behaviour",
+    "wellbeing", "well-being", "quality of life", "subjective", "experience",
+    "psychophysiolog", "heart rate variability", "hrv",
 }
-
-MENTAL_HEALTH_INTERVENTION_TERMS = {
-    "intervention", "therapy", "treatment", "psychotherap", "trial", "randomized",
-    "randomised", "protocol", "programme", "program", "self-guided", "self-help",
-    "micro-intervention", "microintervention", "biofeedback", "hrv biofeedback",
-    "mind-body intervention", "mindfulness-based", "mindfulness intervention",
-    "meditation intervention", "relaxation intervention", "breathing intervention",
-    "somatic intervention", "body-oriented psychotherapy",
+MENTAL_MICRO_EXPLICIT_TERMS = {
+    "micro-intervention", "microintervention", "brief intervention",
+    "single-session intervention", "single session", "self-guided intervention",
+    "self-help intervention", "self-help exercise",
+}
+MENTAL_MICRO_MINDBODY_TERMS = {
     "mindfulness-based intervention", "mindfulness intervention", "mindfulness practice",
-    "meditation training", "meditation program", "loving-kindness meditation",
-    "compassion meditation", "body scan", "mindful movement",
-    "relaxation therapy", "relaxation training", "relaxation technique",
+    "meditation intervention", "meditation training", "meditation program",
+    "loving-kindness meditation", "compassion meditation", "body scan", "mindful movement",
+    "relaxation intervention", "relaxation therapy", "relaxation training",
     "progressive muscle relaxation", "autogenic training", "guided imagery",
-    "breathing exercise", "paced breathing", "slow breathing", "slow-paced breathing",
-    "mindful breathing", "diaphragmatic breathing", "deep breathing", "breathwork",
-    "somatic therapy", "somatic experiencing", "body psychotherapy",
-    "dance movement therapy", "mind-body exercise", "mind-body therapy",
-    "behavioral activation", "behavioural activation", "brief intervention",
-    "single-session intervention",
+    "breathing intervention", "breathing exercise", "paced breathing", "slow breathing",
+    "slow-paced breathing", "mindful breathing", "diaphragmatic breathing",
+    "deep breathing", "breathwork", "biofeedback", "hrv biofeedback",
+    "heart rate variability biofeedback", "somatic intervention", "somatic therapy",
+    "somatic experiencing", "body-oriented psychotherapy", "body psychotherapy",
+    "dance movement therapy", "mind-body exercise", "mind-body intervention",
+    "mind-body therapy", "behavioral activation", "behavioural activation",
 }
+MENTAL_MICRO_DIGITAL_TERMS = {
+    "digital intervention", "digital psychological intervention", "mobile intervention",
+    "smartphone intervention", "app-based intervention", "web-based intervention",
+    "internet-based intervention", "mhealth intervention", "digital therapeutics",
+    "dmhi", "icbt", "ai-assisted intervention", "virtual reality intervention",
+    "wearable intervention",
+}
+# 这些词只有与明确实施形式成对出现时，才可作为数字递送心理微干预锚点。
+MENTAL_MICRO_DELIVERY_TERMS = {
+    "digital", "mobile", "smartphone", "app", "web", "internet", "mhealth",
+    "ehealth", "wearable", "virtual reality", "ai-assisted",
+}
+MENTAL_MICRO_IMPLEMENTATION_TERMS = {
+    "intervention", "training", "exercise", "program", "programme", "session",
+}
+MENTAL_MICRO_ANY_INTERVENTION_TERMS = (
+    MENTAL_MICRO_EXPLICIT_TERMS
+    | MENTAL_MICRO_MINDBODY_TERMS
+    | MENTAL_MICRO_DIGITAL_TERMS
+)
 
-# PubMed 是严格布尔检索。第三主线使用“核心心理/行为主题 AND 一般干预”
-# 作为宽召回入口；高特异身心干预另设入口。协议、trial、programme 等泛词
-# 不单独用于检索，避免把大量一般医学研究引入候选池。
+# PubMed 是严格布尔检索。第三主线采用“心理/行为/动态/心理生理语境
+# AND 微干预词”作为入口；高特异身心或简短干预另设入口。泛治疗、随机化
+# 与方案词不单独用于检索，避免把大量一般医学研究引入候选池。
 MENTAL_HEALTH_RETRIEVAL_OUTCOME_TERMS = (
     "mental health", "emotion regulation", "psychological distress", "stress",
     "anxiety", "depression", "mood", "affect", "well-being",
     "mental wellbeing", "psychological well-being", "flourishing", "resilience",
     "loneliness", "coping", "self-efficacy", "quality of life",
     "health behavior", "health behaviour", "self-regulation",
-    "sleep", "insomnia", "pain",
+    "sleep", "insomnia", "pain", "mental", "psycholog", "psychiatr", "emotion",
+    "cognitive", "behavior", "behaviour", "subjective", "experience", "wellbeing",
+    "daily monitoring", "dynamic measurement", "dynamic monitoring",
+    "ambulatory monitoring", "ecological", "experience sampling", "ema", "esm",
+    "psychophysiolog", "heart rate variability", "hrv", "heart rate",
+    "eeg", "erp", "hep", "interoception", "neuroimaging", "fmri", "neuroscience",
+    "neural", "brain", "mindfulness", "meditation", "relaxation", "breathing",
+    "biofeedback", "adherence", "motivation", "attention", "executive", "decision",
+    "social cognition",
 )
-MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS = (
-    "intervention", "therapy", "treatment", "psychotherapy", "randomized",
-    "randomised", "psychological intervention", "self-guided intervention",
-    "self-help intervention", "digital intervention", "mobile intervention",
+MENTAL_HEALTH_RETRIEVAL_MICROINTERVENTION_TERMS = (
+    "micro-intervention", "self-guided intervention", "self-help intervention",
+    "digital intervention", "mobile intervention", "self-help exercise",
+    "digital mental health", "digital psychological intervention", "app-based intervention",
+    "mhealth intervention", "digital therapeutics", "dmhi", "ehealth", "icbt",
+    "ai-assisted intervention", "wearable intervention", "brief intervention",
+    "single-session intervention",
 )
 MENTAL_HEALTH_HIGH_SPECIFIC_INTERVENTION_TERMS = (
     "mind-body intervention",
@@ -223,29 +279,18 @@ MENTAL_HEALTH_HIGH_SPECIFIC_INTERVENTION_TERMS = (
     "brief intervention", "single-session intervention", "behavioral activation",
     "behavioural activation",
 )
-MENTAL_HEALTH_DIGITAL_RETRIEVAL_TERMS = (
-    "digital mental health", "digital psychological intervention", "digital intervention",
-    "mobile intervention", "smartphone intervention", "app-based intervention",
-    "web-based intervention", "internet-based intervention", "mhealth intervention",
-    "digital therapeutics", "dmhi", "ehealth", "icbt", "ai-assisted intervention",
-    "virtual reality intervention", "wearable intervention", "brief intervention",
-    "single-session intervention",
-)
-
-
 def _pubmed_title_abstract_any(terms):
     return " OR ".join(f'"{term}"[Title/Abstract]' for term in terms)
 
 
 PUBMED_MENTAL_HEALTH_QUERY = (
     f"(({_pubmed_title_abstract_any(MENTAL_HEALTH_RETRIEVAL_OUTCOME_TERMS)}) "
-    f"AND ({_pubmed_title_abstract_any(MENTAL_HEALTH_RETRIEVAL_INTERVENTION_TERMS)})) "
-    f"OR ({_pubmed_title_abstract_any(MENTAL_HEALTH_HIGH_SPECIFIC_INTERVENTION_TERMS)}) "
-    f"OR ({_pubmed_title_abstract_any(MENTAL_HEALTH_DIGITAL_RETRIEVAL_TERMS)}))"
+    f"AND ({_pubmed_title_abstract_any(MENTAL_HEALTH_RETRIEVAL_MICROINTERVENTION_TERMS)})) "
+    f"OR ({_pubmed_title_abstract_any(MENTAL_HEALTH_HIGH_SPECIFIC_INTERVENTION_TERMS)}))"
 )
 
-# PubMed 检索按三条主线分为三个 tiab 模块。语境限制放在本地预筛和
-# DeepSeek 阶段，以首先建立宽而结构化的候选池。
+# PubMed 检索按三条主线分为三个 tiab 模块。心理微干预模块已在检索入口
+# 引入语境限制；其余直接主题的最终直接性判断仍由本地预筛和 DeepSeek 完成。
 PUBMED_HEART_BRAIN_QUERY = (
     f"(({_pubmed_title_abstract_any(TOPIC_GROUPS['heart_brain']['terms'])}) "
     f"OR ({EEG_ECG_PUBMED_QUERY}))"
@@ -289,52 +334,16 @@ EMA_EMI_PHYSIOLOGICAL_TERMS = {
     "passive sensing", "mobile sensing",
     "hr", "hrv", "eeg", "ecg",
 }
-DIGITAL_PHENOTYPING_HUMAN_HEALTH_TERMS = {
-    "digital phenotyping", "passive sensing", "mobile sensing", "wearable",
-    "wearables", "health", "healthcare", "public health", "patient", "patients",
-}
-
-REVIEW_TERMS = {
-    "systematic review", "scoping review", "narrative review", "literature review",
-    "meta-analysis", "meta analysis", "umbrella review", "review article",
-}
-
-# 除直接的心脑术语外，三条主线都应落在心理学、精神健康、行为科学、
-# 心理生理或神经科学的语境中。该集合用于本地阶段拦截泛临床/工程噪声；
-# 不是最终的学术相关性判断。
+# 仅供 EMA/ESM、EMI/JITAI 分支使用；词干 psycholog/psychiatr/depress
+# 由 _SAFE_STEM_PREFIXES 以 ``*`` 语义匹配其派生形式。
 PSYCHOLOGY_NEUROSCIENCE_CONTEXT_TERMS = {
     "mental", "psycholog", "psychiatr", "depress", "anxiety", "stress",
     "emotion", "affect", "mood", "cognitive", "behavior", "behaviour",
-    "wellbeing", "well-being", "quality of life", "subjective", "experience",
-    "neuroscience", "neural", "brain", "eeg", "psychophysiolog", "hrv",
-    "mindfulness", "meditation", "relaxation", "breathing", "biofeedback",
-    "sleep", "insomnia", "pain", "adherence", "coping", "self-efficacy",
-    "loneliness", "flourishing", "health behavior", "health behaviour",
-    "self-regulation", "motivation", "attention", "executive", "decision",
-    "social cognition", "daily monitoring", "dynamic measurement", "dynamic monitoring",
-    "ambulatory monitoring", "ecological", "experience sampling", "ema", "esm",
-    "neuroimaging", "fmri", "erp", "hep", "interoception", "hrv", "heart rate",
-}
-
-# 第三主线允许睡眠、疼痛、身体活动或依从性作为身心干预结局，但这些健康词
-# 本身不能把一般临床试验带入周报；还须有心理/行为、心理生理或身心方法语境。
-MENTAL_HEALTH_CONTEXT_TERMS = {
-    "mental", "psycholog", "psychiatr", "depress", "anxiety", "stress",
-    "emotion", "affect", "mood", "cognitive", "behavior", "behaviour",
-    "wellbeing", "well-being", "quality of life", "subjective", "experience",
-    "psychophysiolog", "heart rate variability", "hrv", "biofeedback",
-    "mindfulness", "meditation", "relaxation", "breathing", "mind-body",
-    "somatic", "body-oriented", "coping", "self-efficacy", "loneliness",
-    "flourishing", "health behavior", "health behaviour", "self-regulation",
-    "daily monitoring", "dynamic measurement", "dynamic monitoring", "hrv", "heart rate",
-}
-MENTAL_HEALTH_SUPPORTING_OUTCOME_TERMS = {
-    "sleep", "insomnia", "pain", "physical activity", "adherence",
-    "medication adherence", "treatment adherence",
-}
-MENTAL_HEALTH_MINDBODY_INTERVENTION_TERMS = {
-    "mindfulness", "meditation", "relaxation", "breathing", "mind-body",
-    "biofeedback", "hrv biofeedback", "somatic", "body-oriented",
+    "wellbeing", "well-being", "quality of life", "subjective",
+    "psychophysiolog", "hrv", "heart rate", "wearable", "passive sensing",
+    "mobile sensing", "daily monitoring", "dynamic measurement", "neuroimaging",
+    "sleep", "insomnia", "pain", "adherence", "mindfulness", "meditation",
+    "relaxation", "breathing", "biofeedback",
 }
 
 LOCAL_PREFILTER_BROAD_TERMS = {
@@ -364,8 +373,9 @@ _TOPIC_ALIASES = {
         "生态瞬时干预", "ema/esm", "密集纵向", "emi/jitai", "即时自适应",
         "生态瞬时评估", "经验取样", "数字表型",
     ),
-    "心理健康与数字心理干预": (
-        "心理健康与数字心理干预", "心理健康", "数字心理干预", "数字/移动心理干预",
+    "心理微干预": (
+        "心理微干预", "心理健康与数字心理干预", "心理健康", "数字心理干预",
+        "数字/移动心理干预",
     ),
 }
 
@@ -387,8 +397,22 @@ def iter_topic_terms():
                 yield term
 
 
+_SAFE_STEM_PREFIXES = {
+    "psycholog", "psychiatr", "depress", "intervention", "behavior",
+    "behaviour", "psychophysiolog", "psychotherap",
+}
+
+
 def _contains_term(text, term):
-    return term.casefold() in text.casefold()
+    """以整词/整短语匹配正向词；仅允许少数安全词干匹配派生形式。"""
+    normalized = str(text or "").casefold()
+    normalized_term = str(term or "").casefold().strip()
+    if not normalized_term:
+        return False
+    phrase = re.escape(normalized_term).replace(r"\ ", r"\s+")
+    if normalized_term in _SAFE_STEM_PREFIXES:
+        phrase = re.escape(normalized_term) + r"\w*"
+    return bool(re.search(rf"(?<!\w){phrase}(?!\w)", normalized))
 
 
 def _has_any(text, terms):
@@ -411,19 +435,41 @@ def local_prefilter_decision(title, abstract):
     本层只移除明显不属于心理学/神经科学三条主线的记录；最终的直接相关性
     由 DeepSeek 判定。因此它不把“不是重点推荐”误当作“不能收录”。
     """
-    text = " ".join(str(value or "") for value in (title, abstract))
-    has_human_signal = _has_any_whole_phrase(text, HUMAN_STUDY_TERMS)
-    has_nonhuman_or_cell_signal = _has_any_whole_phrase(text, NONHUMAN_OR_CELL_TERMS)
-    # 动物、细胞与体外研究是全局排除项。人类研究或人类综述偶尔会提及
-    # 动物证据，故有明确人类信号时不在本地阶段误删，交由 DeepSeek 终审。
-    if has_nonhuman_or_cell_signal and not has_human_signal:
+    title_text = str(title or "")
+    abstract_text = str(abstract or "")
+    text = " ".join((title_text, abstract_text))
+    # 用户确认：动物词一旦出现在标题或摘要中，即直接排除，不再区分背景提及
+    # 与实际动物对象。
+    if _has_any_whole_phrase(text, ANIMAL_TITLE_TERMS):
         return {
             "accepted": False,
             "groups": [],
-            "reason": "nonhuman_or_cell_study",
+            "reason": "animal_term_in_title_or_abstract",
+        }
+    has_psychological_outcome = _has_any(text, PSYCHOLOGICAL_OUTCOME_TERMS)
+    has_any_intervention = (
+        _has_any(text, MENTAL_MICRO_ANY_INTERVENTION_TERMS)
+        or _has_any(text, EMA_EMI_INTERVENTION_TERMS)
+    )
+    has_ema_or_objective_dynamic_measurement = _has_any_whole_phrase(
+        text, OBJECTIVE_DYNAMIC_MEASUREMENT_TERMS
+    )
+    # 纯细胞、分子、受体、基因表达或纯神经/生理机制研究，只有在具有人类
+    # 心理结局、实际干预、或 EMA/客观动态测量之一时才保留候选资格。
+    if (
+        _has_any_whole_phrase(text, PURE_MECHANISTIC_TERMS)
+        and not (
+            has_psychological_outcome
+            or has_any_intervention
+            or has_ema_or_objective_dynamic_measurement
+        )
+    ):
+        return {
+            "accepted": False,
+            "groups": [],
+            "reason": "pure_mechanistic_without_required_signal",
         }
     has_psych_neuro_context = _has_any(text, PSYCHOLOGY_NEUROSCIENCE_CONTEXT_TERMS)
-    is_review = _has_any(text, REVIEW_TERMS)
     accepted_groups = []
     reasons = []
     for group_id, group in TOPIC_GROUPS.items():
@@ -439,12 +485,9 @@ def local_prefilter_decision(title, abstract):
         ):
             continue
         if group_id == "heart_brain":
-            # HRV/迷走/自主神经等词非常宽泛，仍需心理或神经科学语境；直接
-            # 心脑研究和综述同样须落在这一语境，而不是纯心血管生理。
-            if not (
-                _has_any(text, HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS)
-                or (is_review and has_psych_neuro_context)
-            ):
+            # HRV/迷走/自主神经等词非常宽泛，仍需心理或神经科学语境；综述
+            # 不享有例外，和其他文章使用同一判断。
+            if not _has_any(text, HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS):
                 continue
             accepted_groups.append(group["label"])
             reasons.append(
@@ -452,54 +495,41 @@ def local_prefilter_decision(title, abstract):
             )
             continue
         if group_id == "mental_health":
-            has_intervention = _has_any(text, MENTAL_HEALTH_INTERVENTION_TERMS)
-            has_delivery = _has_any(text, MENTAL_HEALTH_DIGITAL_DELIVERY_TERMS)
-            has_context = _has_any(text, MENTAL_HEALTH_CONTEXT_TERMS)
-            has_supporting_outcome = _has_any(text, MENTAL_HEALTH_SUPPORTING_OUTCOME_TERMS)
-            has_mindbody_intervention = _has_any(
-                text, MENTAL_HEALTH_MINDBODY_INTERVENTION_TERMS
+            has_outcome = _has_any(text, MENTAL_MICRO_OUTCOME_TERMS)
+            has_explicit_micro = _has_any(text, MENTAL_MICRO_EXPLICIT_TERMS)
+            has_mindbody_micro = _has_any(text, MENTAL_MICRO_MINDBODY_TERMS)
+            has_direct_digital_micro = _has_any(text, MENTAL_MICRO_DIGITAL_TERMS)
+            has_digital_delivery_pair = (
+                _has_any(text, MENTAL_MICRO_DELIVERY_TERMS)
+                and _has_any(text, MENTAL_MICRO_IMPLEMENTATION_TERMS)
             )
-            has_eligible_context = has_context or (
-                has_supporting_outcome and has_mindbody_intervention
+            has_microintervention_anchor = (
+                has_explicit_micro
+                or has_mindbody_micro
+                or has_direct_digital_micro
+                or has_digital_delivery_pair
             )
-            # 第三主线只排除明显无关的记录：不再强制要求命中特定结局词。只要
-            # 具备心理/身心/心理生理语境和干预信号即可送入 DeepSeek；直接相关
-            # 综述也保留，由模型判断是否足够直接。
-            if not (
-                (has_eligible_context and has_intervention)
-                or (is_review and has_eligible_context)
-            ):
+            # 必须同时有心理/情绪/行为/主观体验/心理生理结局与明确微干预锚点。
+            # 泛 therapy/treatment/trial/protocol 不再单独放行普通长程治疗。
+            if not (has_outcome and has_microintervention_anchor):
                 continue
             accepted_groups.append(group["label"])
-            reasons.append(
-                "mental_health_intervention_with_digital_delivery"
-                if has_delivery
-                else "mental_health_intervention"
-            )
+            reasons.append("mental_microintervention")
             continue
         if group_id == "emi":
             has_core_method = _has_any(text, EMA_EMI_CORE_METHOD_TERMS)
             has_intervention = _has_any(text, EMA_EMI_INTERVENTION_TERMS)
             has_physiology = _has_any_whole_phrase(text, EMA_EMI_PHYSIOLOGICAL_TERMS)
-            is_human_health_digital_phenotyping_review = (
-                is_review
-                and _has_any(text, {"digital phenotyping", "passive sensing", "mobile sensing"})
-                and _has_any(text, DIGITAL_PHENOTYPING_HUMAN_HEALTH_TERMS)
-            )
             # 排除只做自评问卷的 EMA/ESM；需为直接干预，或结合客观生理/传感
-            # 指标。两者兼具的论文会在 DeepSeek 阶段获得重点推荐资格。
-            # EMA/ESM 的方法学门槛保持不变；但直接讨论该方法学的综述也有
-            # 长期追踪价值，不按“简单问卷研究”处理。
+            # 指标。综述不单独放行，和其他文章采用同一方法/语境要求。
             if not (
                 has_core_method
-                and (has_intervention or has_physiology or is_review)
-                and (has_psych_neuro_context or is_human_health_digital_phenotyping_review)
+                and (has_intervention or has_physiology)
+                and has_psych_neuro_context
             ):
                 continue
             accepted_groups.append(group["label"])
-            if is_review and not (has_intervention or has_physiology):
-                reasons.append("ema_emi_review")
-            elif has_intervention and has_physiology:
+            if has_intervention and has_physiology:
                 reasons.append("emi_with_intervention_and_physiology")
             elif has_intervention:
                 reasons.append("emi_with_intervention")
@@ -512,12 +542,6 @@ def local_prefilter_decision(title, abstract):
             continue
         accepted_groups.append(group["label"])
         reasons.append("broad_term_with_context" if only_broad else "specific_term")
-    if not accepted_groups and _has_any_whole_phrase(text, PURE_MECHANISTIC_TERMS):
-        return {
-            "accepted": False,
-            "groups": [],
-            "reason": "pure_mechanistic_without_target_context",
-        }
     return {
         "accepted": bool(accepted_groups),
         "groups": accepted_groups,

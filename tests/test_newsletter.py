@@ -11,7 +11,7 @@ class NewsletterFormattingTests(unittest.TestCase):
     def test_legacy_json_style_label_is_normalized(self):
         self.assertEqual(
             normalize_topic_labels('["心理健康与数字心理干预"]'),
-            ["心理健康与数字心理干预"],
+            ["心理微干预"],
         )
 
     def test_legacy_ema_and_emi_labels_merge(self):
@@ -41,8 +41,8 @@ class NewsletterFormattingTests(unittest.TestCase):
         rendered = generator.render_markdown([paper], "2026-09-01 至 2026-09-07")
         self.assertIn("## 心脑轴", rendered)
         self.assertIn("## 生态瞬时干预", rendered)
-        self.assertIn("## 心理健康与数字心理干预", rendered)
-        self.assertIn("主题标签：心理健康与数字心理干预", rendered)
+        self.assertIn("## 心理微干预", rendered)
+        self.assertIn("主题标签：心理微干预", rendered)
         self.assertNotIn('["心理健康与数字心理干预"]', rendered)
         self.assertIn("收录 1 篇文献。", rendered)
         self.assertNotIn("优先级：", rendered)
@@ -96,7 +96,7 @@ class NewsletterFormattingTests(unittest.TestCase):
                 self.assertIn("期刊：Journal of Medical Internet Research，JCR Q1，IF 6.0", rendered)
                 self.assertNotIn("优先级：", rendered)
                 self.assertNotIn("收录决定：", rendered)
-                self.assertIn("主题标签：生态瞬时干预；心理健康与数字心理干预", rendered)
+                self.assertIn("主题标签：生态瞬时干预；心理微干预", rendered)
                 self.assertIn("## 数据分析", rendered)
                 self.assertIn("关键词云图", rendered)
                 self.assertTrue(
