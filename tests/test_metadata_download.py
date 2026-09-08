@@ -44,7 +44,7 @@ class PubMedMetadataTests(unittest.TestCase):
             "paper": {
                 "id": "1", "pmid": "1", "doi": "10.1000/pilot",
                 "title": "A digital mental health intervention for anxiety",
-                "summary": "A randomized psychological intervention assessed anxiety and wellbeing.",
+                "summary": "Adult participants received a randomized digital psychological intervention that assessed anxiety and wellbeing.",
                 "authors": [{"name": "Ada Lovelace"}],
                 "journal": "Journal of Medical Internet Research",
                 "issns": ["1438-8871"], "publishedAt": "2026-08-24",
@@ -61,6 +61,28 @@ class PubMedMetadataTests(unittest.TestCase):
         self.assertFalse(result["calls_deepseek"])
         self.assertEqual(result["weekly_source_after_dedup"], 1)
         self.assertEqual(result["deepseek_candidate_count"], 1)
+
+    def test_metadata_pilot_applies_journal_filter_before_local_keyword_prefilter(self):
+        q4_candidate = {
+            "paper": {
+                "id": "1", "pmid": "1", "doi": "10.1000/q4",
+                "title": "A digital mental health intervention for anxiety",
+                "summary": "A randomized psychological intervention assessed anxiety and wellbeing.",
+                "authors": [{"name": "Ada Lovelace"}],
+                "journal": "Online Journal of Public Health Informatics",
+                "issns": ["1947-2579"], "publishedAt": "2026-08-24",
+                "source": "PubMed", "sources": ["PubMed"],
+            }
+        }
+        with patch(
+            "Paper_metadata_download.download_papers_for_date", return_value=[q4_candidate]
+        ):
+            result = metadata_pilot("2026-08-24", "2026-08-24")
+        self.assertEqual(result["weekly_source_after_dedup"], 1)
+        self.assertEqual(result["journal_quartile_filter"]["rejected"], 1)
+        self.assertEqual(result["journal_quartile_filter"]["reasons"], {"q4_excluded": 1})
+        self.assertEqual(result["local_prefilter"]["input"], 0)
+        self.assertEqual(result["deepseek_candidate_count"], 0)
 
 
 if __name__ == "__main__":

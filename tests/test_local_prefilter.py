@@ -6,10 +6,10 @@ from domain_config import local_prefilter_decision, topic_label_eligibility
 class LocalKeywordPrefilterTests(unittest.TestCase):
     def test_each_topic_line_can_pass_independently(self):
         examples = [
-            ("Brain-heart coupling during affective stress", "A neurovisceral integration study."),
+            ("Brain-heart coupling during affective stress", "Adult participants completed a neurovisceral integration study."),
             ("Ecological momentary assessment of mood with PPG", "Participants completed smartphone prompts and wearable physiological monitoring."),
-            ("A just-in-time adaptive intervention for anxiety", "The mobile intervention adapts support."),
-            ("A mobile behavioral activation programme for depression", "A self-guided digital psychological intervention trial."),
+            ("A just-in-time adaptive intervention for anxiety", "Adult participants received mobile intervention support."),
+            ("A mobile behavioral activation programme for depression", "Participants received a self-guided digital psychological intervention."),
         ]
         for title, abstract in examples:
             with self.subTest(title=title):
@@ -22,10 +22,17 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         )
         accepted = local_prefilter_decision(
             "Heart rate variability and emotion regulation",
-            "A daily-life study of psychological stress.",
+            "Adult participants completed a daily-life study of psychological stress.",
         )
         self.assertFalse(rejected["accepted"])
         self.assertTrue(accepted["accepted"])
+
+    def test_brain_or_neural_words_do_not_supply_heart_brain_context(self):
+        result = local_prefilter_decision(
+            "Heart rate variability and brain structure",
+            "We examined neural signals in healthy adults.",
+        )
+        self.assertFalse(result["accepted"])
 
     def test_heart_brain_medical_or_animal_record_is_rejected(self):
         result = local_prefilter_decision(
@@ -40,12 +47,12 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             "A mouse model received treatment and behavioral testing.",
         )
         self.assertFalse(result["accepted"])
-        self.assertEqual(result["reason"], "nonhuman_or_cell_study")
+        self.assertEqual(result["reason"], "animal_term_in_title_or_abstract")
 
     def test_synchronous_eeg_ecg_with_psychological_context_is_heart_brain(self):
         result = local_prefilter_decision(
             "Concurrent EEG and ECG during emotion regulation",
-            "We examined brain-heart coupling during psychological stress.",
+            "We examined brain-heart coupling during psychological stress in adult participants.",
         )
         self.assertTrue(result["accepted"])
         self.assertIn("心脑轴", result["groups"])
@@ -67,7 +74,7 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
     def test_mental_digital_track_requires_outcome_delivery_and_intervention(self):
         accepted = local_prefilter_decision(
             "A smartphone cognitive behavioral intervention for depression",
-            "A randomized trial of a mobile mental health treatment.",
+            "Adult participants received a randomized mobile mental health intervention.",
         )
         rejected = local_prefilter_decision(
             "Digital monitoring of depression symptoms",
@@ -79,31 +86,38 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
     def test_non_digital_mind_body_intervention_is_eligible(self):
         result = local_prefilter_decision(
             "HRV biofeedback for stress and insomnia",
-            "A randomized relaxation intervention assessed perceived stress, sleep and heart rate variability.",
+            "Adult participants received a relaxation intervention assessing perceived stress and heart rate variability.",
         )
         self.assertTrue(result["accepted"])
-        self.assertIn("心理健康与数字心理干预", result["groups"])
+        self.assertIn("心理微干预", result["groups"])
 
     def test_somatic_intervention_is_eligible(self):
         result = local_prefilter_decision(
             "Body-oriented psychotherapy for anxiety",
-            "A somatic intervention evaluated emotional distress and psychological wellbeing.",
+            "Patients received a somatic intervention evaluating emotional distress and psychological wellbeing.",
         )
         self.assertTrue(result["accepted"])
-        self.assertIn("心理健康与数字心理干预", result["groups"])
+        self.assertIn("心理微干预", result["groups"])
 
     def test_direct_psychological_intervention_review_does_not_need_a_fixed_outcome_word(self):
         result = local_prefilter_decision(
             "A systematic review of psychological interventions",
-            "This review synthesizes psychotherapy and self-guided intervention methods.",
+            "This review synthesizes human psychological research on self-guided intervention methods.",
         )
         self.assertTrue(result["accepted"])
-        self.assertIn("心理健康与数字心理干预", result["groups"])
+        self.assertIn("心理微干预", result["groups"])
+
+    def test_review_without_an_actual_intervention_is_not_automatically_accepted(self):
+        result = local_prefilter_decision(
+            "A scoping review of mental wellbeing and emotion regulation",
+            "This review synthesizes descriptive research in adults.",
+        )
+        self.assertFalse(result["accepted"])
 
     def test_physiology_alone_does_not_create_emi_label(self):
         labels = topic_label_eligibility(
             "Concurrent EEG and ECG during emotion regulation",
-            "We examined brain-heart coupling, heart rate variability and psychological stress.",
+            "Adult participants underwent brain-heart coupling measurement during psychological stress.",
         )
         self.assertEqual(labels, ["心脑轴"])
 
@@ -114,40 +128,56 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         )
         physiology_ema = local_prefilter_decision(
             "Experience sampling with ECG and PPG",
-            "Ambulatory physiological monitoring assessed affect in daily life.",
+            "Adult participants underwent ambulatory physiological monitoring of affect in daily life.",
         )
         emi = local_prefilter_decision(
             "A just-in-time adaptive intervention for anxiety",
-            "A smartphone intervention delivered support in daily life.",
+            "Adult participants received smartphone intervention support in daily life.",
         )
         digital_phenotyping = local_prefilter_decision(
             "Digital phenotyping in intensive longitudinal mental health research",
-            "Passive sensing captured daily-life behavioral signals.",
+            "Participants provided passive sensing data on daily-life behavioral signals.",
         )
         self.assertFalse(questionnaire_only["accepted"])
         self.assertTrue(physiology_ema["accepted"])
         self.assertTrue(emi["accepted"])
         self.assertTrue(digital_phenotyping["accepted"])
 
-    def test_direct_topic_reviews_are_kept(self):
+    def test_reviews_follow_the_same_rules_as_other_records(self):
         heart_review = local_prefilter_decision(
             "A systematic review of neurovisceral integration and emotion",
-            "This review synthesizes heart rate variability research in affective neuroscience.",
+            "This review synthesizes human heart rate variability research in affective neuroscience.",
         )
         ema_review = local_prefilter_decision(
             "A systematic review of ecological momentary assessment in depression",
             "We review intensive longitudinal psychological assessment methods.",
         )
         self.assertIn("心脑轴", heart_review["groups"])
-        self.assertIn("生态瞬时干预", ema_review["groups"])
+        self.assertFalse(ema_review["accepted"])
 
-    def test_human_health_digital_phenotyping_review_is_kept(self):
+    def test_review_with_ema_and_objective_measurement_can_pass_normally(self):
         result = local_prefilter_decision(
-            "Digital phenotyping in human health research: a scoping review",
-            "This review synthesizes wearable and passive sensing studies in healthcare.",
+            "A systematic review of digital phenotyping in depression",
+            "This review synthesizes human intensive longitudinal passive sensing and wearable studies of mood.",
         )
         self.assertTrue(result["accepted"])
         self.assertIn("生态瞬时干预", result["groups"])
+
+    def test_animal_term_in_human_background_is_directly_rejected(self):
+        result = local_prefilter_decision(
+            "Heart rate variability and stress regulation",
+            "Although relevant to human health, mice were exposed to chronic stress and received treatment.",
+        )
+        self.assertFalse(result["accepted"])
+        self.assertEqual(result["reason"], "animal_term_in_title_or_abstract")
+
+    def test_pure_mechanistic_record_without_required_signal_is_rejected(self):
+        result = local_prefilter_decision(
+            "Molecular mechanism of autonomic receptor signaling",
+            "We characterized receptor expression and a signaling pathway in vitro.",
+        )
+        self.assertFalse(result["accepted"])
+        self.assertEqual(result["reason"], "pure_mechanistic_without_required_signal")
 
     def test_generic_clinical_intervention_without_psychology_or_neuroscience_is_rejected(self):
         result = local_prefilter_decision(
@@ -155,6 +185,27 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             "A randomized trial of postoperative analgesic treatment.",
         )
         self.assertFalse(result["accepted"])
+
+    def test_generic_long_cbt_without_a_microintervention_anchor_is_rejected(self):
+        result = local_prefilter_decision(
+            "Cognitive behavioral therapy for depression",
+            "Adult participants received a randomized psychotherapy program for depression.",
+        )
+        self.assertFalse(result["accepted"])
+
+    def test_developmental_does_not_match_the_whole_word_mental(self):
+        result = local_prefilter_decision(
+            "Developmental outcomes after surgery",
+            "Children received a rehabilitation intervention after surgery.",
+        )
+        self.assertFalse(result["accepted"])
+
+    def test_human_signal_is_not_a_global_requirement(self):
+        result = local_prefilter_decision(
+            "A breathing intervention for stress",
+            "A brief intervention assessed stress reduction.",
+        )
+        self.assertTrue(result["accepted"])
 
     def test_unrelated_record_is_rejected(self):
         result = local_prefilter_decision(
