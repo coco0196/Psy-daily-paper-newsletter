@@ -1,13 +1,13 @@
-"""心脑、生态瞬时干预与心理微干预文献追踪配置。"""
+"""心脑、生态瞬时研究与心理微干预文献追踪配置。"""
 
 import re
 
-REPORT_TITLE = "心脑、生态瞬时干预与心理微干预文献周报"
+REPORT_TITLE = "心脑、生态瞬时研究与心理微干预文献周报"
 
 # 这三个值既是 DeepSeek 的唯一允许输出，也是 Newsletter 的固定分栏顺序。
 CANONICAL_TOPIC_LABELS = (
     "心脑轴",
-    "生态瞬时干预",
+    "生态瞬时研究",
     "心理微干预",
 )
 
@@ -35,7 +35,7 @@ TOPIC_GROUPS = {
         ],
     },
     "emi": {
-        "label": "生态瞬时干预",
+        "label": "生态瞬时研究",
         "terms": [
             "ecological momentary assessment", "experience sampling",
             "experience sampling method", "ambulatory assessment",
@@ -304,10 +304,9 @@ PUBMED_QUERY_MODULES = {
     "mental_health": PUBMED_MENTAL_HEALTH_QUERY,
 }
 
-# EMA/ESM 的一般自评问卷研究数量很大，且未必符合本项目的重点。EMA/EMI
-# 主线要求明确的瞬时/密集纵向方法，并进一步要求：要么是主动干预，要么结合
-# 客观生理数据（含心血管与可穿戴感测）。数字表型和被动感测被视为传感路径，
-# 但仍需明确属于 EMA/ESM 或密集纵向设计。
+# 生态瞬时研究覆盖 EMA/ESM、密集纵向、适应性干预、数字表型、被动感知、
+# 动态预测和日常多模态测量。本地预筛只确认候选文献具有这些研究设计及心理/
+# 行为语境；是否属于最终主题标签由 DeepSeek 判定。
 EMA_EMI_CORE_METHOD_TERMS = {
     "ecological momentary assessment", "experience sampling",
     "experience sampling method", "ambulatory assessment", "intensive longitudinal",
@@ -369,8 +368,8 @@ LOCAL_PREFILTER_CONTEXT_TERMS = {
 
 _TOPIC_ALIASES = {
     "心脑轴": ("心脑轴", "心脑耦合", "心脑轴/心脑耦合", "heart-brain"),
-    "生态瞬时干预": (
-        "生态瞬时干预", "ema/esm", "密集纵向", "emi/jitai", "即时自适应",
+    "生态瞬时研究": (
+        "生态瞬时研究", "生态瞬时干预", "ema/esm", "密集纵向", "emi/jitai", "即时自适应",
         "生态瞬时评估", "经验取样", "数字表型",
     ),
     "心理微干预": (
@@ -432,20 +431,13 @@ def _has_any_whole_phrase(text, terms):
 def local_prefilter_decision(title, abstract):
     """在 API 调用前执行“宽召回、可解释”的候选预筛。
 
-    本层只移除明显不属于心理学/神经科学三条主线的记录；最终的直接相关性
-    由 DeepSeek 判定。因此它不把“不是重点推荐”误当作“不能收录”。
+    本层只移除明显不属于心理学/神经科学三条主线的记录；最终的直接相关性和
+    主题标签均由 DeepSeek 判定。因此本函数不返回或决定主题标签。
     """
-    title_text = str(title or "")
-    abstract_text = str(abstract or "")
-    text = " ".join((title_text, abstract_text))
-    # 用户确认：动物词一旦出现在标题或摘要中，即直接排除，不再区分背景提及
-    # 与实际动物对象。
+    text = " ".join((str(title or ""), str(abstract or "")))
     if _has_any_whole_phrase(text, ANIMAL_TITLE_TERMS):
-        return {
-            "accepted": False,
-            "groups": [],
-            "reason": "animal_term_in_title_or_abstract",
-        }
+        return {"accepted": False, "reason": "animal_term_in_title_or_abstract"}
+
     has_psychological_outcome = _has_any(text, PSYCHOLOGICAL_OUTCOME_TERMS)
     has_any_intervention = (
         _has_any(text, MENTAL_MICRO_ANY_INTERVENTION_TERMS)
@@ -454,8 +446,6 @@ def local_prefilter_decision(title, abstract):
     has_ema_or_objective_dynamic_measurement = _has_any_whole_phrase(
         text, OBJECTIVE_DYNAMIC_MEASUREMENT_TERMS
     )
-    # 纯细胞、分子、受体、基因表达或纯神经/生理机制研究，只有在具有人类
-    # 心理结局、实际干预、或 EMA/客观动态测量之一时才保留候选资格。
     if (
         _has_any_whole_phrase(text, PURE_MECHANISTIC_TERMS)
         and not (
@@ -464,14 +454,10 @@ def local_prefilter_decision(title, abstract):
             or has_ema_or_objective_dynamic_measurement
         )
     ):
-        return {
-            "accepted": False,
-            "groups": [],
-            "reason": "pure_mechanistic_without_required_signal",
-        }
+        return {"accepted": False, "reason": "pure_mechanistic_without_required_signal"}
+
     has_psych_neuro_context = _has_any(text, PSYCHOLOGY_NEUROSCIENCE_CONTEXT_TERMS)
-    accepted_groups = []
-    reasons = []
+    accepted_reasons = []
     for group_id, group in TOPIC_GROUPS.items():
         hits = [term for term in group["terms"] if _contains_term(text, term)]
         has_eeg_ecg_pair = (
@@ -485,12 +471,9 @@ def local_prefilter_decision(title, abstract):
         ):
             continue
         if group_id == "heart_brain":
-            # HRV/迷走/自主神经等词非常宽泛，仍需心理或神经科学语境；综述
-            # 不享有例外，和其他文章使用同一判断。
             if not _has_any(text, HEART_BRAIN_PSYCHOLOGICAL_CONTEXT_TERMS):
                 continue
-            accepted_groups.append(group["label"])
-            reasons.append(
+            accepted_reasons.append(
                 "eeg_ecg_psych_context" if has_eeg_ecg_pair else "heart_brain_psych_context"
             )
             continue
@@ -503,49 +486,27 @@ def local_prefilter_decision(title, abstract):
                 _has_any(text, MENTAL_MICRO_DELIVERY_TERMS)
                 and _has_any(text, MENTAL_MICRO_IMPLEMENTATION_TERMS)
             )
-            has_microintervention_anchor = (
-                has_explicit_micro
-                or has_mindbody_micro
-                or has_direct_digital_micro
-                or has_digital_delivery_pair
-            )
-            # 必须同时有心理/情绪/行为/主观体验/心理生理结局与明确微干预锚点。
-            # 泛 therapy/treatment/trial/protocol 不再单独放行普通长程治疗。
-            if not (has_outcome and has_microintervention_anchor):
+            if not (
+                has_outcome
+                and (
+                    has_explicit_micro
+                    or has_mindbody_micro
+                    or has_direct_digital_micro
+                    or has_digital_delivery_pair
+                )
+            ):
                 continue
-            accepted_groups.append(group["label"])
-            reasons.append("mental_microintervention")
+            accepted_reasons.append("mental_microintervention_candidate")
             continue
         if group_id == "emi":
             has_core_method = _has_any(text, EMA_EMI_CORE_METHOD_TERMS)
-            has_intervention = _has_any(text, EMA_EMI_INTERVENTION_TERMS)
-            has_physiology = _has_any_whole_phrase(text, EMA_EMI_PHYSIOLOGICAL_TERMS)
-            # 排除只做自评问卷的 EMA/ESM；需为直接干预，或结合客观生理/传感
-            # 指标。综述不单独放行，和其他文章采用同一方法/语境要求。
-            if not (
-                has_core_method
-                and (has_intervention or has_physiology)
-                and has_psych_neuro_context
-            ):
+            if not (has_core_method and has_psych_neuro_context):
                 continue
-            accepted_groups.append(group["label"])
-            if has_intervention and has_physiology:
-                reasons.append("emi_with_intervention_and_physiology")
-            elif has_intervention:
-                reasons.append("emi_with_intervention")
-            else:
-                reasons.append("ema_with_physiology")
-            continue
-        broad_terms = LOCAL_PREFILTER_BROAD_TERMS.get(group_id, set())
-        only_broad = all(term in broad_terms for term in hits)
-        if only_broad and not _has_any(text, LOCAL_PREFILTER_CONTEXT_TERMS):
-            continue
-        accepted_groups.append(group["label"])
-        reasons.append("broad_term_with_context" if only_broad else "specific_term")
+            accepted_reasons.append("ecological_momentary_candidate")
+
     return {
-        "accepted": bool(accepted_groups),
-        "groups": accepted_groups,
-        "reason": "；".join(reasons) if reasons else "no_qualifying_term",
+        "accepted": bool(accepted_reasons),
+        "reason": "；".join(accepted_reasons) if accepted_reasons else "no_qualifying_term",
     }
 
 
@@ -562,12 +523,3 @@ def normalize_topic_labels(raw_labels):
         if any(alias.casefold() in text for alias in _TOPIC_ALIASES[canonical]):
             labels.append(canonical)
     return labels
-
-
-def topic_label_eligibility(title, abstract):
-    """返回可由本地可解释规则支持的主题标签。
-
-    DeepSeek 负责语义判断，程序只用此函数阻止明显不成立的标签。例如，单纯
-    EEG/HRV/EDA 实验不会因含生理指标而获得“生态瞬时干预”标签。
-    """
-    return local_prefilter_decision(title, abstract)["groups"]
