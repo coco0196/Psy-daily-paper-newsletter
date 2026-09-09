@@ -20,7 +20,7 @@ class AnalyticsTests(unittest.TestCase):
                 first = generator.generate(
                     [
                         _paper(["心脑轴"], "心率变异性；压力"),
-                        _paper(["生态瞬时干预", "心理健康与数字心理干预"], "JITAI；焦虑"),
+                        _paper(["生态瞬时研究", "心理健康与数字心理干预"], "JITAI；焦虑"),
                     ],
                     "2026-08-24_to_2026-08-30",
                     "2026-08-24 至 2026-08-30",
