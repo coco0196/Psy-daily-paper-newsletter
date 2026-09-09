@@ -11,7 +11,7 @@ from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from newsletter import NewsletterGenerator
-from domain_config import CANONICAL_TOPIC_LABELS, normalize_topic_labels, topic_label_eligibility
+from domain_config import CANONICAL_TOPIC_LABELS
 from utils import (
     get_last_week_range,
     get_model_name,
@@ -25,7 +25,7 @@ from utils import (
 logger = setup_logger()
 
 # 改动筛选准则时必须使旧缓存失效；否则同一篇论文会沿用旧提示词下的决定。
-SCREENING_POLICY_VERSION = "2026-09-08-direct-core-relevance-v4"
+SCREENING_POLICY_VERSION = "2026-09-09-deepseek-final-labels-v5"
 
 
 def _translation_marked_relevant(text):
@@ -59,21 +59,21 @@ def _build_prompt(title, summary, journal="", journal_metrics=None):
     return f"""你是一名严谨的心理学学术编辑。请根据标题和摘要，判断论文是否与三条追踪主线具有明确、直接的连接，值得进入每周的前沿核心文献周报。
 
 【三条追踪主线领域】
-1. 心脑轴：心脑交互/耦合、身心交互，以及与心理健康相关的 HRV、迷走神经、自主神经系统和 EEG-ECG 研究。
-2. 生态瞬时干预：EMA/ESM、密集纵向测量、EMI、JITAI、微随机试验、数字表型和实时个体化干预。
-3. 心理微干预：以心理、情绪、行为、主观体验或心理生理指标为结局的简短、身心、自助或数字干预研究。
+1. 心脑轴：研究脑—心/自主神经系统如何相互作用，包括心脑交互或耦合、神经内脏整合，以及与心理健康相关的 HRV、迷走神经、自主神经系统和 EEG-ECG 研究。
+2. 生态瞬时研究：研究心理与行为如何在日常情境中动态变化、测量或适应性响应，包括 EMA/ESM、密集纵向、适应性干预、数字表型、被动感知、动态预测和日常多模态测量。
+3. 心理微干预：研究低负担、短时的心理干预是否、如何产生改变，例如呼吸、正念、放松、生物反馈、自助练习与数字干预。
 
 【共同纳入前提】
 仅收录以人为研究对象、或主要讨论人类研究的综述和方法学研究，且处于心理学、健康心理学或神经科学语境。动物实验、细胞实验、体外实验，以及单纯神经、生物或生理机制分析一律排除。
 
-【高度相关前提】
-只有满足下列任一条件才收录：（1）论文的主要研究问题、核心方法或主要结局直接属于心脑轴、EMA/ESM、EMI/JITAI 或心理微干预3个领域；（2）论文是以这些主题为核心对象的研究综述或方法综述。仅在背景中提及、泛相邻主题、泛方法、泛心理干预、无法确认或不十分相关时，一律排除。
+【直接性阈值】
+只有满足下列任一条件才收录：（1）论文的主要研究问题、核心方法或主要结局直接属于心脑轴、生态瞬时研究或心理微干预；（2）论文是以这些主题为核心对象的人类研究综述或方法综述。仅在背景中提及、仅为次要测量、泛相邻主题、泛方法、泛心理干预、泛数字健康、部分相关、无法确认或不十分相关时，一律排除。
 
 【心脑轴特别规则】
 HRV、迷走神经、自主神经系统或副交感神经相关研究，只有在明确在心理学语境下，涉及心理健康、身心交互、精神障碍、情绪、压力、心理干预、日常生活动态测量、神经科学等心理学相关问题下时才相关。纯心血管疾病、手术、药物、解剖、生理机制、生化机制及无心理行为意义的研究一律排除。
 
-【生态瞬时干预特别规则】
-研究必须直接采用 EMA/ESM、密集纵向测量、EMI、JITAI、微随机试验等方法，或研究数字表型、被动感知、日常动态测量/干预。仅因出现 ECG、PPG、HRV、EEG、可穿戴或 App，不能标注为本主题；它们只有采用上述研究方法时才相关。若这些指标用于心理生理、心脑交互、迷走神经或自主神经研究，应更可能为“心脑轴”领域。
+【生态瞬时研究特别规则】
+直接研究 EMA/ESM、密集纵向测量、EMI、JITAI、微随机试验、数字表型、被动感知、动态预测或日常多模态测量中的至少一种即可相关。EMA/ESM、日记法和密集纵向的心理与行为研究，以及以这些方法为核心的方法综述，即使未实施干预、未使用客观生理或传感器数据，也可以收录。仅因出现 ECG、PPG、HRV、EEG、可穿戴或 App，不能标注为本主题；这些要素必须构成日常动态研究设计、主要测量或适应性响应。若主要问题是心理生理、心脑交互、迷走神经或自主神经关系，应优先判断为“心脑轴”。
 
 【心理微干预特别规则】
 必须同时满足：（1）心理、情绪、行为、主观体验或心理生理指标是主要结局或核心目标；（2）研究实际聚焦明确的微干预、简短干预、自助练习、数字干预或身心干预。特别关注正念、呼吸训练、冥想、放松训练、HRV 生物反馈等身心取向干预。笼统的长程 CBT、ACT 等心理治疗若没有与 EMA/ESM、EMI/JITAI、微干预、数字递送、心脑或心理生理联系，一律排除。
@@ -86,7 +86,7 @@ HRV、迷走神经、自主神经系统或副交感神经相关研究，只有�
 若应排除，仅输出：收录决定：排除
 
 若相关，严格逐行输出。不要使用方括号、中括号、引号、Markdown 列表或 JSON。
-主题标签只能使用以下三个标准名称；多标签以中文分号分隔：心脑轴；生态瞬时干预；心理微干预。
+你无需提供标签判定依据。主题标签只能使用以下三个标准名称；多标签以中文分号分隔：心脑轴；生态瞬时研究；心理微干预。
 
 收录决定：收录
 主题标签：标签1
@@ -175,17 +175,13 @@ def _replace_topic_labels(translation, labels):
     )
 
 
-def _validated_translation_labels(translation, title, summary):
-    """保留模型的语义标签，但移除无本地方法学依据的错误标签。"""
-    model_labels = normalize_topic_labels(_topic_labels_line(translation))
-    eligible = set(topic_label_eligibility(title, summary))
-    labels = [label for label in model_labels if label in eligible]
-    if not labels:
-        # 模型已经作出“收录”决定时，不能仅因输出标签漏写或错写而把直接
-        # 相关论文排除。回退到本地规则支持的标准标签，同时阻止生理指标被
-        # 误贴为 EMA/EMI。
-        labels = [label for label in CANONICAL_TOPIC_LABELS if label in eligible]
-    if not labels:
+def _validated_model_labels(translation):
+    """验证 DeepSeek 的最终标签，不以本地关键词覆写或补充标签。"""
+    raw_labels = _topic_labels_line(translation)
+    labels = [part.strip() for part in re.split(r"[；;]", raw_labels) if part.strip()]
+    if not labels or len(labels) != len(set(labels)):
+        return ""
+    if any(label not in CANONICAL_TOPIC_LABELS for label in labels):
         return ""
     return _replace_topic_labels(translation, labels)
 
@@ -219,7 +215,6 @@ def _result_from_paper(paper, translation):
         "publication_date_source": paper.get("publicationDateSource", ""),
         "issns": paper.get("issns", []),
         "journal_metrics": paper.get("journal_metrics", {}),
-        "local_prefilter_groups": paper.get("local_prefilter_groups", []),
     }
 
 
@@ -286,17 +281,9 @@ def process_papers(start_date=None, end_date=None, weekly_key=None):
                 continue
             if not _response_has_required_fields(translation):
                 raise ValueError("DeepSeek 返回格式不完整")
-            translation = _validated_translation_labels(translation, title, summary)
+            translation = _validated_model_labels(translation)
             if not translation:
-                logger.info("第 %d 篇的主题标签与可解释规则不一致，已排除", index)
-                cache_entries[identity] = {
-                    "content_hash": fingerprint,
-                    "decision": "rejected",
-                    "translation": "收录决定：排除",
-                }
-                with open(cache_file, "w", encoding="utf-8") as handle:
-                    json.dump(cache, handle, ensure_ascii=False, indent=2)
-                continue
+                raise ValueError("DeepSeek 返回的主题标签为空、重复或不属于三个标准标签")
             results.append(_result_from_paper(paper, translation))
             cache_entries[identity] = {
                 "content_hash": fingerprint,
