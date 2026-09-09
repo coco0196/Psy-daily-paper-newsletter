@@ -73,7 +73,7 @@ class CrossrefQueryParamsTests(unittest.TestCase):
             ),
         })
 
-    def test_crossref_limits_each_query_to_thirty_published_records_without_cursor(self):
+    def test_crossref_limits_each_query_to_forty_published_records_without_cursor(self):
         class FakeResponse:
             def raise_for_status(self):
                 return None
@@ -89,7 +89,7 @@ class CrossrefQueryParamsTests(unittest.TestCase):
         self.assertEqual(api_get.call_count, 9)
         for call in api_get.call_args_list:
             params = call.kwargs["params"]
-            self.assertEqual(params["rows"], 30)
+            self.assertEqual(params["rows"], 40)
             self.assertNotIn("cursor", params)
             self.assertIn("from-pub-date:2026-08-24", params["filter"])
             self.assertIn("until-pub-date:2026-08-24", params["filter"])
