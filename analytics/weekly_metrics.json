@@ -3,63 +3,63 @@
   "weeks": {
     "2026-08-24_to_2026-08-30": {
       "date_range": "2026-08-24 至 2026-08-30",
-      "total_papers": 7,
+      "total_papers": 44,
       "track_counts": {
-        "心脑轴": 3,
-        "生态瞬时干预": 0,
-        "心理微干预": 5
+        "心脑轴": 12,
+        "生态瞬时研究": 26,
+        "心理微干预": 20
       },
       "hot_topics": [
         {
           "topic": "生态瞬时评估",
-          "count": 2
-        },
-        {
-          "topic": "脑电图",
-          "count": 1
+          "count": 14
         },
         {
           "topic": "心率变异性",
-          "count": 1
+          "count": 5
         },
         {
-          "topic": "皮层-自主神经交互",
-          "count": 1
+          "topic": "随机对照试验",
+          "count": 4
         },
         {
-          "topic": "精准精神病学",
-          "count": 1
+          "topic": "系统综述",
+          "count": 2
         },
         {
-          "topic": "个体差异",
-          "count": 1
+          "topic": "青少年",
+          "count": 2
         },
         {
-          "topic": "脑-心交互",
-          "count": 1
+          "topic": "自主神经反应",
+          "count": 2
         },
         {
-          "topic": "方向性因果推断",
-          "count": 1
+          "topic": "移动感知",
+          "count": 2
         },
         {
-          "topic": "非周期脑电成分",
-          "count": 1
+          "topic": "抑郁症状",
+          "count": 2
         },
         {
-          "topic": "心率动力学",
-          "count": 1
+          "topic": "可穿戴设备",
+          "count": 2
         },
         {
-          "topic": "格兰杰因果",
-          "count": 1
+          "topic": "即时自适应干预",
+          "count": 2
         },
         {
-          "topic": "电皮活动",
-          "count": 1
+          "topic": "身体活动",
+          "count": 2
+        },
+        {
+          "topic": "经验取样法",
+          "count": 2
         }
       ],
-      "updated_at": "2026-09-08T16:40:14.157004+00:00"
+      "updated_at": "2026-09-09T07:43:58.031588+00:00"
     }
   }
 }
