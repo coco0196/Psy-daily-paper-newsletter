@@ -1,6 +1,6 @@
 import unittest
 
-from domain_config import local_prefilter_decision, topic_label_eligibility
+from domain_config import local_prefilter_decision
 
 
 class LocalKeywordPrefilterTests(unittest.TestCase):
@@ -55,7 +55,7 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             "We examined brain-heart coupling during psychological stress in adult participants.",
         )
         self.assertTrue(result["accepted"])
-        self.assertIn("心脑轴", result["groups"])
+        self.assertIn("eeg_ecg_psych_context", result["reason"])
 
     def test_eeg_or_ecg_alone_is_not_a_heart_brain_signal(self):
         result = local_prefilter_decision(
@@ -89,7 +89,7 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             "Adult participants received a relaxation intervention assessing perceived stress and heart rate variability.",
         )
         self.assertTrue(result["accepted"])
-        self.assertIn("心理微干预", result["groups"])
+        self.assertIn("mental_microintervention_candidate", result["reason"])
 
     def test_somatic_intervention_is_eligible(self):
         result = local_prefilter_decision(
@@ -97,7 +97,7 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             "Patients received a somatic intervention evaluating emotional distress and psychological wellbeing.",
         )
         self.assertTrue(result["accepted"])
-        self.assertIn("心理微干预", result["groups"])
+        self.assertIn("mental_microintervention_candidate", result["reason"])
 
     def test_direct_psychological_intervention_review_does_not_need_a_fixed_outcome_word(self):
         result = local_prefilter_decision(
@@ -105,7 +105,7 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             "This review synthesizes human psychological research on self-guided intervention methods.",
         )
         self.assertTrue(result["accepted"])
-        self.assertIn("心理微干预", result["groups"])
+        self.assertIn("mental_microintervention_candidate", result["reason"])
 
     def test_review_without_an_actual_intervention_is_not_automatically_accepted(self):
         result = local_prefilter_decision(
@@ -114,14 +114,15 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
         )
         self.assertFalse(result["accepted"])
 
-    def test_physiology_alone_does_not_create_emi_label(self):
-        labels = topic_label_eligibility(
+    def test_local_prefilter_does_not_assign_topic_labels(self):
+        result = local_prefilter_decision(
             "Concurrent EEG and ECG during emotion regulation",
             "Adult participants underwent brain-heart coupling measurement during psychological stress.",
         )
-        self.assertEqual(labels, ["心脑轴"])
+        self.assertTrue(result["accepted"])
+        self.assertNotIn("groups", result)
 
-    def test_questionnaire_only_ema_is_rejected_but_physiology_or_emi_is_accepted(self):
+    def test_questionnaire_only_ema_is_accepted_for_deepseek_screening(self):
         questionnaire_only = local_prefilter_decision(
             "Ecological momentary assessment of mood",
             "Participants completed repeated self-report questionnaires.",
@@ -138,7 +139,7 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             "Digital phenotyping in intensive longitudinal mental health research",
             "Participants provided passive sensing data on daily-life behavioral signals.",
         )
-        self.assertFalse(questionnaire_only["accepted"])
+        self.assertTrue(questionnaire_only["accepted"])
         self.assertTrue(physiology_ema["accepted"])
         self.assertTrue(emi["accepted"])
         self.assertTrue(digital_phenotyping["accepted"])
@@ -152,8 +153,8 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             "A systematic review of ecological momentary assessment in depression",
             "We review intensive longitudinal psychological assessment methods.",
         )
-        self.assertIn("心脑轴", heart_review["groups"])
-        self.assertFalse(ema_review["accepted"])
+        self.assertTrue(heart_review["accepted"])
+        self.assertTrue(ema_review["accepted"])
 
     def test_review_with_ema_and_objective_measurement_can_pass_normally(self):
         result = local_prefilter_decision(
@@ -161,7 +162,7 @@ class LocalKeywordPrefilterTests(unittest.TestCase):
             "This review synthesizes human intensive longitudinal passive sensing and wearable studies of mood.",
         )
         self.assertTrue(result["accepted"])
-        self.assertIn("生态瞬时干预", result["groups"])
+        self.assertIn("ecological_momentary_candidate", result["reason"])
 
     def test_animal_term_in_human_background_is_directly_rejected(self):
         result = local_prefilter_decision(
