@@ -445,10 +445,10 @@ def _crossref_published_date(item, fallback):
     return fallback
 
 
-def _fetch_crossref(session, date_str, max_results_per_query=30, return_stats=False):
+def _fetch_crossref(session, date_str, max_results_per_query=40, return_stats=False):
     """
     从 Crossref REST API 拉取指定发表日、含摘要的文献，映射为与 PubMed 一致的结构，并标记 source=Crossref。
-    每个主题短查询仅取相关性排序靠前的 30 条，不使用 cursor 翻页。
+    每个主题短查询仅取相关性排序靠前的 40 条，不使用 cursor 翻页。
     日期过滤使用 pub-date，避免按 Crossref 入库/索引日期检索。
     失败时记录 warning 并返回空列表，不向上抛出以免中断主流程。
     """
@@ -465,7 +465,7 @@ def _fetch_crossref(session, date_str, max_results_per_query=30, return_stats=Fa
             for track, queries in CROSSREF_TRACK_QUERIES.items()
             for query_text in (queries if isinstance(queries, (tuple, list)) else (queries,))
         ]
-        max_results_per_query = max(1, min(int(max_results_per_query), 30))
+        max_results_per_query = max(1, min(int(max_results_per_query), 40))
         crossref_delay = float(os.getenv("CROSSREF_INTER_REQUEST_DELAY_SEC", "1.0"))
         for index, (track, query_text) in enumerate(track_queries):
             params = {
@@ -612,14 +612,13 @@ def _apply_local_keyword_prefilter(papers, return_stats=False):
         logger.info("本地关键词预筛已通过 LOCAL_KEYWORD_PREFILTER_ENABLED 关闭")
         stats = {
             "input": len(papers), "accepted": len(papers), "rejected": 0,
-            "reasons": {}, "topic_assignments": {}, "enabled": False,
+            "reasons": {}, "enabled": False,
         }
         return (papers, stats) if return_stats else papers
 
     accepted = []
     rejected = 0
     reasons = {}
-    topic_assignments = Counter()
     for item in papers:
         paper = item.get("paper", {})
         decision = local_prefilter_decision(
@@ -627,11 +626,9 @@ def _apply_local_keyword_prefilter(papers, return_stats=False):
             paper.get("summary", ""),
         )
         if decision["accepted"]:
-            # 保留可追溯信息；后续 DeepSeek 仍独立做语义相关性判断。
-            paper["local_prefilter_groups"] = decision["groups"]
+            # 仅保留预筛原因；主题标签完全由 DeepSeek 定义。
             paper["local_prefilter_reason"] = decision["reason"]
             accepted.append(item)
-            topic_assignments.update(decision["groups"])
         else:
             rejected += 1
             reason = decision["reason"]
@@ -646,7 +643,7 @@ def _apply_local_keyword_prefilter(papers, return_stats=False):
     )
     stats = {
         "input": len(papers), "accepted": len(accepted), "rejected": rejected,
-        "reasons": reasons, "topic_assignments": dict(topic_assignments), "enabled": True,
+        "reasons": reasons, "enabled": True,
     }
     return (accepted, stats) if return_stats else accepted
 
@@ -724,7 +721,7 @@ def download_papers_for_date(date_str, retmax=10000, return_stats=False):
         },
     }
     inter_delay = float(os.getenv("NCBI_INTER_REQUEST_DELAY_SEC", "0.35"))
-    crossref_max_results_per_query = int(os.getenv("CROSSREF_PAGE_SIZE", "30"))
+    crossref_max_results_per_query = int(os.getenv("CROSSREF_PAGE_SIZE", "40"))
     session = _make_api_session()
     try:
         try:
