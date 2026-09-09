@@ -17,7 +17,7 @@ class NewsletterFormattingTests(unittest.TestCase):
     def test_legacy_ema_and_emi_labels_merge(self):
         self.assertEqual(
             normalize_topic_labels("EMA/ESM 与密集纵向测量；EMI/JITAI 与微干预"),
-            ["生态瞬时干预"],
+            ["生态瞬时研究"],
         )
 
     def test_markdown_uses_three_sections_and_clean_labels(self):
@@ -40,7 +40,7 @@ class NewsletterFormattingTests(unittest.TestCase):
         )
         rendered = generator.render_markdown([paper], "2026-09-01 至 2026-09-07")
         self.assertIn("## 心脑轴", rendered)
-        self.assertIn("## 生态瞬时干预", rendered)
+        self.assertIn("## 生态瞬时研究", rendered)
         self.assertIn("## 心理微干预", rendered)
         self.assertIn("主题标签：心理微干预", rendered)
         self.assertNotIn('["心理健康与数字心理干预"]', rendered)
@@ -50,7 +50,7 @@ class NewsletterFormattingTests(unittest.TestCase):
     def test_multiple_labels_do_not_automatically_become_featured(self):
         paper = {
             "priority": "常规收录",
-            "topic_labels": ["心脑轴", "生态瞬时干预"],
+            "topic_labels": ["心脑轴", "生态瞬时研究"],
         }
         self.assertFalse(NewsletterGenerator.is_featured(paper))
 
@@ -58,7 +58,7 @@ class NewsletterFormattingTests(unittest.TestCase):
         payload = [{
             "title": "A just-in-time intervention for anxiety",
             "translation": """收录决定：核心收录
-主题标签：生态瞬时干预；心理健康与数字心理干预
+主题标签：生态瞬时研究；心理健康与数字心理干预
 优先级：重点推荐
 标题：焦虑的即时干预
 摘要：一项数字心理干预研究。
@@ -96,7 +96,7 @@ class NewsletterFormattingTests(unittest.TestCase):
                 self.assertIn("期刊：Journal of Medical Internet Research，JCR Q1，IF 6.0", rendered)
                 self.assertNotIn("优先级：", rendered)
                 self.assertNotIn("收录决定：", rendered)
-                self.assertIn("主题标签：生态瞬时干预；心理微干预", rendered)
+                self.assertIn("主题标签：生态瞬时研究；心理微干预", rendered)
                 self.assertIn("## 数据分析", rendered)
                 self.assertIn("关键词云图", rendered)
                 self.assertTrue(
